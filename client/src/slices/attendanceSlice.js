@@ -262,15 +262,6 @@ const attendanceSlice = createSlice({
       })
       .addCase(updateAttendance.fulfilled, (state, action) => {
         state.loading = false;
-        // The explicit dispatch(fetchAttendanceRecords) added above will now handle updating state.records.
-        // You can remove the manual findIndex/update logic here if you rely on the refetch.
-        /*
-        const updatedRecord = action.payload;
-        const index = state.records.findIndex((record) => record.id === updatedRecord.id);
-        if (index !== -1) {
-            state.records[index] = updatedRecord;
-        }
-        */
       })
       .addCase(updateAttendance.rejected, (state, action) => {
         state.loading = false;
