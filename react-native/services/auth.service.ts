@@ -1,5 +1,5 @@
-import api from './api';
-import { storage } from '../utils/storage';
+import api from '@/services/api';
+import { storage } from '@/utils/storage';
 
 export interface LoginCredentials {
   email: string;

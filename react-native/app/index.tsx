@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
-import { storage } from '../utils/storage';
-import { COLORS } from '../constants/theme';
+import { storage } from '@/utils/storage';
+import { COLORS } from '@/constants/theme';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);

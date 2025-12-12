@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import LottieView from 'lottie-react-native';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, SIZES } from '@/constants/theme';
 
 interface OnboardingItemProps {
   item: {

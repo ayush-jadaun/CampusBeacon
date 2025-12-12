@@ -1,6 +1,6 @@
 import * as AuthSession from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-import authService from './auth.service';
+import authService from '@/services/auth.service';
 
 // This is required for the OAuth redirect to work properly
 WebBrowser.maybeCompleteAuthSession();

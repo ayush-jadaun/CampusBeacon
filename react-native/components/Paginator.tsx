@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, SIZES } from '@/constants/theme';
 
 interface PaginatorProps {
   data: any[];

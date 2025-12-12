@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { storage } from '../utils/storage';
+import { storage } from '@/utils/storage';
 
 // Get API URL from environment or use default
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000/api/v1';

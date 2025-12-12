@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
-import { COLORS, SIZES } from '../constants/theme';
+import { COLORS, SIZES } from '@/constants/theme';
 
 interface CustomEmailInputProps {
   value: string;
