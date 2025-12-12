@@ -1,5 +1,6 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { storage } from '../utils/storage';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { login as loginAction, signup as signupAction, logout as logoutAction, verifyToken, updateUser as updateUserAction } from '@/store/slices/authSlice';
 
 interface User {
   id: string;
@@ -7,15 +8,19 @@ interface User {
   firstName: string;
   lastName: string;
   registrationNumber: string;
-  graduationYear: number;
+  graduationYear?: number;
+  branch?: string;
+  year?: number;
   profilePicture?: string;
-  isVerified: boolean;
+  isVerified?: boolean;
+  phone?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
   googleSignIn: (idToken: string) => Promise<void>;
@@ -28,96 +33,57 @@ interface SignupData {
   password: string;
   firstName: string;
   lastName: string;
+  registrationNumber: string;
+  branch: string;
+  year: number;
+  phone?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { user, isLoading, isAuthenticated, token, error } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    checkAuthStatus();
+    // Verify token on app start
+    if (token) {
+      dispatch(verifyToken());
+    }
   }, []);
 
-  const checkAuthStatus = async () => {
-    try {
-      const token = await storage.getAuthToken();
-      const userData = await storage.getUserData();
-
-      if (token && userData) {
-        setUser(userData as User);
-      }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const login = async (email: string, password: string) => {
-    // This will be implemented with API call
-    setIsLoading(true);
-    try {
-      // API call will be made here
-      // For now, this is a placeholder
-      throw new Error('Not implemented');
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
+    const result = await dispatch(loginAction({ email, password }));
+    if (loginAction.rejected.match(result)) {
+      throw new Error(result.payload as string || 'Login failed');
     }
   };
 
   const signup = async (data: SignupData) => {
-    // This will be implemented with API call
-    setIsLoading(true);
-    try {
-      // API call will be made here
-      throw new Error('Not implemented');
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
+    const result = await dispatch(signupAction(data));
+    if (signupAction.rejected.match(result)) {
+      throw new Error(result.payload as string || 'Signup failed');
     }
   };
 
   const googleSignIn = async (idToken: string) => {
     // This will be implemented with API call
-    setIsLoading(true);
-    try {
-      // API call will be made here
-      throw new Error('Not implemented');
-    } catch (error) {
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
+    throw new Error('Google Sign-In not implemented yet');
   };
 
   const logout = async () => {
-    try {
-      await storage.removeAuthToken();
-      await storage.removeUserData();
-      setUser(null);
-    } catch (error) {
-      console.error('Error logging out:', error);
-      throw error;
-    }
+    await dispatch(logoutAction());
   };
 
   const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-      storage.setUserData(updatedUser);
-    }
+    dispatch(updateUserAction(userData));
   };
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user,
+    isAuthenticated,
     isLoading,
+    error,
     login,
     signup,
     googleSignIn,

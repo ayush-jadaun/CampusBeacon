@@ -58,8 +58,26 @@ export default function HomeScreen() {
   };
 
   const handleServicePress = (route: string) => {
-    // For now, show alert. Later navigate to the route
-    alert(`${route} - Coming Soon!`);
+    // Map routes to actual screen paths
+    const routeMap: Record<string, string> = {
+      '/lost-found': '/(screens)/lost-found',
+      '/marketplace': '/(screens)/marketplace',
+      '/attendance': '/(screens)/attendance',
+      '/mess-menu': '/(screens)/mess-menu',
+      '/resources': '/(screens)/resources',
+      '/ride-share': '/(screens)/ride-share',
+      '/events': '/(screens)/events',
+      '/clubs': '/(screens)/clubs',
+      '/eateries': '/(screens)/eateries',
+      '/hostel': '/(screens)/hostel',
+    };
+
+    const screenPath = routeMap[route];
+    if (screenPath) {
+      router.push(screenPath as any);
+    } else {
+      alert(`${route} - Coming Soon!`);
+    }
   };
 
   return (
