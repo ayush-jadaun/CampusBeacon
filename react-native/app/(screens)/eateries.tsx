@@ -20,12 +20,13 @@ import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchEateries, submitRating } from '@/store/slices/eateriesSlice';
+import { Eatery } from '@/services/eateries.service';
 
 export default function EateriesScreen() {
   const dispatch = useAppDispatch();
   const { eateries, isLoading, error } = useAppSelector((state) => state.eateries);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [expandedEatery, setExpandedEatery] = useState<string | null>(null);
+  const [expandedEatery, setExpandedEatery] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchEateries());
@@ -79,7 +80,7 @@ export default function EateriesScreen() {
                 onToggle={() =>
                   setExpandedEatery(expandedEatery === eatery.id ? null : eatery.id)
                 }
-                onRate={(rating) => dispatch(submitRating({ eateryId: eatery.id, rating }))}
+                onRate={(rating: number) => dispatch(submitRating({ eateryId: eatery.id, rating }))}
               />
             ))}
           </View>
@@ -89,10 +90,20 @@ export default function EateriesScreen() {
   );
 }
 
-function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
+function EateryCard({
+  eatery,
+  isExpanded,
+  onToggle,
+  onRate,
+}: {
+  eatery: Eatery;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onRate: (rating: number) => void;
+}) {
   const callEatery = () => {
-    if (eatery.phone) {
-      Linking.openURL(`tel:${eatery.phone}`).catch(() => alert('Failed to make call'));
+    if (eatery.phoneNumber) {
+      Linking.openURL(`tel:${eatery.phoneNumber}`).catch(() => alert('Failed to make call'));
     }
   };
 
@@ -116,8 +127,8 @@ function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
       <TouchableOpacity activeOpacity={0.9} onPress={onToggle}>
         {/* Header */}
         <View style={styles.eateryHeader}>
-          {eatery.image ? (
-            <Image source={{ uri: eatery.image }} style={styles.eateryImage} />
+          {eatery.menuImageUrl ? (
+            <Image source={{ uri: eatery.menuImageUrl }} style={styles.eateryImage} />
           ) : (
             <LinearGradient
               colors={['#f093fb', '#f5576c']}
@@ -131,12 +142,12 @@ function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
 
           <View style={styles.eateryInfo}>
             <Text style={styles.eateryName}>{eatery.name}</Text>
-            <Text style={styles.eateryType}>{eatery.type}</Text>
+            <Text style={styles.eateryType}>{eatery.location}</Text>
 
             <View style={styles.ratingContainer}>
-              {renderStars(Math.round(eatery.rating))}
+              {renderStars(Math.round(eatery.rating ?? 0))}
               <Text style={styles.ratingText}>
-                {eatery.rating.toFixed(1)} ({eatery.reviewCount} reviews)
+                {(eatery.rating ?? 0).toFixed(1)} ({eatery.totalRatings} reviews)
               </Text>
             </View>
           </View>
@@ -157,7 +168,7 @@ function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
           <View style={styles.detail}>
             <Ionicons name="time" size={16} color={COLORS.textSecondary} />
             <Text style={styles.detailText}>
-              {eatery.openingHours.open} - {eatery.openingHours.close}
+              {eatery.openingTime ?? 'N/A'} - {eatery.closingTime ?? 'N/A'}
             </Text>
           </View>
         </View>
@@ -167,27 +178,6 @@ function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
       {isExpanded && (
         <View style={styles.expandedContent}>
           <Text style={styles.description}>{eatery.description}</Text>
-
-          {/* Menu */}
-          {eatery.menu && eatery.menu.length > 0 && (
-            <View style={styles.menuSection}>
-              <Text style={styles.sectionTitle}>Popular Items</Text>
-              {eatery.menu.slice(0, 5).map((item: any) => (
-                <View key={item.id} style={styles.menuItem}>
-                  <View style={styles.menuItemLeft}>
-                    <View
-                      style={[
-                        styles.categoryDot,
-                        { backgroundColor: getCategoryColor(item.category) },
-                      ]}
-                    />
-                    <Text style={styles.menuItemName}>{item.name}</Text>
-                  </View>
-                  <Text style={styles.menuItemPrice}>₹{item.price}</Text>
-                </View>
-              ))}
-            </View>
-          )}
 
           {/* Actions */}
           <View style={styles.actions}>
@@ -207,17 +197,6 @@ function EateryCard({ eatery, isExpanded, onToggle, onRate }: any) {
       )}
     </View>
   );
-}
-
-function getCategoryColor(category: string): string {
-  const colors: { [key: string]: string } = {
-    Snacks: '#F59E0B',
-    'Main Course': '#EF4444',
-    Beverages: '#3B82F6',
-    Desserts: '#EC4899',
-    default: '#6B7280',
-  };
-  return colors[category] || colors.default;
 }
 
 const styles = StyleSheet.create({

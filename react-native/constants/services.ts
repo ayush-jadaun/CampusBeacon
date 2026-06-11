@@ -3,8 +3,9 @@ import { Ionicons } from '@expo/vector-icons';
 export interface Service {
   id: string;
   title: string;
+  description?: string;
   icon: keyof typeof Ionicons.glyphMap;
-  gradientColors: string[];
+  gradientColors: readonly [string, string];
   route: string;
   badge?: number;
 }

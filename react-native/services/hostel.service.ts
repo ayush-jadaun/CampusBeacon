@@ -1,46 +1,62 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
-export interface HostelMenu {
-  id: string;
-  hostelId: string;
-  day: string;
-  mealType: 'breakfast' | 'lunch' | 'dinner';
-  items: string[];
+export type MenuDay =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+
+export interface Hostel {
+  hostel_id: number;
+  hostel_name: string;
   createdAt: string;
+  updatedAt: string;
 }
 
-export interface HostelComplaint {
-  id: string;
-  userId: string;
-  hostelId: string;
-  title: string;
-  description: string;
-  category: string;
-  status: 'pending' | 'in-progress' | 'resolved';
+export interface HostelMenu {
+  menu_id: number;
+  hostel_id: number;
+  day: MenuDay;
+  breakfast: string | null;
+  lunch: string | null;
+  snacks: string | null;
+  dinner: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface HostelOfficial {
-  id: string;
-  hostelId: string;
+  official_id: number;
+  hostel_id: number;
   name: string;
-  position: string;
-  phone: string;
   email: string;
+  phone: number | string;
+  designation: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Hostel {
-  id: string;
-  name: string;
-  type: 'boys' | 'girls';
-  warden: string;
-  wardenContact: string;
+export interface HostelComplaint {
+  complaint_id: number;
+  hostel_id: number;
+  student_name: string;
+  student_email: string;
+  official_id: number | null;
+  official_name: string;
+  official_email: string;
+  complaint_type: string;
+  complaint_description: string;
+  due_date: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const hostelService = {
   // Get all hostels
-  async getAll(): Promise<{ success: boolean; data: Hostel[] }> {
+  async getAll(): Promise<ApiResponse<Hostel[]>> {
     try {
       const response = await api.get('/hostels');
       return response.data;
@@ -50,7 +66,7 @@ const hostelService = {
   },
 
   // Get hostel details
-  async getById(id: string): Promise<{ success: boolean; data: Hostel }> {
+  async getById(id: number): Promise<ApiResponse<Hostel>> {
     try {
       const response = await api.get(`/hostels/${id}`);
       return response.data;
@@ -60,7 +76,7 @@ const hostelService = {
   },
 
   // Get mess menu
-  async getMenu(hostelId: string): Promise<{ success: boolean; data: HostelMenu[] }> {
+  async getMenu(hostelId: number): Promise<ApiResponse<HostelMenu[]>> {
     try {
       const response = await api.get(`/hostels/menus/hostel/${hostelId}`);
       return response.data;
@@ -70,7 +86,7 @@ const hostelService = {
   },
 
   // Get hostel officials
-  async getOfficials(hostelId: string): Promise<{ success: boolean; data: HostelOfficial[] }> {
+  async getOfficials(hostelId: number): Promise<ApiResponse<HostelOfficial[]>> {
     try {
       const response = await api.get(`/hostels/officials/hostel/${hostelId}`);
       return response.data;
@@ -80,7 +96,7 @@ const hostelService = {
   },
 
   // Get complaints
-  async getComplaints(hostelId: string): Promise<{ success: boolean; data: HostelComplaint[] }> {
+  async getComplaints(hostelId: number): Promise<ApiResponse<HostelComplaint[]>> {
     try {
       const response = await api.get(`/hostels/complaints/hostel/${hostelId}`);
       return response.data;
@@ -91,11 +107,14 @@ const hostelService = {
 
   // Submit complaint
   async submitComplaint(data: {
-    hostelId: string;
-    title: string;
-    description: string;
-    category: string;
-  }): Promise<{ success: boolean; data: HostelComplaint }> {
+    hostel_id: number;
+    student_name: string;
+    student_email: string;
+    official_id: number;
+    complaint_type: string;
+    complaint_description: string;
+    due_date: string;
+  }): Promise<ApiResponse<HostelComplaint>> {
     try {
       const response = await api.post('/hostels/complaints', data);
       return response.data;

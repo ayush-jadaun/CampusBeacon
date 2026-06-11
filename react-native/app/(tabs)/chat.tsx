@@ -81,7 +81,7 @@ export default function ChatScreen() {
       await dispatch(sendMessage({
         channelId: activeChannelId,
         content,
-        userId: user.id,
+        userId: Number(user.id),
       })).unwrap();
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -225,7 +225,7 @@ export default function ChatScreen() {
               </View>
             ) : (
               activeMessages.map((message, index) => {
-                const isMyMessage = message.userId === user?.id;
+                const isMyMessage = user != null && message.userId === Number(user.id);
                 return (
                   <View
                     key={message.id}

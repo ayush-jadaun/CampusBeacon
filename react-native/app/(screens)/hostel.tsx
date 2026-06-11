@@ -64,7 +64,7 @@ export default function HostelScreen() {
     return <ErrorState message={error} onRetry={() => dispatch(fetchHostels())} />;
   }
 
-  const currentHostel = hostels.find((h) => h.id === selectedHostel) || hostels[0];
+  const currentHostel = hostels.find((h) => h.hostel_id === selectedHostel) || hostels[0];
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -85,21 +85,21 @@ export default function HostelScreen() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hostelScroll}>
         {hostels.map((hostel) => (
           <TouchableOpacity
-            key={hostel.id}
+            key={hostel.hostel_id}
             style={[
               styles.hostelChip,
-              currentHostel?.id === hostel.id && styles.hostelChipActive,
+              currentHostel?.hostel_id === hostel.hostel_id && styles.hostelChipActive,
             ]}
-            onPress={() => dispatch(setSelectedHostel(hostel.id))}
+            onPress={() => dispatch(setSelectedHostel(hostel.hostel_id))}
             activeOpacity={0.7}
           >
             <Text
               style={[
                 styles.hostelChipText,
-                currentHostel?.id === hostel.id && styles.hostelChipTextActive,
+                currentHostel?.hostel_id === hostel.hostel_id && styles.hostelChipTextActive,
               ]}
             >
-              {hostel.name}
+              {hostel.hostel_name}
             </Text>
           </TouchableOpacity>
         ))}

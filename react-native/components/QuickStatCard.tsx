@@ -8,7 +8,7 @@ interface QuickStatCardProps {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   value: string;
-  gradientColors: string[];
+  gradientColors: readonly [string, string];
   subtext?: string;
 }
 

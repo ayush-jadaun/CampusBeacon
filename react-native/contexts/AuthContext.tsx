@@ -1,20 +1,7 @@
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { login as loginAction, signup as signupAction, logout as logoutAction, verifyToken, updateUser as updateUserAction } from '@/store/slices/authSlice';
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  registrationNumber: string;
-  graduationYear?: number;
-  branch?: string;
-  year?: number;
-  profilePicture?: string;
-  isVerified?: boolean;
-  phone?: string;
-}
+import { User, SignupData } from '@/services/auth.service';
 
 interface AuthContextType {
   user: User | null;
@@ -26,17 +13,6 @@ interface AuthContextType {
   googleSignIn: (idToken: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
-}
-
-interface SignupData {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  registrationNumber: string;
-  branch: string;
-  year: number;
-  phone?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

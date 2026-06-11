@@ -1,17 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import authService from '@/services/auth.service';
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  registrationNumber: string;
-  branch: string;
-  year: number;
-  profilePicture?: string;
-  phone?: string;
-}
+import authService, { User } from '@/services/auth.service';
 
 interface AuthState {
   user: User | null;
@@ -68,7 +56,7 @@ export const verifyToken = createAsyncThunk(
   'auth/verifyToken',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await authService.verifyToken();
+      const response = await authService.getCurrentUser();
       if (response.success) {
         return response.data;
       }
@@ -103,7 +91,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.token = action.payload.token ?? null;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
@@ -118,11 +106,8 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(signup.fulfilled, (state, action) => {
+      .addCase(signup.fulfilled, (state) => {
         state.isLoading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
         state.error = null;
       })
       .addCase(signup.rejected, (state, action) => {
@@ -148,7 +133,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token;
+        state.token = action.payload.token ?? null;
       })
       .addCase(verifyToken.rejected, (state) => {
         state.isLoading = false;

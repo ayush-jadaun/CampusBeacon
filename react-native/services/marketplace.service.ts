@@ -1,53 +1,40 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
+
+export type ItemCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
 
 export interface MarketplaceItem {
-  id: string;
-  userId: string;
-  title: string;
-  description: string;
+  id: number;
+  item_name: string;
+  description: string | null;
+  date_bought: string | null;
+  owner_contact: string | null;
   price: number;
-  category: string;
-  condition: 'new' | 'like-new' | 'good' | 'fair' | 'poor';
-  images: string[];
-  contactInfo: string;
-  isSold: boolean;
+  image_url: string | null;
+  userId: number;
+  item_condition: ItemCondition;
   createdAt: string;
   updatedAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
+  users?: {
+    id: number;
+    name: string;
     email: string;
   };
 }
 
 export interface CreateMarketplaceData {
-  title: string;
-  description: string;
+  item_name: string;
+  description?: string;
+  date_bought?: string;
+  owner_contact?: string;
+  item_condition: ItemCondition;
   price: number;
-  category: string;
-  condition: 'new' | 'like-new' | 'good' | 'fair' | 'poor';
-  images?: string[];
-  contactInfo: string;
 }
 
 const marketplaceService = {
   // Get all items
-  async getAll(filters?: {
-    category?: string;
-    condition?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    search?: string;
-  }): Promise<{ success: boolean; data: MarketplaceItem[] }> {
+  async getAll(): Promise<ApiResponse<MarketplaceItem[]>> {
     try {
-      const params = new URLSearchParams();
-      if (filters?.category) params.append('category', filters.category);
-      if (filters?.condition) params.append('condition', filters.condition);
-      if (filters?.minPrice) params.append('minPrice', filters.minPrice.toString());
-      if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
-      if (filters?.search) params.append('search', filters.search);
-
-      const response = await api.get(`/buy-and-sell/items?${params.toString()}`);
+      const response = await api.get('/buy-and-sell/items');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');
@@ -55,7 +42,7 @@ const marketplaceService = {
   },
 
   // Get my items (current user)
-  async getMyItems(): Promise<{ success: boolean; data: MarketplaceItem[] }> {
+  async getMyItems(): Promise<ApiResponse<MarketplaceItem[]>> {
     try {
       const response = await api.get('/buy-and-sell/user/items');
       return response.data;
@@ -65,7 +52,7 @@ const marketplaceService = {
   },
 
   // Get item by ID
-  async getById(id: string): Promise<{ success: boolean; data: MarketplaceItem }> {
+  async getById(id: number): Promise<ApiResponse<MarketplaceItem>> {
     try {
       const response = await api.get(`/buy-and-sell/items/${id}`);
       return response.data;
@@ -75,7 +62,7 @@ const marketplaceService = {
   },
 
   // Create new item
-  async create(data: CreateMarketplaceData): Promise<{ success: boolean; data: MarketplaceItem }> {
+  async create(data: CreateMarketplaceData): Promise<ApiResponse<MarketplaceItem>> {
     try {
       const response = await api.post('/buy-and-sell/items', data);
       return response.data;
@@ -85,7 +72,7 @@ const marketplaceService = {
   },
 
   // Update item
-  async update(id: string, data: Partial<CreateMarketplaceData>): Promise<{ success: boolean; data: MarketplaceItem }> {
+  async update(id: number, data: Partial<CreateMarketplaceData>): Promise<ApiResponse<MarketplaceItem>> {
     try {
       const response = await api.put(`/buy-and-sell/items/${id}`, data);
       return response.data;
@@ -95,22 +82,12 @@ const marketplaceService = {
   },
 
   // Delete item
-  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  async delete(id: number): Promise<ApiResponse<null>> {
     try {
       const response = await api.delete(`/buy-and-sell/items/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete item');
-    }
-  },
-
-  // Mark as sold
-  async markAsSold(id: string): Promise<{ success: boolean; data: MarketplaceItem }> {
-    try {
-      const response = await api.put(`/buy-and-sell/items/${id}`, { isSold: true });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to mark as sold');
     }
   },
 };

@@ -23,13 +23,11 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import {
   fetchLostFoundItems,
   setSearchQuery as setSearchQueryAction,
-  setStatusFilter,
-  clearFilters,
 } from '@/store/slices/lostFoundSlice';
 
 export default function LostAndFoundScreen() {
   const dispatch = useAppDispatch();
-  const { filteredItems, isLoading, error, searchQuery, statusFilter } = useAppSelector(
+  const { filteredItems, isLoading, error, searchQuery } = useAppSelector(
     (state) => state.lostFound
   );
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -46,7 +44,7 @@ export default function LostAndFoundScreen() {
 
   const handleItemPress = (item: LostAndFoundItem) => {
     // Navigate to detail screen
-    alert(`Item details: ${item.itemName}`);
+    alert(`Item details: ${item.item_name}`);
   };
 
   if (isLoading) {
@@ -88,33 +86,6 @@ export default function LostAndFoundScreen() {
           )}
         </View>
 
-        {/* Filters */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.filtersContainer}
-        >
-          {(['all', 'lost', 'found'] as const).map(filter => (
-            <TouchableOpacity
-              key={filter}
-              style={[
-                styles.filterChip,
-                statusFilter === filter && styles.filterChipActive,
-              ]}
-              onPress={() => dispatch(setStatusFilter(filter))}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.filterChipText,
-                  statusFilter === filter && styles.filterChipTextActive,
-                ]}
-              >
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
       </View>
 
       {/* Items List */}
@@ -167,30 +138,29 @@ export default function LostAndFoundScreen() {
 
 // Item Card Component
 function ItemCard({ item, onPress }: { item: LostAndFoundItem; onPress: () => void }) {
-  const isLost = item.status === 'lost';
-  const statusColor = isLost ? '#f5576c' : '#43e97b';
-  const statusBg = isLost ? '#f5576c20' : '#43e97b20';
+  const statusColor = '#43e97b';
+  const statusBg = '#43e97b20';
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       {/* Image */}
-      {item.images && item.images.length > 0 ? (
-        <Image source={{ uri: item.images[0] }} style={styles.cardImage} />
+      {item.image_url ? (
+        <Image source={{ uri: item.image_url }} style={styles.cardImage} />
       ) : (
         <View style={[styles.cardImagePlaceholder, { backgroundColor: statusBg }]}>
-          <Ionicons name={isLost ? 'sad-outline' : 'happy-outline'} size={40} color={statusColor} />
+          <Ionicons name="happy-outline" size={40} color={statusColor} />
         </View>
       )}
 
       {/* Status Badge */}
       <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-        <Text style={styles.statusBadgeText}>{isLost ? 'Lost' : 'Found'}</Text>
+        <Text style={styles.statusBadgeText}>Found</Text>
       </View>
 
       {/* Content */}
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle} numberOfLines={1}>
-          {item.itemName}
+          {item.item_name}
         </Text>
         <Text style={styles.cardDescription} numberOfLines={2}>
           {item.description}
@@ -200,7 +170,7 @@ function ItemCard({ item, onPress }: { item: LostAndFoundItem; onPress: () => vo
           <View style={styles.cardLocation}>
             <Ionicons name="location-outline" size={14} color={COLORS.textLight} />
             <Text style={styles.cardLocationText} numberOfLines={1}>
-              {item.location}
+              {item.location_found}
             </Text>
           </View>
           <Text style={styles.cardDate}>

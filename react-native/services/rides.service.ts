@@ -1,64 +1,51 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
-export interface Ride {
-  id: string;
-  userId: string;
-  from: string;
-  to: string;
-  date: string;
-  time: string;
-  availableSeats: number;
-  pricePerSeat: number;
-  vehicleType: string;
-  description: string;
-  status: 'active' | 'completed' | 'cancelled';
-  participants: RideParticipant[];
-  createdAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  };
+export interface RideUser {
+  id: number;
+  name: string;
+  email: string;
 }
 
 export interface RideParticipant {
-  id: string;
-  rideId: string;
-  userId: string;
-  seatsBooked: number;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  user?: {
-    firstName: string;
-    lastName: string;
-  };
+  id: number;
+  rideId: number;
+  userId: number;
+  participant?: RideUser;
+}
+
+export interface Ride {
+  id: number;
+  creatorId: number;
+  pickupLocation: string;
+  dropLocation: string;
+  departureDateTime: string;
+  totalSeats: number;
+  availableSeats: number;
+  estimatedCost: number | null;
+  status: 'OPEN' | 'FULL' | 'CANCELLED' | 'COMPLETED';
+  description: string | null;
+  phoneNumber: string | null;
+  createdAt: string;
+  updatedAt: string;
+  creator?: RideUser;
+  participants?: RideParticipant[];
 }
 
 export interface CreateRideData {
-  from: string;
-  to: string;
-  date: string;
-  time: string;
-  availableSeats: number;
-  pricePerSeat: number;
-  vehicleType: string;
-  description: string;
+  pickupLocation: string;
+  dropLocation: string;
+  departureDateTime: string;
+  totalSeats: number;
+  estimatedCost?: number;
+  description?: string;
+  phoneNumber?: string;
 }
 
 const ridesService = {
-  // Get all rides
-  async getAll(filters?: {
-    from?: string;
-    to?: string;
-    date?: string;
-  }): Promise<{ success: boolean; data: Ride[] }> {
+  // Get all open rides
+  async getAll(): Promise<ApiResponse<Ride[]>> {
     try {
-      const params = new URLSearchParams();
-      if (filters?.from) params.append('from', filters.from);
-      if (filters?.to) params.append('to', filters.to);
-      if (filters?.date) params.append('date', filters.date);
-
-      const response = await api.get(`/rides?${params.toString()}`);
+      const response = await api.get('/rides');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch rides');
@@ -66,7 +53,7 @@ const ridesService = {
   },
 
   // Get ride by ID
-  async getById(id: string): Promise<{ success: boolean; data: Ride }> {
+  async getById(id: number): Promise<ApiResponse<Ride>> {
     try {
       const response = await api.get(`/rides/${id}`);
       return response.data;
@@ -75,8 +62,18 @@ const ridesService = {
     }
   },
 
+  // Get current user's rides
+  async getUserRides(): Promise<ApiResponse<Ride[]>> {
+    try {
+      const response = await api.get('/rides/user/rides');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch user rides');
+    }
+  },
+
   // Create new ride
-  async create(data: CreateRideData): Promise<{ success: boolean; data: Ride }> {
+  async create(data: CreateRideData): Promise<ApiResponse<Ride>> {
     try {
       const response = await api.post('/rides', data);
       return response.data;
@@ -86,9 +83,9 @@ const ridesService = {
   },
 
   // Join ride
-  async join(rideId: string, seatsBooked: number): Promise<{ success: boolean; data: RideParticipant }> {
+  async join(rideId: number): Promise<ApiResponse<RideParticipant[]>> {
     try {
-      const response = await api.post(`/rides/${rideId}/join`, { seatsBooked });
+      const response = await api.post(`/rides/${rideId}/join`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to join ride');
@@ -96,7 +93,7 @@ const ridesService = {
   },
 
   // Leave ride
-  async leave(rideId: string): Promise<{ success: boolean; message: string }> {
+  async leave(rideId: number): Promise<ApiResponse<RideParticipant[]>> {
     try {
       const response = await api.delete(`/rides/${rideId}/join`);
       return response.data;
@@ -106,7 +103,7 @@ const ridesService = {
   },
 
   // Delete ride
-  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  async delete(id: number): Promise<ApiResponse<null>> {
     try {
       const response = await api.delete(`/rides/${id}`);
       return response.data;

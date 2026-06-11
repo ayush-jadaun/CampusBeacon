@@ -8,7 +8,11 @@ import asyncHandler from "../utils/asyncHandler.js";
 =======================================================================
 */
 export const authMiddleware = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.token;
+  // Web clients send the httpOnly cookie; mobile clients send a Bearer header
+  const authHeader = req.headers.authorization;
+  const token =
+    req.cookies.token ||
+    (authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null);
 
   if (!token) {
     // For /current endpoint, return a specific response

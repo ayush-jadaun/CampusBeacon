@@ -7,7 +7,7 @@ import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 interface ServiceCardProps {
   title: string;
   icon: keyof typeof Ionicons.glyphMap;
-  gradientColors: string[];
+  gradientColors: readonly [string, string];
   onPress: () => void;
   badge?: number;
 }

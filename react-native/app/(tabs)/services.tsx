@@ -14,7 +14,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import ServiceCard from '@/components/ServiceCard';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
-import { SERVICES } from '@/constants/services';
+import { SERVICES, Service } from '@/constants/services';
+
+type ServiceItem = Service & { description?: string };
+
+const ALL_SERVICES: ServiceItem[] = SERVICES;
 
 // Group services by category
 const SERVICE_CATEGORIES = [
@@ -62,10 +66,10 @@ export default function ServicesScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const filteredServices = SERVICES.filter(service => {
+  const filteredServices = ALL_SERVICES.filter(service => {
     const matchesSearch =
       service.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (service.description ?? '').toLowerCase().includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;
 
@@ -75,7 +79,7 @@ export default function ServicesScreen() {
     return category?.services.includes(service.title);
   });
 
-  const featuredServices = SERVICES.filter(service =>
+  const featuredServices = ALL_SERVICES.filter(service =>
     FEATURED_SERVICES.includes(service.title)
   );
 
@@ -206,7 +210,7 @@ export default function ServicesScreen() {
                   activeOpacity={0.7}
                 >
                   <LinearGradient
-                    colors={service.gradientColors}
+                    colors={service.gradientColors as [string, string]}
                     style={styles.featuredCardGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
@@ -244,7 +248,10 @@ export default function ServicesScreen() {
             {filteredServices.map((service) => (
               <ServiceCard
                 key={service.id}
-                {...service}
+                title={service.title}
+                icon={service.icon}
+                gradientColors={service.gradientColors as [string, string]}
+                badge={service.badge}
                 onPress={() => handleServicePress(service.route)}
               />
             ))}

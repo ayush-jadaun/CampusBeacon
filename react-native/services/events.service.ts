@@ -1,59 +1,55 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
 export interface Event {
-  id: string;
-  clubId: string;
-  title: string;
+  id: number;
+  name: string;
   description: string;
+  images: string[] | null;
+  videos: string[] | null;
+  social_media_links: string[] | null;
+  club_id: number;
   date: string;
-  time: string;
   location: string;
-  type: string;
-  imageUrl: string;
-  maxParticipants: number;
-  registrationDeadline: string;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   createdAt: string;
+  updatedAt: string;
   club?: {
+    id: number;
     name: string;
-    logo: string;
   };
-  coordinators?: EventCoordinator[];
+  coordinators?: Coordinator[];
 }
 
-export interface EventCoordinator {
-  id: string;
-  eventId: string;
-  userId: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
+export type EventStatus = 'upcoming' | 'ongoing' | 'completed';
 
 export interface Club {
-  id: string;
+  id: number;
   name: string;
-  description: string;
-  logo: string;
-  category: string;
-  email: string;
-  socialLinks: {
-    instagram?: string;
-    linkedin?: string;
-    website?: string;
-  };
-  coordinators?: ClubCoordinator[];
+  description: string | null;
+  images: string[] | null;
+  social_media_links: string[] | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ClubCoordinator {
-  id: string;
-  clubId: string;
+export interface Coordinator {
+  id: number;
   name: string;
-  position: string;
-  email: string;
-  phone: string;
+  designation: string;
+  images: string[] | null;
+  contact: string | number | null;
+  social_media_links: string[] | null;
+  club_id?: number;
+  club?: {
+    id: number;
+    name: string;
+  };
+}
+
+export function getEventStatus(event: Event): EventStatus {
+  const eventDate = new Date(event.date);
+  const now = new Date();
+  if (eventDate.toDateString() === now.toDateString()) return 'ongoing';
+  return eventDate > now ? 'upcoming' : 'completed';
 }
 
 const eventsService = {
@@ -61,76 +57,64 @@ const eventsService = {
   async getAll(filters?: {
     status?: string;
     clubId?: string;
-  }): Promise<{ success: boolean; data: Event[] }> {
+  }): Promise<ApiResponse<Event[]>> {
     try {
       const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
-      if (filters?.clubId) params.append('clubId', filters.clubId);
+      if (filters?.clubId) params.append('club_id', filters.clubId);
 
       const response = await api.get(`/events/events?${params.toString()}`);
-      return response.data;
+      const { success, events, message } = response.data;
+      let data: Event[] = events ?? [];
+      if (filters?.status && filters.status !== 'all') {
+        data = data.filter((event) => getEventStatus(event) === filters.status);
+      }
+      return { success, data, message };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch events');
     }
   },
 
   // Get event by ID
-  async getById(id: string): Promise<{ success: boolean; data: Event }> {
+  async getById(id: number): Promise<ApiResponse<Event>> {
     try {
       const response = await api.get(`/events/events/${id}`);
-      return response.data;
+      const { success, event, message } = response.data;
+      return { success, data: event, message };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch event');
     }
   },
 
   // Get all clubs
-  async getClubs(): Promise<{ success: boolean; data: Club[] }> {
+  async getClubs(): Promise<ApiResponse<Club[]>> {
     try {
-      const response = await api.get('/club');
-      return response.data;
+      const response = await api.get('/club/clubs');
+      const { success, clubs, message } = response.data;
+      return { success, data: clubs ?? [], message };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch clubs');
     }
   },
 
   // Get club by ID
-  async getClubById(id: string): Promise<{ success: boolean; data: Club }> {
+  async getClubById(id: number): Promise<ApiResponse<Club>> {
     try {
-      const response = await api.get(`/club/${id}`);
-      return response.data;
+      const response = await api.get(`/club/clubs/${id}`);
+      const { success, club, message } = response.data;
+      return { success, data: club, message };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch club');
     }
   },
 
   // Get club coordinators
-  async getClubCoordinators(clubId: string): Promise<{ success: boolean; data: ClubCoordinator[] }> {
+  async getClubCoordinators(clubId: number): Promise<ApiResponse<Coordinator[]>> {
     try {
-      const response = await api.get(`/club/${clubId}/coordinators`);
-      return response.data;
+      const response = await api.get(`/coordinator/coordinators?club_id=${clubId}`);
+      const { success, coordinators, message } = response.data;
+      return { success, data: coordinators ?? [], message };
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch coordinators');
-    }
-  },
-
-  // Register for event
-  async registerForEvent(eventId: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await api.post(`/events/events/${eventId}/register`);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to register for event');
-    }
-  },
-
-  // Unregister from event
-  async unregisterFromEvent(eventId: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const response = await api.delete(`/events/events/${eventId}/register`);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to unregister from event');
     }
   },
 };

@@ -19,6 +19,7 @@ import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchRides, joinRide, leaveRide, setFilters, clearFilters } from '@/store/slices/ridesSlice';
+import type { Ride } from '@/services/rides.service';
 
 export default function RideShareScreen() {
   const dispatch = useAppDispatch();
@@ -135,9 +136,18 @@ export default function RideShareScreen() {
   );
 }
 
-function RideCard({ ride, onJoin, onLeave }: any) {
+function RideCard({
+  ride,
+  onJoin,
+  onLeave,
+}: {
+  ride: Ride;
+  onJoin: () => void;
+  onLeave: () => void;
+}) {
   const [hasJoined, setHasJoined] = useState(false);
-  const isAvailable = ride.seatsAvailable > 0;
+  const isAvailable = ride.availableSeats > 0;
+  const departure = new Date(ride.departureDateTime);
 
   const handleAction = () => {
     if (hasJoined) {
@@ -157,7 +167,7 @@ function RideCard({ ride, onJoin, onLeave }: any) {
           <View style={[styles.routeDot, { backgroundColor: COLORS.success }]} />
           <View style={styles.routeInfo}>
             <Text style={styles.routeLabel}>From</Text>
-            <Text style={styles.routeLocation}>{ride.from}</Text>
+            <Text style={styles.routeLocation}>{ride.pickupLocation}</Text>
           </View>
         </View>
 
@@ -167,7 +177,7 @@ function RideCard({ ride, onJoin, onLeave }: any) {
           <View style={[styles.routeDot, { backgroundColor: COLORS.error }]} />
           <View style={styles.routeInfo}>
             <Text style={styles.routeLabel}>To</Text>
-            <Text style={styles.routeLocation}>{ride.to}</Text>
+            <Text style={styles.routeLocation}>{ride.dropLocation}</Text>
           </View>
         </View>
       </View>
@@ -177,25 +187,29 @@ function RideCard({ ride, onJoin, onLeave }: any) {
         <View style={styles.rideDetail}>
           <Ionicons name="calendar" size={16} color={COLORS.textSecondary} />
           <Text style={styles.rideDetailText}>
-            {new Date(ride.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            {departure.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
           </Text>
         </View>
         <View style={styles.rideDetail}>
           <Ionicons name="time" size={16} color={COLORS.textSecondary} />
-          <Text style={styles.rideDetailText}>{ride.time}</Text>
+          <Text style={styles.rideDetailText}>
+            {departure.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          </Text>
         </View>
         <View style={styles.rideDetail}>
           <Ionicons name="car" size={16} color={COLORS.textSecondary} />
-          <Text style={styles.rideDetailText}>{ride.vehicleType}</Text>
+          <Text style={styles.rideDetailText}>{ride.status}</Text>
         </View>
       </View>
 
       {/* Bottom Section */}
       <View style={styles.rideBottom}>
         <View style={styles.rideLeft}>
-          <Text style={styles.ridePrice}>₹{ride.pricePerSeat}/seat</Text>
+          <Text style={styles.ridePrice}>
+            {ride.estimatedCost != null ? `₹${ride.estimatedCost} est.` : 'Free'}
+          </Text>
           <Text style={styles.rideSeats}>
-            {ride.seatsAvailable}/{ride.totalSeats} seats available
+            {ride.availableSeats}/{ride.totalSeats} seats available
           </Text>
         </View>
 
@@ -219,7 +233,8 @@ function RideCard({ ride, onJoin, onLeave }: any) {
       <View style={styles.driverInfo}>
         <Ionicons name="person-circle" size={18} color={COLORS.textLight} />
         <Text style={styles.driverText}>
-          {ride.driver.name} • {ride.driver.phone}
+          {ride.creator?.name ?? 'Unknown'}
+          {ride.phoneNumber ? ` • ${ride.phoneNumber}` : ''}
         </Text>
       </View>
     </View>

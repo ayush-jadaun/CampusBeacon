@@ -1,23 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import attendanceService from '@/services/attendance.service';
-
-interface Subject {
-  id: string;
-  name: string;
-  code: string;
-  totalClasses: number;
-  attendedClasses: number;
-  percentage: number;
-  required: number;
-  target: number;
-}
-
-interface AttendanceStats {
-  overallPercentage: number;
-  totalClasses: number;
-  attendedClasses: number;
-  subjects: Subject[];
-}
+import attendanceService, { AttendanceStats } from '@/services/attendance.service';
 
 interface AttendanceState {
   stats: AttendanceStats | null;
@@ -31,12 +13,19 @@ const initialState: AttendanceState = {
   error: null,
 };
 
+const getUserId = (state: unknown) =>
+  (state as { auth: { user: { id: string } | null } }).auth.user?.id;
+
 // Async thunks
 export const fetchAttendance = createAsyncThunk(
   'attendance/fetchAttendance',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await attendanceService.getAttendance();
+      const userId = getUserId(getState());
+      if (!userId) {
+        return rejectWithValue('User not authenticated');
+      }
+      const response = await attendanceService.getAttendance(userId);
       if (response.success) {
         return response.data;
       }
@@ -49,13 +38,24 @@ export const fetchAttendance = createAsyncThunk(
 
 export const addAttendance = createAsyncThunk(
   'attendance/addAttendance',
-  async (data: { subjectId: string; date: string; status: string }, { rejectWithValue }) => {
+  async (
+    data: { subjectId: string | number; date: string; status: 'Present' | 'Absent' },
+    { getState, rejectWithValue }
+  ) => {
     try {
-      const response = await attendanceService.addAttendance(data);
-      if (response.success) {
-        return response.data;
+      const userId = getUserId(getState());
+      if (!userId) {
+        return rejectWithValue('User not authenticated');
       }
-      return rejectWithValue(response.message);
+      const response = await attendanceService.markAttendance({ userId, ...data });
+      if (!response.success) {
+        return rejectWithValue(response.message);
+      }
+      const statsResponse = await attendanceService.getAttendance(userId);
+      if (statsResponse.success) {
+        return statsResponse.data;
+      }
+      return rejectWithValue(statsResponse.message);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -64,13 +64,24 @@ export const addAttendance = createAsyncThunk(
 
 export const updateAttendance = createAsyncThunk(
   'attendance/updateAttendance',
-  async ({ id, data }: { id: string; data: any }, { rejectWithValue }) => {
+  async (
+    { id, data }: { id: string | number; data: { status: 'Present' | 'Absent' } },
+    { getState, rejectWithValue }
+  ) => {
     try {
-      const response = await attendanceService.updateAttendance(id, data);
-      if (response.success) {
-        return response.data;
+      const userId = getUserId(getState());
+      if (!userId) {
+        return rejectWithValue('User not authenticated');
       }
-      return rejectWithValue(response.message);
+      const response = await attendanceService.updateAttendance(id, data);
+      if (!response.success) {
+        return rejectWithValue(response.message);
+      }
+      const statsResponse = await attendanceService.getAttendance(userId);
+      if (statsResponse.success) {
+        return statsResponse.data;
+      }
+      return rejectWithValue(statsResponse.message);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -105,17 +116,13 @@ const attendanceSlice = createSlice({
     // Add attendance
     builder
       .addCase(addAttendance.fulfilled, (state, action) => {
-        if (state.stats) {
-          state.stats = action.payload;
-        }
+        state.stats = action.payload;
       });
 
     // Update attendance
     builder
       .addCase(updateAttendance.fulfilled, (state, action) => {
-        if (state.stats) {
-          state.stats = action.payload;
-        }
+        state.stats = action.payload;
       });
   },
 });

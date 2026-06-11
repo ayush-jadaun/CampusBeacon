@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import marketplaceService from './marketplace.service';
 import lostFoundService from './lostandfound.service';
 import ridesService from './rides.service';
@@ -6,7 +7,7 @@ import eventsService from './events.service';
 export interface RecentActivity {
   id: string;
   type: 'marketplace' | 'lost_found' | 'ride' | 'event' | 'resource' | 'hostel';
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
   iconBg: string;
   title: string;
@@ -30,7 +31,7 @@ const activityService = {
         eventsRes,
       ] = await Promise.allSettled([
         marketplaceService.getAll(),
-        lostFoundService.getAll({ status: 'lost' }),
+        lostFoundService.getAll(),
         ridesService.getAll(),
         eventsService.getAll({ status: 'upcoming' }),
       ]);
@@ -46,7 +47,7 @@ const activityService = {
             iconColor: '#f5576c',
             iconBg: '#f5576c20',
             title: 'New Item in Marketplace',
-            description: `${item.title} - ₹${item.price}`,
+            description: `${item.item_name} - ₹${item.price}`,
             time: this.formatTimeAgo(item.createdAt),
             createdAt: item.createdAt,
             data: item,
@@ -64,8 +65,8 @@ const activityService = {
             icon: 'search-outline',
             iconColor: '#764ba2',
             iconBg: '#764ba220',
-            title: item.status === 'lost' ? 'Item Lost' : 'Item Found',
-            description: `${item.itemName} - ${item.location}`,
+            title: 'Lost & Found Item',
+            description: `${item.item_name} - ${item.location_found ?? 'Unknown location'}`,
             time: this.formatTimeAgo(item.createdAt),
             createdAt: item.createdAt,
             data: item,
@@ -84,7 +85,7 @@ const activityService = {
             iconColor: '#330867',
             iconBg: '#30cfd020',
             title: 'New Ride Available',
-            description: `${ride.from} to ${ride.to} - ${ride.availableSeats} seats`,
+            description: `${ride.pickupLocation} to ${ride.dropLocation} - ${ride.availableSeats} seats`,
             time: this.formatTimeAgo(ride.createdAt),
             createdAt: ride.createdAt,
             data: ride,
@@ -103,7 +104,7 @@ const activityService = {
             iconColor: '#43e97b',
             iconBg: '#43e97b20',
             title: 'New Event',
-            description: `${event.title} - ${event.location}`,
+            description: `${event.name} - ${event.location}`,
             time: this.formatTimeAgo(event.createdAt),
             createdAt: event.createdAt,
             data: event,

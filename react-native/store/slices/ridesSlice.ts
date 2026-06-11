@@ -1,22 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import ridesService from '@/services/rides.service';
-
-interface Ride {
-  id: string;
-  from: string;
-  to: string;
-  date: string;
-  time: string;
-  seatsAvailable: number;
-  totalSeats: number;
-  pricePerSeat: number;
-  vehicleType: string;
-  driver: {
-    name: string;
-    phone: string;
-  };
-  participants: string[];
-}
+import ridesService, { Ride, CreateRideData } from '@/services/rides.service';
 
 interface RidesState {
   rides: Ride[];
@@ -57,9 +40,22 @@ export const fetchRides = createAsyncThunk(
   }
 );
 
+export const fetchMyRides = createAsyncThunk(
+  'rides/fetchMyRides',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await ridesService.getUserRides();
+      if (response.success) return response.data;
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const createRide = createAsyncThunk(
   'rides/createRide',
-  async (data: any, { rejectWithValue }) => {
+  async (data: CreateRideData, { rejectWithValue }) => {
     try {
       const response = await ridesService.create(data);
       if (response.success) return response.data;
@@ -72,9 +68,9 @@ export const createRide = createAsyncThunk(
 
 export const joinRide = createAsyncThunk(
   'rides/joinRide',
-  async (rideId: string, { rejectWithValue }) => {
+  async (rideId: number, { rejectWithValue }) => {
     try {
-      const response = await ridesService.joinRide(rideId);
+      const response = await ridesService.join(rideId);
       if (response.success) return rideId;
       return rejectWithValue(response.message);
     } catch (error: any) {
@@ -85,9 +81,9 @@ export const joinRide = createAsyncThunk(
 
 export const leaveRide = createAsyncThunk(
   'rides/leaveRide',
-  async (rideId: string, { rejectWithValue }) => {
+  async (rideId: number, { rejectWithValue }) => {
     try {
-      const response = await ridesService.leaveRide(rideId);
+      const response = await ridesService.leave(rideId);
       if (response.success) return rideId;
       return rejectWithValue(response.message);
     } catch (error: any) {
@@ -123,20 +119,29 @@ const ridesSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       })
+      .addCase(fetchMyRides.fulfilled, (state, action) => {
+        state.myRides = action.payload;
+      })
       .addCase(createRide.fulfilled, (state, action) => {
         state.rides.unshift(action.payload);
         state.filteredRides = filterRides(state);
       })
       .addCase(joinRide.fulfilled, (state, action) => {
         const ride = state.rides.find((r) => r.id === action.payload);
-        if (ride && ride.seatsAvailable > 0) {
-          ride.seatsAvailable -= 1;
+        if (ride && ride.availableSeats > 0) {
+          ride.availableSeats -= 1;
+          if (ride.availableSeats === 0) {
+            ride.status = 'FULL';
+          }
         }
       })
       .addCase(leaveRide.fulfilled, (state, action) => {
         const ride = state.rides.find((r) => r.id === action.payload);
         if (ride) {
-          ride.seatsAvailable += 1;
+          ride.availableSeats += 1;
+          if (ride.status === 'FULL') {
+            ride.status = 'OPEN';
+          }
         }
       });
   },
@@ -147,18 +152,20 @@ function filterRides(state: RidesState): Ride[] {
 
   if (state.filters.from) {
     filtered = filtered.filter((ride) =>
-      ride.from.toLowerCase().includes(state.filters.from.toLowerCase())
+      ride.pickupLocation.toLowerCase().includes(state.filters.from.toLowerCase())
     );
   }
 
   if (state.filters.to) {
     filtered = filtered.filter((ride) =>
-      ride.to.toLowerCase().includes(state.filters.to.toLowerCase())
+      ride.dropLocation.toLowerCase().includes(state.filters.to.toLowerCase())
     );
   }
 
   if (state.filters.date) {
-    filtered = filtered.filter((ride) => ride.date === state.filters.date);
+    filtered = filtered.filter((ride) =>
+      ride.departureDateTime.startsWith(state.filters.date)
+    );
   }
 
   return filtered;

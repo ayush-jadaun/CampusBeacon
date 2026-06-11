@@ -102,7 +102,7 @@ export default function ForgotPasswordScreen() {
           <View style={styles.header}>
             <Text style={styles.title}>Forgot Password?</Text>
             <Text style={styles.subtitle}>
-              Don't worry! Enter your MNNIT email and we'll send you a link to reset your password.
+              Don&apos;t worry! Enter your MNNIT email and we&apos;ll send you a link to reset your password.
             </Text>
           </View>
 

@@ -51,8 +51,8 @@ export default function ProfileScreen() {
     const subjects = stats?.subjects;
     if (!subjects || subjects.length === 0) return '0.0%';
 
-    const totalClasses = subjects.reduce((sum, subject) => sum + subject.totalClasses, 0);
-    const totalAttended = subjects.reduce((sum, subject) => sum + subject.attendedClasses, 0);
+    const totalClasses = subjects.reduce((sum, subject) => sum + subject.totalDays, 0);
+    const totalAttended = subjects.reduce((sum, subject) => sum + subject.presentDays, 0);
 
     if (totalClasses === 0) return '0.0%';
     return ((totalAttended / totalClasses) * 100).toFixed(1) + '%';
@@ -80,23 +80,19 @@ export default function ProfileScreen() {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.profileImageContainer}>
-            {user?.profilePicture ? (
-              <Image source={{ uri: user.profilePicture }} style={styles.profileImage} />
-            ) : (
-              <View style={styles.profileImagePlaceholder}>
-                <Ionicons name="person" size={50} color={COLORS.white} />
-              </View>
-            )}
+            <View style={styles.profileImagePlaceholder}>
+              <Ionicons name="person" size={50} color={COLORS.white} />
+            </View>
           </View>
 
-          <Text style={styles.name}>
-            {user?.firstName} {user?.lastName}
-          </Text>
+          <Text style={styles.name}>{user?.name || 'Student'}</Text>
           <Text style={styles.email}>{user?.email}</Text>
-          <Text style={styles.regNumber}>Reg: {user?.registrationNumber}</Text>
-          {user?.branch && user?.year && (
+          {user?.registration_number && (
+            <Text style={styles.regNumber}>Reg: {user.registration_number}</Text>
+          )}
+          {user?.branch && user?.semester && (
             <Text style={styles.courseInfo}>
-              {user.branch} - Year {user.year}
+              {user.branch} - Semester {user.semester}
             </Text>
           )}
         </LinearGradient>

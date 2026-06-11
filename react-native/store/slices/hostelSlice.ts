@@ -1,40 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import hostelService from '@/services/hostel.service';
-
-interface HostelMenu {
-  id: string;
-  hostelId: string;
-  day: string;
-  mealType: 'breakfast' | 'lunch' | 'dinner';
-  items: string[];
-}
-
-interface Hostel {
-  id: string;
-  name: string;
-  type: string;
-}
-
-interface HostelOfficial {
-  id: string;
-  name: string;
-  position: string;
-  phone: string;
-  email: string;
-}
-
-interface HostelComplaint {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  status: string;
-  createdAt: string;
-}
+import hostelService, {
+  Hostel,
+  HostelMenu,
+  HostelOfficial,
+  HostelComplaint,
+} from '@/services/hostel.service';
 
 interface HostelState {
   hostels: Hostel[];
-  selectedHostel: string | null;
+  selectedHostel: number | null;
   menu: HostelMenu[];
   officials: HostelOfficial[];
   complaints: HostelComplaint[];
@@ -67,7 +41,7 @@ export const fetchHostels = createAsyncThunk(
 
 export const fetchMessMenu = createAsyncThunk(
   'hostel/fetchMessMenu',
-  async (hostelId: string, { rejectWithValue }) => {
+  async (hostelId: number, { rejectWithValue }) => {
     try {
       const response = await hostelService.getMenu(hostelId);
       if (response.success) return response.data;
@@ -80,7 +54,7 @@ export const fetchMessMenu = createAsyncThunk(
 
 export const fetchOfficials = createAsyncThunk(
   'hostel/fetchOfficials',
-  async (hostelId: string, { rejectWithValue }) => {
+  async (hostelId: number, { rejectWithValue }) => {
     try {
       const response = await hostelService.getOfficials(hostelId);
       if (response.success) return response.data;

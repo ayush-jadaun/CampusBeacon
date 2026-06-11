@@ -2,6 +2,14 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storage } from '@/utils/storage';
 import Constants from 'expo-constants';
 
+// Shape of every backend response (see server/src/utils/apiResponse.js)
+export interface ApiResponse<T> {
+  statusCode?: number;
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
 // Get API URL from environment or use default localhost
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiUrl ||

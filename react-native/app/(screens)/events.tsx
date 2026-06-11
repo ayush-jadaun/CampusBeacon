@@ -18,7 +18,8 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchEvents, setEventFilter, registerForEvent } from '@/store/slices/eventsSlice';
+import { fetchEvents, setEventFilter } from '@/store/slices/eventsSlice';
+import { Event, EventStatus, getEventStatus } from '@/services/events.service';
 
 const FILTERS = ['upcoming', 'ongoing', 'completed', 'all'] as const;
 
@@ -97,11 +98,7 @@ export default function EventsScreen() {
         ) : (
           <View style={styles.eventsList}>
             {filteredEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                onRegister={() => dispatch(registerForEvent(event.id))}
-              />
+              <EventCard key={event.id} event={event} />
             ))}
           </View>
         )}
@@ -110,24 +107,26 @@ export default function EventsScreen() {
   );
 }
 
-function EventCard({ event, onRegister }: any) {
-  const statusColors = {
+function EventCard({ event }: { event: Event }) {
+  const statusColors: Record<EventStatus, string> = {
     upcoming: '#4facfe',
     ongoing: '#43e97b',
     completed: '#95a5a6',
   };
 
-  const isFull = event.currentParticipants >= event.maxParticipants;
+  const status = getEventStatus(event);
+  const image = event.images?.[0];
+  const eventDate = new Date(event.date);
 
   return (
     <TouchableOpacity
       style={styles.eventCard}
-      onPress={() => alert(`Event details: ${event.title}`)}
+      onPress={() => alert(`Event details: ${event.name}`)}
       activeOpacity={0.7}
     >
       {/* Event Image */}
-      {event.image ? (
-        <Image source={{ uri: event.image }} style={styles.eventImage} />
+      {image ? (
+        <Image source={{ uri: image }} style={styles.eventImage} />
       ) : (
         <LinearGradient
           colors={['#667eea', '#764ba2']}
@@ -140,13 +139,13 @@ function EventCard({ event, onRegister }: any) {
       )}
 
       {/* Status Badge */}
-      <View style={[styles.statusBadge, { backgroundColor: statusColors[event.status] }]}>
-        <Text style={styles.statusBadgeText}>{event.status}</Text>
+      <View style={[styles.statusBadge, { backgroundColor: statusColors[status] }]}>
+        <Text style={styles.statusBadgeText}>{status}</Text>
       </View>
 
       {/* Content */}
       <View style={styles.eventContent}>
-        <Text style={styles.eventTitle}>{event.title}</Text>
+        <Text style={styles.eventTitle}>{event.name}</Text>
         <Text style={styles.eventDescription} numberOfLines={2}>
           {event.description}
         </Text>
@@ -156,7 +155,7 @@ function EventCard({ event, onRegister }: any) {
           <View style={styles.eventDetail}>
             <Ionicons name="calendar" size={14} color={COLORS.textSecondary} />
             <Text style={styles.eventDetailText}>
-              {new Date(event.date).toLocaleDateString('en-US', {
+              {eventDate.toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
               })}
@@ -164,7 +163,9 @@ function EventCard({ event, onRegister }: any) {
           </View>
           <View style={styles.eventDetail}>
             <Ionicons name="time" size={14} color={COLORS.textSecondary} />
-            <Text style={styles.eventDetailText}>{event.time}</Text>
+            <Text style={styles.eventDetailText}>
+              {eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+            </Text>
           </View>
           <View style={styles.eventDetail}>
             <Ionicons name="location" size={14} color={COLORS.textSecondary} />
@@ -175,31 +176,12 @@ function EventCard({ event, onRegister }: any) {
         </View>
 
         {/* Club Info */}
-        <View style={styles.clubInfo}>
-          {event.club.logo ? (
-            <Image source={{ uri: event.club.logo }} style={styles.clubLogo} />
-          ) : (
+        {event.club && (
+          <View style={styles.clubInfo}>
             <View style={styles.clubLogoPlaceholder}>
               <Ionicons name="people" size={16} color={COLORS.primary} />
             </View>
-          )}
-          <Text style={styles.clubName}>{event.club.name}</Text>
-        </View>
-
-        {/* Registration */}
-        {event.registrationRequired && event.status === 'upcoming' && (
-          <View style={styles.registrationSection}>
-            <Text style={styles.participantsText}>
-              {event.currentParticipants}/{event.maxParticipants} registered
-            </Text>
-            <TouchableOpacity
-              style={[styles.registerButton, isFull && styles.registerButtonDisabled]}
-              onPress={onRegister}
-              disabled={isFull}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.registerButtonText}>{isFull ? 'Full' : 'Register'}</Text>
-            </TouchableOpacity>
+            <Text style={styles.clubName}>{event.club.name}</Text>
           </View>
         )}
       </View>
@@ -335,13 +317,6 @@ const styles = StyleSheet.create({
     paddingTop: SIZES.md,
     borderTopWidth: 1,
     borderTopColor: COLORS.backgroundDark,
-    marginBottom: SIZES.md,
-  },
-  clubLogo: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    marginRight: SIZES.sm,
   },
   clubLogoPlaceholder: {
     width: 24,
@@ -356,28 +331,5 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: COLORS.primary,
-  },
-  registrationSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  participantsText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  registerButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: SIZES.sm,
-    paddingHorizontal: SIZES.lg,
-    borderRadius: 12,
-  },
-  registerButtonDisabled: {
-    backgroundColor: COLORS.textLight,
-  },
-  registerButtonText: {
-    color: COLORS.white,
-    fontWeight: '600',
-    fontSize: 13,
   },
 });

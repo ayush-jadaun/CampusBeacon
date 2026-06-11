@@ -1,24 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import marketplaceService from '@/services/marketplace.service';
-
-interface MarketplaceItem {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  category: string;
-  condition: string;
-  images: string[];
-  seller: {
-    name: string;
-    phone: string;
-    email: string;
-  };
-  status: 'available' | 'sold';
-  location: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import marketplaceService, {
+  MarketplaceItem,
+  CreateMarketplaceData,
+} from '@/services/marketplace.service';
 
 interface MarketplaceState {
   items: MarketplaceItem[];
@@ -27,7 +11,6 @@ interface MarketplaceState {
   isLoading: boolean;
   error: string | null;
   searchQuery: string;
-  categoryFilter: string;
   priceRange: { min: number; max: number };
   conditionFilter: string;
 }
@@ -39,7 +22,6 @@ const initialState: MarketplaceState = {
   isLoading: false,
   error: null,
   searchQuery: '',
-  categoryFilter: 'All',
   priceRange: { min: 0, max: 100000 },
   conditionFilter: 'All',
 };
@@ -77,7 +59,7 @@ export const fetchMyListings = createAsyncThunk(
 
 export const createMarketplaceItem = createAsyncThunk(
   'marketplace/createItem',
-  async (itemData: any, { rejectWithValue }) => {
+  async (itemData: CreateMarketplaceData, { rejectWithValue }) => {
     try {
       const response = await marketplaceService.create(itemData);
       if (response.success) {
@@ -90,24 +72,9 @@ export const createMarketplaceItem = createAsyncThunk(
   }
 );
 
-export const markAsSold = createAsyncThunk(
-  'marketplace/markAsSold',
-  async (id: string, { rejectWithValue }) => {
-    try {
-      const response = await marketplaceService.markAsSold(id);
-      if (response.success) {
-        return id;
-      }
-      return rejectWithValue(response.message);
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 export const deleteMarketplaceItem = createAsyncThunk(
   'marketplace/deleteItem',
-  async (id: string, { rejectWithValue }) => {
+  async (id: number, { rejectWithValue }) => {
     try {
       const response = await marketplaceService.delete(id);
       if (response.success) {
@@ -128,10 +95,6 @@ const marketplaceSlice = createSlice({
       state.searchQuery = action.payload;
       state.filteredItems = filterItems(state);
     },
-    setCategoryFilter: (state, action: PayloadAction<string>) => {
-      state.categoryFilter = action.payload;
-      state.filteredItems = filterItems(state);
-    },
     setPriceRange: (state, action: PayloadAction<{ min: number; max: number }>) => {
       state.priceRange = action.payload;
       state.filteredItems = filterItems(state);
@@ -142,7 +105,6 @@ const marketplaceSlice = createSlice({
     },
     clearFilters: (state) => {
       state.searchQuery = '';
-      state.categoryFilter = 'All';
       state.priceRange = { min: 0, max: 100000 };
       state.conditionFilter = 'All';
       state.filteredItems = state.items;
@@ -195,15 +157,6 @@ const marketplaceSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    // Mark as sold
-    builder.addCase(markAsSold.fulfilled, (state, action) => {
-      const item = state.items.find((item) => item.id === action.payload);
-      if (item) {
-        item.status = 'sold';
-      }
-      state.filteredItems = filterItems(state);
-    });
-
     // Delete item
     builder.addCase(deleteMarketplaceItem.fulfilled, (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
@@ -214,16 +167,11 @@ const marketplaceSlice = createSlice({
 
 // Helper function to filter items
 function filterItems(state: MarketplaceState): MarketplaceItem[] {
-  let filtered = state.items.filter((item) => item.status === 'available');
-
-  // Filter by category
-  if (state.categoryFilter !== 'All') {
-    filtered = filtered.filter((item) => item.category === state.categoryFilter);
-  }
+  let filtered = [...state.items];
 
   // Filter by condition
   if (state.conditionFilter !== 'All') {
-    filtered = filtered.filter((item) => item.condition === state.conditionFilter);
+    filtered = filtered.filter((item) => item.item_condition === state.conditionFilter);
   }
 
   // Filter by price range
@@ -236,14 +184,14 @@ function filterItems(state: MarketplaceState): MarketplaceItem[] {
     const query = state.searchQuery.toLowerCase();
     filtered = filtered.filter(
       (item) =>
-        item.title.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+        item.item_name.toLowerCase().includes(query) ||
+        (item.description ?? '').toLowerCase().includes(query)
     );
   }
 
   return filtered;
 }
 
-export const { setSearchQuery, setCategoryFilter, setPriceRange, setConditionFilter, clearFilters } =
+export const { setSearchQuery, setPriceRange, setConditionFilter, clearFilters } =
   marketplaceSlice.actions;
 export default marketplaceSlice.reducer;

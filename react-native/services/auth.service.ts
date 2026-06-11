@@ -1,4 +1,4 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 import { storage } from '@/utils/storage';
 
 export interface LoginCredentials {
@@ -9,27 +9,35 @@ export interface LoginCredentials {
 export interface SignupData {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 }
 
-export interface AuthResponse {
-  success: boolean;
-  message: string;
-  data: {
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      registrationNumber: string;
-      graduationYear: number;
-      profilePicture?: string;
-      isVerified: boolean;
-    };
-    token?: string;
-  };
+export interface UpdateProfileData {
+  name?: string;
+  semester?: string;
+  branch?: string;
+  hostel?: string;
 }
+
+export interface User {
+  id: number;
+  email: string;
+  name?: string | null;
+  registration_number?: string | null;
+  semester?: string | null;
+  branch?: string | null;
+  hostel?: string | null;
+  graduation_year?: number | null;
+  isVerified?: boolean;
+  roles?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type AuthResponse = ApiResponse<{ user: User; token?: string }>;
+export type SignupResponse = ApiResponse<{ userId: number }>;
+export type MessageResponse = ApiResponse<null>;
 
 const authService = {
   // Login
@@ -39,9 +47,10 @@ const authService = {
       const response = await api.post<AuthResponse>('/users/login', credentials);
       console.log('✅ Login response:', response.data);
 
-      if (response.data.success && response.data.data.token) {
-        // Store token and user data
-        await storage.setAuthToken(response.data.data.token);
+      if (response.data.success) {
+        if (response.data.data.token) {
+          await storage.setAuthToken(response.data.data.token);
+        }
         await storage.setUserData(response.data.data.user);
       }
 
@@ -53,10 +62,10 @@ const authService = {
   },
 
   // Signup
-  async signup(data: SignupData): Promise<AuthResponse> {
+  async signup(data: SignupData): Promise<SignupResponse> {
     try {
       console.log('📝 Attempting signup with:', data.email);
-      const response = await api.post<AuthResponse>('/users/signup', data);
+      const response = await api.post<SignupResponse>('/users/signup', data);
       console.log('✅ Signup response:', response.data);
       return response.data;
     } catch (error: any) {
@@ -73,9 +82,10 @@ const authService = {
         idToken,
       });
 
-      if (response.data.success && response.data.data.token) {
-        // Store token and user data
-        await storage.setAuthToken(response.data.data.token);
+      if (response.data.success) {
+        if (response.data.data.token) {
+          await storage.setAuthToken(response.data.data.token);
+        }
         await storage.setUserData(response.data.data.user);
       }
 
@@ -105,8 +115,10 @@ const authService = {
     try {
       const response = await api.get<AuthResponse>(`/users/verify-email?token=${token}`);
 
-      if (response.data.success && response.data.data.token) {
-        await storage.setAuthToken(response.data.data.token);
+      if (response.data.success) {
+        if (response.data.data.token) {
+          await storage.setAuthToken(response.data.data.token);
+        }
         await storage.setUserData(response.data.data.user);
       }
 
@@ -118,9 +130,9 @@ const authService = {
   },
 
   // Forgot Password
-  async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+  async forgotPassword(email: string): Promise<MessageResponse> {
     try {
-      const response = await api.post('/users/forgot-password', { email });
+      const response = await api.post<MessageResponse>('/users/forgot-password', { email });
       return response.data;
     } catch (error: any) {
       console.error('❌ Forgot password error:', error.response?.data || error.message);
@@ -129,11 +141,11 @@ const authService = {
   },
 
   // Reset Password
-  async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+  async resetPassword(token: string, newPassword: string): Promise<MessageResponse> {
     try {
-      const response = await api.post(`/users/reset-password`, {
+      const response = await api.post<MessageResponse>('/users/reset-password', {
         token,
-        password: newPassword,
+        newPassword,
       });
       return response.data;
     } catch (error: any) {
@@ -142,10 +154,10 @@ const authService = {
     }
   },
 
-  // Get Profile
-  async getProfile(): Promise<AuthResponse> {
+  // Get Current User
+  async getCurrentUser(): Promise<AuthResponse> {
     try {
-      const response = await api.get<AuthResponse>('/users/profile');
+      const response = await api.get<AuthResponse>('/users/current');
 
       if (response.data.success) {
         await storage.setUserData(response.data.data.user);
@@ -153,15 +165,15 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
-      console.error('❌ Get profile error:', error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || 'Failed to fetch profile');
+      console.error('❌ Get current user error:', error.response?.data || error.message);
+      throw new Error(error.response?.data?.message || 'Failed to fetch current user');
     }
   },
 
   // Update Profile
-  async updateProfile(data: Partial<SignupData>): Promise<AuthResponse> {
+  async updateProfile(data: UpdateProfileData): Promise<AuthResponse> {
     try {
-      const response = await api.put<AuthResponse>('/users/profile', data);
+      const response = await api.put<AuthResponse>('/users/update', data);
 
       if (response.data.success) {
         await storage.setUserData(response.data.data.user);

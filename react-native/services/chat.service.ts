@@ -182,7 +182,9 @@ const chatService = {
         );
 
         if (sharedChannels.length > 0) {
-          return { success: true, data: sharedChannels[0].Channels };
+          const channel = sharedChannels[0].Channels;
+          const directChannel = (Array.isArray(channel) ? channel[0] : channel) as ChatChannel;
+          return { success: true, data: directChannel };
         }
       }
 

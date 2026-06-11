@@ -121,7 +121,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
     .json(
       new ApiResponse(
         200,
-        { user: { id: user.id, email: user.email, roles } },
+        { user: { id: user.id, email: user.email, roles }, token },
         "Login successful"
       )
     );
@@ -372,7 +372,10 @@ export const googleAuth = asyncHandler(async (req, res, next) => {
     .json(
       new ApiResponse(
         200,
-        { user: { id: user.id, email: user.email, name: user.name, roles } },
+        {
+          user: { id: user.id, email: user.email, name: user.name, roles },
+          token,
+        },
         "Google authentication successful"
       )
     );
@@ -442,6 +445,7 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
           isVerified: true,
           roles,
         },
+        token: authToken,
       },
       "Email verified successfully. You are now logged in."
     )

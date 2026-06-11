@@ -18,18 +18,30 @@ import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchHostels, fetchMessMenu, setSelectedHostel } from '@/store/slices/hostelSlice';
+import { HostelMenu } from '@/services/hostel.service';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+// getDay() is 0 for Sunday; shift so Monday-first DAYS indexes correctly
+const todayName = () => DAYS[(new Date().getDay() + 6) % 7];
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'] as const;
+
+type MealType = (typeof MEAL_TYPES)[number];
+
+function getMealItems(menuRow: HostelMenu | undefined, meal: MealType): string[] {
+  const value = menuRow?.[meal];
+  if (!value) return [];
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 export default function MessMenuScreen() {
   const dispatch = useAppDispatch();
   const { hostels, selectedHostel, menu, isLoading, error } = useAppSelector(
     (state) => state.hostel
   );
-  const [selectedMeal, setSelectedMeal] = useState<'breakfast' | 'lunch' | 'dinner'>(
-    getCurrentMeal()
-  );
+  const [selectedMeal, setSelectedMeal] = useState<MealType>(getCurrentMeal());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -42,7 +54,7 @@ export default function MessMenuScreen() {
     }
   }, [selectedHostel]);
 
-  function getCurrentMeal(): 'breakfast' | 'lunch' | 'dinner' {
+  function getCurrentMeal(): MealType {
     const hour = new Date().getHours();
     if (hour < 10) return 'breakfast';
     if (hour < 16) return 'lunch';
@@ -66,9 +78,10 @@ export default function MessMenuScreen() {
     return <ErrorState message={error} onRetry={() => dispatch(fetchHostels())} />;
   }
 
-  const currentHostel = hostels.find((h) => h.id === selectedHostel) || hostels[0];
-  const todayMenu = menu.filter(
-    (m) => m.day === DAYS[new Date().getDay() - 1] && m.mealType === selectedMeal
+  const currentHostel = hostels.find((h) => h.hostel_id === selectedHostel) || hostels[0];
+  const todayItems = getMealItems(
+    menu.find((m) => m.day === todayName()),
+    selectedMeal
   );
 
   return (
@@ -95,21 +108,21 @@ export default function MessMenuScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hostelScroll}>
           {hostels.map((hostel) => (
             <TouchableOpacity
-              key={hostel.id}
+              key={hostel.hostel_id}
               style={[
                 styles.hostelChip,
-                currentHostel?.id === hostel.id && styles.hostelChipActive,
+                currentHostel?.hostel_id === hostel.hostel_id && styles.hostelChipActive,
               ]}
-              onPress={() => dispatch(setSelectedHostel(hostel.id))}
+              onPress={() => dispatch(setSelectedHostel(hostel.hostel_id))}
               activeOpacity={0.7}
             >
               <Text
                 style={[
                   styles.hostelChipText,
-                  currentHostel?.id === hostel.id && styles.hostelChipTextActive,
+                  currentHostel?.hostel_id === hostel.hostel_id && styles.hostelChipTextActive,
                 ]}
               >
-                {hostel.name}
+                {hostel.hostel_name}
               </Text>
             </TouchableOpacity>
           ))}
@@ -147,13 +160,13 @@ export default function MessMenuScreen() {
         {/* Today's Menu */}
         <View style={styles.menuCard}>
           <View style={styles.menuHeader}>
-            <Text style={styles.menuTitle}>Today's Menu</Text>
+            <Text style={styles.menuTitle}>Today&apos;s Menu</Text>
             <Text style={styles.menuDate}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</Text>
           </View>
 
-          {todayMenu.length > 0 ? (
+          {todayItems.length > 0 ? (
             <View style={styles.menuItems}>
-              {todayMenu[0].items.map((item, index) => (
+              {todayItems.map((item, index) => (
                 <View key={index} style={styles.menuItem}>
                   <Ionicons name="restaurant" size={18} color={COLORS.primary} />
                   <Text style={styles.menuItemText}>{item}</Text>
@@ -175,7 +188,7 @@ export default function MessMenuScreen() {
           <WeeklyMenuCard
             key={day}
             day={day}
-            menu={menu.filter((m) => m.day === day && m.mealType === selectedMeal)}
+            items={getMealItems(menu.find((m) => m.day === day), selectedMeal)}
           />
         ))}
       </ScrollView>
@@ -199,8 +212,8 @@ export default function MessMenuScreen() {
   );
 }
 
-function WeeklyMenuCard({ day, menu }: { day: string; menu: any[] }) {
-  const isToday = DAYS[new Date().getDay() - 1] === day;
+function WeeklyMenuCard({ day, items }: { day: string; items: string[] }) {
+  const isToday = todayName() === day;
 
   return (
     <View style={[styles.weeklyCard, isToday && styles.weeklyCardToday]}>
@@ -209,9 +222,9 @@ function WeeklyMenuCard({ day, menu }: { day: string; menu: any[] }) {
         {isToday && <View style={styles.todayBadge}><Text style={styles.todayBadgeText}>Today</Text></View>}
       </View>
 
-      {menu.length > 0 ? (
+      {items.length > 0 ? (
         <View style={styles.weeklyMenuItems}>
-          {menu[0].items.map((item, index) => (
+          {items.map((item, index) => (
             <Text key={index} style={styles.weeklyMenuItem}>• {item}</Text>
           ))}
         </View>

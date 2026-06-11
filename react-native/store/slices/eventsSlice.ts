@@ -1,63 +1,22 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import eventsService from '@/services/events.service';
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  time: string;
-  location: string;
-  image: string;
-  club: {
-    id: string;
-    name: string;
-    logo: string;
-  };
-  status: 'upcoming' | 'ongoing' | 'completed';
-  registrationRequired: boolean;
-  maxParticipants: number;
-  currentParticipants: number;
-}
-
-interface Club {
-  id: string;
-  name: string;
-  description: string;
-  logo: string;
-  category: string;
-  socialMedia: {
-    facebook?: string;
-    instagram?: string;
-    linkedin?: string;
-  };
-  coordinators: Array<{
-    name: string;
-    phone: string;
-    email: string;
-  }>;
-}
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import eventsService, { Club, Event, EventStatus, getEventStatus } from '@/services/events.service';
 
 interface EventsState {
   events: Event[];
   filteredEvents: Event[];
   clubs: Club[];
-  filteredClubs: Club[];
   isLoading: boolean;
   error: string | null;
-  eventFilter: 'upcoming' | 'ongoing' | 'completed' | 'all';
-  clubCategoryFilter: string;
+  eventFilter: EventStatus | 'all';
 }
 
 const initialState: EventsState = {
   events: [],
   filteredEvents: [],
   clubs: [],
-  filteredClubs: [],
   isLoading: false,
   error: null,
   eventFilter: 'upcoming',
-  clubCategoryFilter: 'All',
 };
 
 export const fetchEvents = createAsyncThunk(
@@ -86,30 +45,13 @@ export const fetchClubs = createAsyncThunk(
   }
 );
 
-export const registerForEvent = createAsyncThunk(
-  'events/registerForEvent',
-  async (eventId: string, { rejectWithValue }) => {
-    try {
-      const response = await eventsService.registerForEvent(eventId);
-      if (response.success) return eventId;
-      return rejectWithValue(response.message);
-    } catch (error: any) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    setEventFilter: (state, action) => {
+    setEventFilter: (state, action: PayloadAction<EventStatus | 'all'>) => {
       state.eventFilter = action.payload;
       state.filteredEvents = filterEvents(state);
-    },
-    setClubCategoryFilter: (state, action) => {
-      state.clubCategoryFilter = action.payload;
-      state.filteredClubs = filterClubs(state);
     },
   },
   extraReducers: (builder) => {
@@ -128,26 +70,14 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchClubs.fulfilled, (state, action) => {
         state.clubs = action.payload;
-        state.filteredClubs = filterClubs(state);
-      })
-      .addCase(registerForEvent.fulfilled, (state, action) => {
-        const event = state.events.find((e) => e.id === action.payload);
-        if (event) {
-          event.currentParticipants += 1;
-        }
       });
   },
 });
 
 function filterEvents(state: EventsState): Event[] {
   if (state.eventFilter === 'all') return state.events;
-  return state.events.filter((event) => event.status === state.eventFilter);
+  return state.events.filter((event) => getEventStatus(event) === state.eventFilter);
 }
 
-function filterClubs(state: EventsState): Club[] {
-  if (state.clubCategoryFilter === 'All') return state.clubs;
-  return state.clubs.filter((club) => club.category === state.clubCategoryFilter);
-}
-
-export const { setEventFilter, setClubCategoryFilter } = eventsSlice.actions;
+export const { setEventFilter } = eventsSlice.actions;
 export default eventsSlice.reducer;

@@ -20,7 +20,7 @@ import ErrorState from '@/components/ErrorState';
 import marketplaceService, { MarketplaceItem } from '@/services/marketplace.service';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 
-const CATEGORIES = ['All', 'Electronics', 'Books', 'Furniture', 'Clothing', 'Sports', 'Other'];
+const CONDITIONS = ['All', 'New', 'Like New', 'Good', 'Fair', 'Poor'];
 
 export default function MarketplaceScreen() {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
@@ -29,7 +29,7 @@ export default function MarketplaceScreen() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCondition, setSelectedCondition] = useState('All');
 
   useEffect(() => {
     fetchItems();
@@ -37,7 +37,7 @@ export default function MarketplaceScreen() {
 
   useEffect(() => {
     filterItems();
-  }, [searchQuery, selectedCategory, items]);
+  }, [searchQuery, selectedCondition, items]);
 
   const fetchItems = async () => {
     try {
@@ -57,21 +57,18 @@ export default function MarketplaceScreen() {
   const filterItems = () => {
     let filtered = items;
 
-    // Filter by category
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+    // Filter by condition
+    if (selectedCondition !== 'All') {
+      filtered = filtered.filter(item => item.item_condition === selectedCondition);
     }
 
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+        item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
-    // Hide sold items
-    filtered = filtered.filter(item => !item.isSold);
 
     setFilteredItems(filtered);
   };
@@ -82,7 +79,7 @@ export default function MarketplaceScreen() {
   };
 
   const handleItemPress = (item: MarketplaceItem) => {
-    alert(`Item details: ${item.title}\nPrice: ₹${item.price}`);
+    alert(`Item details: ${item.item_name}\nPrice: ₹${item.price}`);
   };
 
   if (isLoading) {
@@ -124,29 +121,29 @@ export default function MarketplaceScreen() {
           )}
         </View>
 
-        {/* Categories */}
+        {/* Conditions */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.categoriesContainer}
         >
-          {CATEGORIES.map(category => (
+          {CONDITIONS.map(condition => (
             <TouchableOpacity
-              key={category}
+              key={condition}
               style={[
                 styles.categoryChip,
-                selectedCategory === category && styles.categoryChipActive,
+                selectedCondition === condition && styles.categoryChipActive,
               ]}
-              onPress={() => setSelectedCategory(category)}
+              onPress={() => setSelectedCondition(condition)}
               activeOpacity={0.7}
             >
               <Text
                 style={[
                   styles.categoryChipText,
-                  selectedCategory === category && styles.categoryChipTextActive,
+                  selectedCondition === condition && styles.categoryChipTextActive,
                 ]}
               >
-                {category}
+                {condition}
               </Text>
             </TouchableOpacity>
           ))}
@@ -204,11 +201,11 @@ export default function MarketplaceScreen() {
 // Product Card Component
 function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => void }) {
   const getConditionColor = () => {
-    switch (item.condition) {
-      case 'new': return '#10B981';
-      case 'like-new': return '#3B82F6';
-      case 'good': return '#F59E0B';
-      case 'fair': return '#EF4444';
+    switch (item.item_condition) {
+      case 'New': return '#10B981';
+      case 'Like New': return '#3B82F6';
+      case 'Good': return '#F59E0B';
+      case 'Fair': return '#EF4444';
       default: return '#6B7280';
     }
   };
@@ -216,8 +213,8 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
       {/* Image */}
-      {item.images && item.images.length > 0 ? (
-        <Image source={{ uri: item.images[0] }} style={styles.cardImage} />
+      {item.image_url ? (
+        <Image source={{ uri: item.image_url }} style={styles.cardImage} />
       ) : (
         <View style={styles.cardImagePlaceholder}>
           <Ionicons name="image-outline" size={40} color={COLORS.textLight} />
@@ -225,10 +222,10 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
       )}
 
       {/* Condition Badge */}
-      {item.condition && (
+      {item.item_condition && (
         <View style={[styles.conditionBadge, { backgroundColor: getConditionColor() }]}>
           <Text style={styles.conditionBadgeText}>
-            {item.condition.replace('-', ' ').toUpperCase()}
+            {item.item_condition.toUpperCase()}
           </Text>
         </View>
       )}
@@ -236,7 +233,7 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
       {/* Content */}
       <View style={styles.cardContent}>
         <Text style={styles.cardTitle} numberOfLines={1}>
-          {item.title}
+          {item.item_name}
         </Text>
         <Text style={styles.cardPrice}>₹{item.price.toLocaleString()}</Text>
         <Text style={styles.cardDescription} numberOfLines={2}>
@@ -245,8 +242,10 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
 
         <View style={styles.cardFooter}>
           <View style={styles.cardCategory}>
-            <Ionicons name="pricetag-outline" size={14} color={COLORS.textLight} />
-            <Text style={styles.cardCategoryText}>{item.category}</Text>
+            <Ionicons name="call-outline" size={14} color={COLORS.textLight} />
+            <Text style={styles.cardCategoryText} numberOfLines={1}>
+              {item.owner_contact}
+            </Text>
           </View>
           <Text style={styles.cardDate}>
             {new Date(item.createdAt).toLocaleDateString()}

@@ -124,7 +124,7 @@ export default function AttendanceScreen() {
 
         {stats.subjects.map(subject => (
           <SubjectCard
-            key={subject.id}
+            key={subject.subjectId}
             subject={subject}
             onPress={() => alert(`Subject details: ${subject.name}`)}
           />
@@ -182,10 +182,12 @@ function SubjectCard({ subject, onPress }: { subject: Subject; onPress: () => vo
           <View style={styles.subjectStat}>
             <Ionicons name="checkmark-circle" size={16} color={color} />
             <Text style={styles.subjectStatText}>
-              {subject.attendedClasses}/{subject.totalClasses} classes
+              {subject.presentDays}/{subject.totalDays} classes
             </Text>
           </View>
-          <Text style={styles.creditsText}>{subject.credits} Credits</Text>
+          {subject.credits != null && (
+            <Text style={styles.creditsText}>{subject.credits} Credits</Text>
+          )}
         </View>
       </View>
     </TouchableOpacity>

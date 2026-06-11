@@ -1,36 +1,46 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
 export interface Branch {
-  id: string;
-  name: string;
-  code: string;
+  branch_id: number;
+  branch_name: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Year {
-  id: string;
-  branchId: string;
-  year: number;
+  year_id: number;
+  year_name: 'First Year' | 'Second Year' | 'Third Year' | 'Fourth Year';
+  branch_id: number;
+  createdAt: string;
+  updatedAt: string;
+  Branch?: Branch;
+}
+
+export interface Subject {
+  id: number;
   name: string;
+  code: string;
+  credit: number | null;
+  icon: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface StudyMaterial {
-  id: string;
-  subjectId: string;
+  material_id: number;
   title: string;
-  description: string;
-  fileUrl: string;
-  fileType: string;
-  uploadedBy: string;
+  material_type: 'Video' | 'PDF';
+  material_url: string;
+  subject_id: number;
+  branch_id: number;
+  year_id: number;
   createdAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-  };
+  updatedAt: string;
 }
 
 const resourcesService = {
   // Get all branches
-  async getBranches(): Promise<{ success: boolean; data: Branch[] }> {
+  async getBranches(): Promise<ApiResponse<Branch[]>> {
     try {
       const response = await api.get('/resources/branches');
       return response.data;
@@ -39,30 +49,30 @@ const resourcesService = {
     }
   },
 
-  // Get years for a branch
-  async getYears(branchId: string): Promise<{ success: boolean; data: Year[] }> {
+  // Get all years
+  async getYears(): Promise<ApiResponse<Year[]>> {
     try {
-      const response = await api.get(`/resources/branch/${branchId}/years`);
+      const response = await api.get('/resources/years');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch years');
     }
   },
 
-  // Get subjects for a year
-  async getSubjects(yearId: string): Promise<{ success: boolean; data: any[] }> {
+  // Get all subjects
+  async getSubjects(): Promise<ApiResponse<Subject[]>> {
     try {
-      const response = await api.get(`/resources/year/${yearId}/subjects`);
+      const response = await api.get('/resources/subjects');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch subjects');
     }
   },
 
-  // Get study materials for a subject
-  async getMaterials(subjectId: string): Promise<{ success: boolean; data: StudyMaterial[] }> {
+  // Get all study materials
+  async getMaterials(): Promise<ApiResponse<StudyMaterial[]>> {
     try {
-      const response = await api.get(`/resources/subject/${subjectId}/materials`);
+      const response = await api.get('/resources/study-materials');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch materials');
@@ -70,9 +80,9 @@ const resourcesService = {
   },
 
   // Upload study material
-  async upload(data: FormData): Promise<{ success: boolean; data: StudyMaterial }> {
+  async upload(data: FormData): Promise<ApiResponse<StudyMaterial>> {
     try {
-      const response = await api.post('/resources/upload', data, {
+      const response = await api.post('/resources/study-materials', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

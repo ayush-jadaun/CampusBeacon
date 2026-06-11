@@ -1,46 +1,24 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
 export interface Eatery {
-  id: string;
+  id: number;
   name: string;
-  description: string;
   location: string;
-  type: string;
-  openingTime: string;
-  closingTime: string;
-  imageUrl: string;
-  menu: MenuItem[];
-  rating: number;
-  totalReviews: number;
-  contactNumber: string;
+  description: string | null;
+  phoneNumber: string | null;
+  openingTime: string | null;
+  closingTime: string | null;
+  rating: number | null;
+  menuImageUrl: string | null;
+  totalRatings: number;
+  ratingSum: number;
   createdAt: string;
-}
-
-export interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  isAvailable: boolean;
-  description?: string;
-}
-
-export interface EateryRating {
-  id: string;
-  eateryId: string;
-  userId: string;
-  rating: number;
-  review: string;
-  createdAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-  };
+  updatedAt: string;
 }
 
 const eateriesService = {
   // Get all eateries
-  async getAll(): Promise<{ success: boolean; data: Eatery[] }> {
+  async getAll(): Promise<ApiResponse<Eatery[]>> {
     try {
       const response = await api.get('/eateries');
       return response.data;
@@ -50,7 +28,7 @@ const eateriesService = {
   },
 
   // Get eatery by ID
-  async getById(id: string): Promise<{ success: boolean; data: Eatery }> {
+  async getById(id: number): Promise<ApiResponse<Eatery>> {
     try {
       const response = await api.get(`/eateries/${id}`);
       return response.data;
@@ -60,10 +38,9 @@ const eateriesService = {
   },
 
   // Rate eatery
-  async rate(eateryId: string, data: {
+  async rate(eateryId: number, data: {
     rating: number;
-    review: string;
-  }): Promise<{ success: boolean; data: EateryRating }> {
+  }): Promise<ApiResponse<Eatery>> {
     try {
       const response = await api.post(`/eateries/${eateryId}/rate`, data);
       return response.data;

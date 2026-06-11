@@ -19,15 +19,12 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchClubs, setClubCategoryFilter } from '@/store/slices/eventsSlice';
-
-const CATEGORIES = ['All', 'Technical', 'Cultural', 'Sports', 'Literary', 'Social'];
+import { fetchClubs } from '@/store/slices/eventsSlice';
+import { Club } from '@/services/events.service';
 
 export default function ClubsScreen() {
   const dispatch = useAppDispatch();
-  const { filteredClubs, isLoading, error, clubCategoryFilter } = useAppSelector(
-    (state) => state.events
-  );
+  const { clubs, isLoading, error } = useAppSelector((state) => state.events);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -40,11 +37,11 @@ export default function ClubsScreen() {
     setIsRefreshing(false);
   };
 
-  if (isLoading && !filteredClubs.length) {
+  if (isLoading && !clubs.length) {
     return <LoadingState message="Loading clubs..." />;
   }
 
-  if (error && !filteredClubs.length) {
+  if (error && !clubs.length) {
     return <ErrorState message={error} onRetry={() => dispatch(fetchClubs())} />;
   }
 
@@ -63,49 +60,20 @@ export default function ClubsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Category Filters */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesScroll}
-        contentContainerStyle={styles.categoriesContent}
-      >
-        {CATEGORIES.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryChip,
-              clubCategoryFilter === category && styles.categoryChipActive,
-            ]}
-            onPress={() => dispatch(setClubCategoryFilter(category))}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={[
-                styles.categoryChipText,
-                clubCategoryFilter === category && styles.categoryChipTextActive,
-              ]}
-            >
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />}
         contentContainerStyle={styles.scrollContent}
       >
-        {filteredClubs.length === 0 ? (
+        {clubs.length === 0 ? (
           <EmptyState
             icon="people-outline"
             title="No Clubs Found"
-            message="Try selecting a different category"
+            message="Check back later for new clubs!"
           />
         ) : (
           <View style={styles.clubsList}>
-            {filteredClubs.map((club) => (
+            {clubs.map((club) => (
               <ClubCard key={club.id} club={club} />
             ))}
           </View>
@@ -115,16 +83,27 @@ export default function ClubsScreen() {
   );
 }
 
-function ClubCard({ club }: any) {
-  const categoryColors: { [key: string]: string[] } = {
-    Technical: ['#667eea', '#764ba2'],
-    Cultural: ['#f093fb', '#f5576c'],
-    Sports: ['#4facfe', '#00f2fe'],
-    Literary: ['#43e97b', '#38f9d7'],
-    Social: ['#fa709a', '#fee140'],
-  };
+const GRADIENTS = [
+  ['#667eea', '#764ba2'],
+  ['#f093fb', '#f5576c'],
+  ['#4facfe', '#00f2fe'],
+  ['#43e97b', '#38f9d7'],
+  ['#fa709a', '#fee140'],
+] as const;
 
-  const colors = categoryColors[club.category] || ['#667eea', '#764ba2'];
+function getSocialIcon(url: string): {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+} {
+  if (url.includes('facebook')) return { name: 'logo-facebook', color: '#1877F2' };
+  if (url.includes('instagram')) return { name: 'logo-instagram', color: '#E4405F' };
+  if (url.includes('linkedin')) return { name: 'logo-linkedin', color: '#0A66C2' };
+  return { name: 'link', color: COLORS.primary };
+}
+
+function ClubCard({ club }: { club: Club }) {
+  const colors = GRADIENTS[club.id % GRADIENTS.length];
+  const logo = club.images?.[0];
 
   const openSocialMedia = (url?: string) => {
     if (url) {
@@ -141,65 +120,39 @@ function ClubCard({ club }: any) {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        {club.logo ? (
-          <Image source={{ uri: club.logo }} style={styles.clubLogo} />
+        {logo ? (
+          <Image source={{ uri: logo }} style={styles.clubLogo} />
         ) : (
           <View style={styles.clubLogoPlaceholder}>
             <Ionicons name="people" size={32} color={COLORS.white} />
           </View>
         )}
         <Text style={styles.clubName}>{club.name}</Text>
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryBadgeText}>{club.category}</Text>
-        </View>
       </LinearGradient>
 
       {/* Content */}
       <View style={styles.clubContent}>
-        <Text style={styles.clubDescription} numberOfLines={3}>
-          {club.description}
-        </Text>
+        {club.description ? (
+          <Text style={styles.clubDescription} numberOfLines={3}>
+            {club.description}
+          </Text>
+        ) : null}
 
         {/* Social Media Links */}
-        <View style={styles.socialMedia}>
-          {club.socialMedia.facebook && (
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => openSocialMedia(club.socialMedia.facebook)}
-            >
-              <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-            </TouchableOpacity>
-          )}
-          {club.socialMedia.instagram && (
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => openSocialMedia(club.socialMedia.instagram)}
-            >
-              <Ionicons name="logo-instagram" size={20} color="#E4405F" />
-            </TouchableOpacity>
-          )}
-          {club.socialMedia.linkedin && (
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => openSocialMedia(club.socialMedia.linkedin)}
-            >
-              <Ionicons name="logo-linkedin" size={20} color="#0A66C2" />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Coordinators */}
-        {club.coordinators && club.coordinators.length > 0 && (
-          <View style={styles.coordinators}>
-            <Text style={styles.coordinatorsTitle}>Coordinators:</Text>
-            {club.coordinators.map((coordinator: any, index: number) => (
-              <View key={index} style={styles.coordinator}>
-                <Ionicons name="person-circle" size={16} color={COLORS.textSecondary} />
-                <Text style={styles.coordinatorText}>
-                  {coordinator.name} • {coordinator.phone}
-                </Text>
-              </View>
-            ))}
+        {club.social_media_links && club.social_media_links.length > 0 && (
+          <View style={styles.socialMedia}>
+            {club.social_media_links.map((link, index) => {
+              const icon = getSocialIcon(link);
+              return (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.socialButton}
+                  onPress={() => openSocialMedia(link)}
+                >
+                  <Ionicons name={icon.name} size={20} color={icon.color} />
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
 
@@ -244,34 +197,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.text,
   },
-  categoriesScroll: {
-    flexGrow: 0,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.backgroundDark,
-  },
-  categoriesContent: {
-    paddingHorizontal: SIZES.xl,
-    paddingVertical: SIZES.md,
-    gap: SIZES.sm,
-  },
-  categoryChip: {
-    paddingVertical: SIZES.sm,
-    paddingHorizontal: SIZES.lg,
-    borderRadius: 20,
-    backgroundColor: COLORS.backgroundDark,
-  },
-  categoryChipActive: {
-    backgroundColor: COLORS.primary,
-  },
-  categoryChipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  categoryChipTextActive: {
-    color: COLORS.white,
-  },
   scrollContent: {
     padding: SIZES.xl,
     paddingBottom: SIZES.xxxl,
@@ -315,17 +240,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: SIZES.sm,
   },
-  categoryBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    paddingVertical: SIZES.xs,
-    paddingHorizontal: SIZES.md,
-    borderRadius: 12,
-  },
-  categoryBadgeText: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: COLORS.white,
-  },
   clubContent: {
     padding: SIZES.lg,
   },
@@ -347,28 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.backgroundDark,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  coordinators: {
-    backgroundColor: COLORS.backgroundDark,
-    borderRadius: 12,
-    padding: SIZES.md,
-    marginBottom: SIZES.lg,
-  },
-  coordinatorsTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SIZES.sm,
-  },
-  coordinator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SIZES.xs,
-    marginTop: SIZES.xs,
-  },
-  coordinatorText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
   },
   actions: {
     gap: SIZES.sm,

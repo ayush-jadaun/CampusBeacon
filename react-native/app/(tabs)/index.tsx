@@ -126,7 +126,7 @@ export default function HomeScreen() {
               <View>
                 <Text style={styles.greeting}>{getGreeting()},</Text>
                 <Text style={styles.userName}>
-                  {user?.firstName || 'Student'} {user?.lastName || ''}! 👋
+                  {user?.name || 'Student'}! 👋
                 </Text>
               </View>
 
@@ -188,7 +188,7 @@ export default function HomeScreen() {
                   key={service.id}
                   title={service.title}
                   icon={service.icon}
-                  gradientColors={service.gradientColors}
+                  gradientColors={service.gradientColors as [string, string]}
                   onPress={() => handleServicePress(service.route)}
                   badge={service.badge}
                 />
@@ -219,7 +219,7 @@ export default function HomeScreen() {
               activities.map((activity) => (
                 <RecentActivityCard
                   key={activity.id}
-                  icon={activity.icon}
+                  icon={activity.icon as keyof typeof Ionicons.glyphMap}
                   iconColor={activity.iconColor}
                   iconBg={activity.iconBg}
                   title={activity.title}

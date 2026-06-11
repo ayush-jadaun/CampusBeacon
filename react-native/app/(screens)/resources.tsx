@@ -20,35 +20,37 @@ import {
   setSelectedBranch,
   setSelectedYear,
   resetSelection,
-  fetchResourcesByBranch,
-  fetchResourcesByYear,
-  fetchResourcesBySubject,
+  fetchBranches,
+  fetchYears,
+  fetchMaterials,
 } from '@/store/slices/resourcesSlice';
+import type { Branch, Year, StudyMaterial } from '@/services/resources.service';
 import type { ColorValue } from "react-native";
-const YEARS = [1, 2, 3, 4];
 
 export default function ResourcesScreen() {
   const dispatch = useAppDispatch();
-  const { branches, selectedBranch, selectedYear, selectedSubject, resources, isLoading } =
+  const { branches, years, materials, selectedBranch, selectedYear, isLoading } =
     useAppSelector((state) => state.resources);
 
-  const handleBranchSelect = (branch: string) => {
+  useEffect(() => {
+    dispatch(fetchBranches());
+  }, [dispatch]);
+
+  const handleBranchSelect = (branch: Branch) => {
     dispatch(setSelectedBranch(branch));
-    dispatch(fetchResourcesByBranch(branch));
+    dispatch(fetchYears(branch.branch_id));
   };
 
-  const handleYearSelect = (year: number) => {
+  const handleYearSelect = (year: Year) => {
     if (selectedBranch) {
       dispatch(setSelectedYear(year));
-      dispatch(fetchResourcesByYear({ branch: selectedBranch, year }));
+      dispatch(fetchMaterials({ branchId: selectedBranch.branch_id, yearId: year.year_id }));
     }
   };
 
   const handleBack = () => {
-    if (selectedSubject) {
-      dispatch(setSelectedYear(selectedYear));
-    } else if (selectedYear) {
-      dispatch(setSelectedBranch(selectedBranch));
+    if (selectedYear) {
+      dispatch(setSelectedYear(null));
     } else if (selectedBranch) {
       dispatch(resetSelection());
     } else {
@@ -85,7 +87,11 @@ export default function ResourcesScreen() {
               <Text style={styles.instructionText}>Select your branch to access resources</Text>
               <View style={styles.grid}>
                 {branches.map((branch) => (
-                  <BranchCard key={branch} branch={branch} onPress={() => handleBranchSelect(branch)} />
+                  <BranchCard
+                    key={branch.branch_id}
+                    branch={branch}
+                    onPress={() => handleBranchSelect(branch)}
+                  />
                 ))}
               </View>
             </>
@@ -96,8 +102,8 @@ export default function ResourcesScreen() {
             <>
               <Text style={styles.instructionText}>Select your year</Text>
               <View style={styles.yearGrid}>
-                {YEARS.map((year) => (
-                  <YearCard key={year} year={year} onPress={() => handleYearSelect(year)} />
+                {years.map((year) => (
+                  <YearCard key={year.year_id} year={year} onPress={() => handleYearSelect(year)} />
                 ))}
               </View>
             </>
@@ -107,15 +113,15 @@ export default function ResourcesScreen() {
           {selectedBranch && selectedYear && (
             <>
               <Text style={styles.instructionText}>
-                {selectedBranch} - Year {selectedYear}
+                {selectedBranch.branch_name} - {selectedYear.year_name}
               </Text>
-              {resources.length > 0 ? (
+              {materials.length > 0 ? (
                 <View style={styles.resourcesList}>
-                  {resources.map((resource) => (
+                  {materials.map((material) => (
                     <ResourceCard
-                      key={resource.id}
-                      resource={resource}
-                      onPress={() => downloadResource(resource.fileUrl)}
+                      key={material.material_id}
+                      material={material}
+                      onPress={() => downloadResource(material.material_url)}
                     />
                   ))}
                 </View>
@@ -152,49 +158,48 @@ export default function ResourcesScreen() {
   );
 }
 
-function BranchCard({ branch, onPress }: { branch: string; onPress: () => void }) {
+function BranchCard({ branch, onPress }: { branch: Branch; onPress: () => void }) {
 
 
   const branchColors: { [key: string]: readonly [ColorValue, ColorValue] } = {
-    CSE: ['#667eea', '#764ba2'],
-    ECE: ['#f093fb', '#f5576c'],
-    ME: ['#4facfe', '#00f2fe'],
-    CE: ['#43e97b', '#38f9d7'],
-    EE: ['#fa709a', '#fee140'],
-    IT: ['#30cfd0', '#330867'],
-    CHE: ['#a8edea', '#fed6e3'],
+    'Computer Science and Engineering': ['#667eea', '#764ba2'],
+    'Electronics and Communication Engineering': ['#f093fb', '#f5576c'],
+    'Mechanical Engineering': ['#4facfe', '#00f2fe'],
+    'Civil Engineering': ['#43e97b', '#38f9d7'],
+    'Electrical Engineering': ['#fa709a', '#fee140'],
+    'Chemical Engineering': ['#30cfd0', '#330867'],
+    'Biotechnology': ['#a8edea', '#fed6e3'],
   };
 
   return (
     <TouchableOpacity style={styles.branchCard} onPress={onPress} activeOpacity={0.8}>
       <LinearGradient
-        colors={branchColors[branch] ?? ['#667eea', '#764ba2'] as [ColorValue, ColorValue]}
+        colors={branchColors[branch.branch_name] ?? ['#667eea', '#764ba2'] as [ColorValue, ColorValue]}
         style={styles.branchGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
         <Ionicons name="book" size={32} color={COLORS.white} />
-        <Text style={styles.branchText}>{branch}</Text>
+        <Text style={styles.branchText}>{branch.branch_name}</Text>
       </LinearGradient>
     </TouchableOpacity>
   );
 }
 
-function YearCard({ year, onPress }: { year: number; onPress: () => void }) {
+function YearCard({ year, onPress }: { year: Year; onPress: () => void }) {
   return (
     <TouchableOpacity style={styles.yearCard} onPress={onPress} activeOpacity={0.7}>
-      <Text style={styles.yearNumber}>{year}</Text>
-      <Text style={styles.yearLabel}>{year === 1 ? 'st' : year === 2 ? 'nd' : year === 3 ? 'rd' : 'th'} Year</Text>
+      <Ionicons name="school" size={40} color={COLORS.primary} />
+      <Text style={styles.yearLabel}>{year.year_name}</Text>
     </TouchableOpacity>
   );
 }
 
-function ResourceCard({ resource, onPress }: { resource: any; onPress: () => void }) {
-  const getFileIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'notes': return 'document-text';
-      case 'pyq': return 'clipboard';
-      case 'book': return 'book';
+function ResourceCard({ material, onPress }: { material: StudyMaterial; onPress: () => void }) {
+  const getFileIcon = (type: StudyMaterial['material_type']) => {
+    switch (type) {
+      case 'Video': return 'videocam';
+      case 'PDF': return 'document-text';
       default: return 'document';
     }
   };
@@ -202,17 +207,18 @@ function ResourceCard({ resource, onPress }: { resource: any; onPress: () => voi
   return (
     <TouchableOpacity style={styles.resourceCard} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.resourceIcon}>
-        <Ionicons name={getFileIcon(resource.type)} size={24} color={COLORS.primary} />
+        <Ionicons name={getFileIcon(material.material_type)} size={24} color={COLORS.primary} />
       </View>
       <View style={styles.resourceContent}>
-        <Text style={styles.resourceTitle}>{resource.title}</Text>
+        <Text style={styles.resourceTitle}>{material.title}</Text>
         <View style={styles.resourceMeta}>
           <View style={styles.resourceTag}>
-            <Text style={styles.resourceTagText}>{resource.type}</Text>
+            <Text style={styles.resourceTagText}>{material.material_type}</Text>
           </View>
-          <Text style={styles.resourceSubject}>{resource.subject}</Text>
         </View>
-        <Text style={styles.resourceUploader}>Uploaded by {resource.uploadedBy}</Text>
+        <Text style={styles.resourceUploader}>
+          Added on {new Date(material.createdAt).toLocaleDateString()}
+        </Text>
       </View>
       <Ionicons name="download-outline" size={22} color={COLORS.primary} />
     </TouchableOpacity>
@@ -275,9 +281,11 @@ const styles = StyleSheet.create({
     gap: SIZES.sm,
   },
   branchText: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: 'bold',
     color: COLORS.white,
+    textAlign: 'center',
+    paddingHorizontal: SIZES.sm,
   },
   yearGrid: {
     flexDirection: 'row',

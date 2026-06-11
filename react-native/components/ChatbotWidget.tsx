@@ -133,7 +133,7 @@ export default function ChatbotWidget() {
                   <Ionicons name="sparkles" size={40} color="#667eea" />
                   <Text style={styles.welcomeTitle}>Hi there!</Text>
                   <Text style={styles.welcomeMessage}>
-                    I'm your campus assistant. Ask me anything about CampusBeacon!
+                    I&apos;m your campus assistant. Ask me anything about CampusBeacon!
                   </Text>
                   <View style={styles.suggestionsContainer}>
                     {suggestions.map((suggestion, index) => (

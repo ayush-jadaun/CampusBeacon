@@ -1,50 +1,31 @@
-import api from '@/services/api';
+import api, { ApiResponse } from '@/services/api';
 
 export interface LostAndFoundItem {
-  id: string;
-  userId: string;
-  itemType: string;
-  itemName: string;
-  description: string;
-  location: string;
-  date: string;
-  status: 'lost' | 'found' | 'resolved';
-  images: string[];
-  contactInfo: string;
+  id: number;
+  item_name: string;
+  description: string | null;
+  location_found: string | null;
+  date_found: string | null;
+  owner_contact: string | null;
+  image_url: string | null;
+  userId: number;
   createdAt: string;
   updatedAt: string;
-  user?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
 }
 
 export interface CreateLostAndFoundData {
-  itemType: string;
-  itemName: string;
-  description: string;
-  location: string;
-  date: string;
-  status: 'lost' | 'found';
-  images?: string[];
-  contactInfo: string;
+  item_name: string;
+  description?: string;
+  location_found?: string;
+  date_found?: string;
+  owner_contact?: string;
 }
 
 const lostAndFoundService = {
   // Get all items
-  async getAll(filters?: {
-    status?: string;
-    itemType?: string;
-    search?: string;
-  }): Promise<{ success: boolean; data: LostAndFoundItem[] }> {
+  async getAll(): Promise<ApiResponse<LostAndFoundItem[]>> {
     try {
-      const params = new URLSearchParams();
-      if (filters?.status) params.append('status', filters.status);
-      if (filters?.itemType) params.append('itemType', filters.itemType);
-      if (filters?.search) params.append('search', filters.search);
-
-      const response = await api.get(`/lost-and-found/lost-items?${params.toString()}`);
+      const response = await api.get('/lost-and-found/lost-items');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');
@@ -52,7 +33,7 @@ const lostAndFoundService = {
   },
 
   // Get item by ID
-  async getById(id: string): Promise<{ success: boolean; data: LostAndFoundItem }> {
+  async getById(id: number): Promise<ApiResponse<LostAndFoundItem>> {
     try {
       const response = await api.get(`/lost-and-found/lost-items/${id}`);
       return response.data;
@@ -62,7 +43,7 @@ const lostAndFoundService = {
   },
 
   // Create new item
-  async create(data: CreateLostAndFoundData): Promise<{ success: boolean; data: LostAndFoundItem }> {
+  async create(data: CreateLostAndFoundData): Promise<ApiResponse<LostAndFoundItem>> {
     try {
       const response = await api.post('/lost-and-found/lost-items', data);
       return response.data;
@@ -72,7 +53,7 @@ const lostAndFoundService = {
   },
 
   // Update item
-  async update(id: string, data: Partial<CreateLostAndFoundData>): Promise<{ success: boolean; data: LostAndFoundItem }> {
+  async update(id: number, data: Partial<CreateLostAndFoundData>): Promise<ApiResponse<LostAndFoundItem>> {
     try {
       const response = await api.put(`/lost-and-found/lost-items/${id}`, data);
       return response.data;
@@ -82,7 +63,7 @@ const lostAndFoundService = {
   },
 
   // Delete item
-  async delete(id: string): Promise<{ success: boolean; message: string }> {
+  async delete(id: number): Promise<ApiResponse<null>> {
     try {
       const response = await api.delete(`/lost-and-found/lost-items/${id}`);
       return response.data;
