@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -24,7 +24,6 @@ const CONDITIONS = ['All', 'New', 'Like New', 'Good', 'Fair', 'Poor'];
 
 export default function MarketplaceScreen() {
   const [items, setItems] = useState<MarketplaceItem[]>([]);
-  const [filteredItems, setFilteredItems] = useState<MarketplaceItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
@@ -34,10 +33,6 @@ export default function MarketplaceScreen() {
   useEffect(() => {
     fetchItems();
   }, []);
-
-  useEffect(() => {
-    filterItems();
-  }, [searchQuery, selectedCondition, items]);
 
   const fetchItems = async () => {
     try {
@@ -54,15 +49,13 @@ export default function MarketplaceScreen() {
     }
   };
 
-  const filterItems = () => {
+  const filteredItems = useMemo(() => {
     let filtered = items;
 
-    // Filter by condition
     if (selectedCondition !== 'All') {
       filtered = filtered.filter(item => item.item_condition === selectedCondition);
     }
 
-    // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
         item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,8 +63,8 @@ export default function MarketplaceScreen() {
       );
     }
 
-    setFilteredItems(filtered);
-  };
+    return filtered;
+  }, [items, searchQuery, selectedCondition]);
 
   const onRefresh = () => {
     setIsRefreshing(true);

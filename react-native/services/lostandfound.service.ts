@@ -1,4 +1,4 @@
-import api, { ApiResponse } from '@/services/api';
+import api, { ApiResponse, LocalImage, toFormData } from '@/services/api';
 
 export interface LostAndFoundItem {
   id: number;
@@ -42,10 +42,12 @@ const lostAndFoundService = {
     }
   },
 
-  // Create new item
-  async create(data: CreateLostAndFoundData): Promise<ApiResponse<LostAndFoundItem>> {
+  // Create new item (backend expects multipart with optional "image" file)
+  async create(data: CreateLostAndFoundData, image?: LocalImage | null): Promise<ApiResponse<LostAndFoundItem>> {
     try {
-      const response = await api.post('/lost-and-found/lost-items', data);
+      const response = await api.post('/lost-and-found/lost-items', toFormData(data, image), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create item');
@@ -53,9 +55,15 @@ const lostAndFoundService = {
   },
 
   // Update item
-  async update(id: number, data: Partial<CreateLostAndFoundData>): Promise<ApiResponse<LostAndFoundItem>> {
+  async update(
+    id: number,
+    data: Partial<CreateLostAndFoundData>,
+    image?: LocalImage | null
+  ): Promise<ApiResponse<LostAndFoundItem>> {
     try {
-      const response = await api.put(`/lost-and-found/lost-items/${id}`, data);
+      const response = await api.put(`/lost-and-found/lost-items/${id}`, toFormData(data, image), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update item');

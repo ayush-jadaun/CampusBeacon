@@ -43,7 +43,7 @@ export default function ChatbotWidget() {
         useNativeDriver: true,
       }).start();
     }
-  }, [isOpen]);
+  }, [isOpen, dispatch, scaleAnim]);
 
   useEffect(() => {
     // Auto-scroll to bottom when new messages arrive

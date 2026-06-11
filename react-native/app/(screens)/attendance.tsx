@@ -28,7 +28,7 @@ export default function AttendanceScreen() {
 
   useEffect(() => {
     dispatch(fetchAttendance());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

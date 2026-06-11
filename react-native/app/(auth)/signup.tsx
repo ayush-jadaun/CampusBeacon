@@ -15,8 +15,9 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import Checkbox from 'expo-checkbox';
+import { Checkbox } from 'expo-checkbox';
 import CustomEmailInput from '../../components/CustomEmailInput';
+import { googleAuthService } from '../../services/google-auth.service';
 import { COLORS, SIZES } from '../../constants/theme';
 import authService from '../../services/auth.service';
 
@@ -146,7 +147,6 @@ export default function SignupScreen() {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      const { googleAuthService } = require('../../services/google-auth.service');
       const result = await googleAuthService.signInWithGoogle();
 
       if (result.success) {

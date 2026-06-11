@@ -18,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import CustomEmailInput from '../../components/CustomEmailInput';
 import { COLORS, SIZES } from '../../constants/theme';
 import authService from '../../services/auth.service';
-import { storage } from '../../utils/storage';
+import { googleAuthService } from '../../services/google-auth.service';
 
 export default function LoginScreen() {
   const [emailUsername, setEmailUsername] = useState('');
@@ -82,7 +82,6 @@ export default function LoginScreen() {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      const { googleAuthService } = require('../../services/google-auth.service');
       const result = await googleAuthService.signInWithGoogle();
 
       if (result.success) {

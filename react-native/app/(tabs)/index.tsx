@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -27,8 +27,8 @@ export default function HomeScreen() {
   const dispatch = useAppDispatch();
   const { activities, isLoading: activitiesLoading } = useAppSelector((state) => state.activity);
   const [refreshing, setRefreshing] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const fadeAnim = new Animated.Value(0);
+  const [currentDate] = useState(new Date());
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -39,7 +39,7 @@ export default function HomeScreen() {
 
     // Fetch recent activities on mount
     dispatch(fetchRecentActivities(5));
-  }, [dispatch]);
+  }, [dispatch, fadeAnim]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -188,7 +188,7 @@ export default function HomeScreen() {
                   key={service.id}
                   title={service.title}
                   icon={service.icon}
-                  gradientColors={service.gradientColors as [string, string]}
+                  gradientColors={service.gradientColors}
                   onPress={() => handleServicePress(service.route)}
                   badge={service.badge}
                 />
@@ -219,7 +219,7 @@ export default function HomeScreen() {
               activities.map((activity) => (
                 <RecentActivityCard
                   key={activity.id}
-                  icon={activity.icon as keyof typeof Ionicons.glyphMap}
+                  icon={activity.icon}
                   iconColor={activity.iconColor}
                   iconBg={activity.iconBg}
                   title={activity.title}

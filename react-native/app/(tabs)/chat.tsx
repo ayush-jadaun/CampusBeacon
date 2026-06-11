@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,7 +33,6 @@ export default function ChatScreen() {
   const [inputText, setInputText] = useState('');
   const [showChannelList, setShowChannelList] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
-  const [subscription, setSubscription] = useState<any>(null);
 
   useEffect(() => {
     // Load user's channels
@@ -51,8 +49,6 @@ export default function ChatScreen() {
       const sub = chatService.subscribeToChannel(activeChannelId, (newMessage) => {
         dispatch(addMessageToChannel({ channelId: activeChannelId, message: newMessage }));
       });
-
-      setSubscription(sub);
 
       return () => {
         if (sub) {

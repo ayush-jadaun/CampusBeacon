@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { LocalImage } from '@/services/api';
 import lostFoundService, {
   LostAndFoundItem,
   CreateLostAndFoundData,
@@ -38,9 +39,12 @@ export const fetchLostFoundItems = createAsyncThunk(
 
 export const createLostFoundItem = createAsyncThunk(
   'lostFound/createItem',
-  async (itemData: CreateLostAndFoundData, { rejectWithValue }) => {
+  async (
+    { data, image }: { data: CreateLostAndFoundData; image?: LocalImage | null },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await lostFoundService.create(itemData);
+      const response = await lostFoundService.create(data, image);
       if (response.success) {
         return response.data;
       }

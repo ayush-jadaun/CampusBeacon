@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { LocalImage } from '@/services/api';
 import marketplaceService, {
   MarketplaceItem,
   CreateMarketplaceData,
@@ -59,9 +60,12 @@ export const fetchMyListings = createAsyncThunk(
 
 export const createMarketplaceItem = createAsyncThunk(
   'marketplace/createItem',
-  async (itemData: CreateMarketplaceData, { rejectWithValue }) => {
+  async (
+    { data, image }: { data: CreateMarketplaceData; image?: LocalImage | null },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await marketplaceService.create(itemData);
+      const response = await marketplaceService.create(data, image);
       if (response.success) {
         return response.data;
       }

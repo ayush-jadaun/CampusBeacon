@@ -29,7 +29,7 @@ export default function RideShareScreen() {
 
   useEffect(() => {
     dispatch(fetchRides());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

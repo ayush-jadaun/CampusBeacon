@@ -1,4 +1,4 @@
-import api, { ApiResponse } from '@/services/api';
+import api, { ApiResponse, LocalImage, toFormData } from '@/services/api';
 
 export type ItemCondition = 'New' | 'Like New' | 'Good' | 'Fair' | 'Poor';
 
@@ -61,10 +61,12 @@ const marketplaceService = {
     }
   },
 
-  // Create new item
-  async create(data: CreateMarketplaceData): Promise<ApiResponse<MarketplaceItem>> {
+  // Create new item (backend expects multipart with optional "image" file)
+  async create(data: CreateMarketplaceData, image?: LocalImage | null): Promise<ApiResponse<MarketplaceItem>> {
     try {
-      const response = await api.post('/buy-and-sell/items', data);
+      const response = await api.post('/buy-and-sell/items', toFormData(data, image), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create item');
@@ -72,9 +74,15 @@ const marketplaceService = {
   },
 
   // Update item
-  async update(id: number, data: Partial<CreateMarketplaceData>): Promise<ApiResponse<MarketplaceItem>> {
+  async update(
+    id: number,
+    data: Partial<CreateMarketplaceData>,
+    image?: LocalImage | null
+  ): Promise<ApiResponse<MarketplaceItem>> {
     try {
-      const response = await api.put(`/buy-and-sell/items/${id}`, data);
+      const response = await api.put(`/buy-and-sell/items/${id}`, toFormData(data, image), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update item');

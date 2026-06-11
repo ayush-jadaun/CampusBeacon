@@ -29,7 +29,7 @@ export default function ClubsScreen() {
 
   useEffect(() => {
     dispatch(fetchClubs());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

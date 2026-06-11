@@ -30,7 +30,7 @@ export default function EateriesScreen() {
 
   useEffect(() => {
     dispatch(fetchEateries());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

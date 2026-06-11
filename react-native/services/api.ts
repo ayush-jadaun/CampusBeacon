@@ -10,6 +10,35 @@ export interface ApiResponse<T> {
   message?: string;
 }
 
+// Local file picked on the device (e.g. from expo-image-picker)
+export interface LocalImage {
+  uri: string;
+  name?: string;
+  type?: string;
+}
+
+// Build a multipart body for endpoints using multer's upload.single(field)
+export function toFormData(
+  data: Record<string, any>,
+  image?: LocalImage | null,
+  field = 'image'
+): FormData {
+  const formData = new FormData();
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+  if (image) {
+    formData.append(field, {
+      uri: image.uri,
+      name: image.name ?? image.uri.split('/').pop() ?? 'photo.jpg',
+      type: image.type ?? 'image/jpeg',
+    } as any);
+  }
+  return formData;
+}
+
 // Get API URL from environment or use default localhost
 const API_BASE_URL =
   Constants.expoConfig?.extra?.apiUrl ||

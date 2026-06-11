@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -62,7 +61,7 @@ export default function ProfileScreen() {
     try {
       await logout();
       router.replace('/(onboarding)');
-    } catch (error) {
+    } catch {
       alert('Failed to logout');
     }
   };

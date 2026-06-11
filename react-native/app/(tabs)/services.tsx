@@ -14,11 +14,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import ServiceCard from '@/components/ServiceCard';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
-import { SERVICES, Service } from '@/constants/services';
+import { SERVICES } from '@/constants/services';
 
-type ServiceItem = Service & { description?: string };
-
-const ALL_SERVICES: ServiceItem[] = SERVICES;
+const ALL_SERVICES = SERVICES;
 
 // Group services by category
 const SERVICE_CATEGORIES = [
@@ -210,13 +208,13 @@ export default function ServicesScreen() {
                   activeOpacity={0.7}
                 >
                   <LinearGradient
-                    colors={service.gradientColors as [string, string]}
+                    colors={service.gradientColors}
                     style={styles.featuredCardGradient}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   >
                     <View style={styles.featuredIconContainer}>
-                      <Ionicons name={service.icon as any} size={28} color={COLORS.white} />
+                      <Ionicons name={service.icon} size={28} color={COLORS.white} />
                     </View>
                     <Text style={styles.featuredCardTitle}>{service.title}</Text>
                     <Text style={styles.featuredCardDesc} numberOfLines={2}>
@@ -250,7 +248,7 @@ export default function ServicesScreen() {
                 key={service.id}
                 title={service.title}
                 icon={service.icon}
-                gradientColors={service.gradientColors as [string, string]}
+                gradientColors={service.gradientColors}
                 badge={service.badge}
                 onPress={() => handleServicePress(service.route)}
               />

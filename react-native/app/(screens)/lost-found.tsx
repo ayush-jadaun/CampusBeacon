@@ -34,7 +34,7 @@ export default function LostAndFoundScreen() {
 
   useEffect(() => {
     dispatch(fetchLostFoundItems());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

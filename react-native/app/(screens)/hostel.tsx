@@ -31,7 +31,7 @@ export default function HostelScreen() {
 
   useEffect(() => {
     dispatch(fetchHostels());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedHostel) {
@@ -41,7 +41,7 @@ export default function HostelScreen() {
         dispatch(fetchOfficials(selectedHostel));
       }
     }
-  }, [selectedHostel, selectedTab]);
+  }, [selectedHostel, selectedTab, dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);

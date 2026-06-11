@@ -23,7 +23,7 @@ import { HostelMenu } from '@/services/hostel.service';
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 // getDay() is 0 for Sunday; shift so Monday-first DAYS indexes correctly
 const todayName = () => DAYS[(new Date().getDay() + 6) % 7];
-const MEAL_TYPES = ['breakfast', 'lunch', 'dinner'] as const;
+const MEAL_TYPES = ['breakfast', 'lunch', 'snacks', 'dinner'] as const;
 
 type MealType = (typeof MEAL_TYPES)[number];
 
@@ -46,18 +46,19 @@ export default function MessMenuScreen() {
 
   useEffect(() => {
     dispatch(fetchHostels());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedHostel) {
       dispatch(fetchMessMenu(selectedHostel));
     }
-  }, [selectedHostel]);
+  }, [selectedHostel, dispatch]);
 
   function getCurrentMeal(): MealType {
     const hour = new Date().getHours();
     if (hour < 10) return 'breakfast';
     if (hour < 16) return 'lunch';
+    if (hour < 19) return 'snacks';
     return 'dinner';
   }
 
@@ -143,6 +144,8 @@ export default function MessMenuScreen() {
                     ? 'sunny'
                     : meal === 'lunch'
                     ? 'partly-sunny'
+                    : meal === 'snacks'
+                    ? 'cafe'
                     : 'moon'
                 }
                 size={20}

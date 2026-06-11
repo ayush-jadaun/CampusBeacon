@@ -30,7 +30,7 @@ export default function EventsScreen() {
 
   useEffect(() => {
     dispatch(fetchEvents());
-  }, []);
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);
