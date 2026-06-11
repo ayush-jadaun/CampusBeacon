@@ -120,17 +120,9 @@ const lostFoundSlice = createSlice({
 
     // Create item
     builder
-      .addCase(createLostFoundItem.pending, (state) => {
-        state.isLoading = true;
-      })
       .addCase(createLostFoundItem.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.items.unshift(action.payload);
         state.filteredItems = filterItems(state);
-      })
-      .addCase(createLostFoundItem.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
       });
 
     // Update item

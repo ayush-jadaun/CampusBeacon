@@ -6,6 +6,7 @@ import { Club } from "./clubs.model.js";
 import { Event } from "./events.model.js";
 import { Coordinator } from "./coordinators.model.js";
 import { EventCoordinator } from "./eventcoordinator.model.js";
+import { EventRegistration } from "./eventRegistration.model.js";
 import { Subject } from "./subject.model.js"; // You already had this
 import {
   Menu,
@@ -149,6 +150,20 @@ Channel.belongsTo(Event, {
     foreignKey: "coordinator_id",
   });
 
+  // Event registrations
+  Event.hasMany(EventRegistration, {
+    foreignKey: "event_id",
+    as: "registrations",
+    onDelete: "CASCADE",
+  });
+  EventRegistration.belongsTo(Event, { foreignKey: "event_id" });
+  User.hasMany(EventRegistration, {
+    foreignKey: "user_id",
+    as: "eventRegistrations",
+    onDelete: "CASCADE",
+  });
+  EventRegistration.belongsTo(User, { foreignKey: "user_id" });
+
   // ================================================
   // START: Attendance Tracker Associations
   // ================================================
@@ -214,6 +229,7 @@ export {
   ChannelMember,
   Coordinator,
   EventCoordinator,
+  EventRegistration,
   Club,
   Event,
   Hostel, 

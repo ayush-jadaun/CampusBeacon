@@ -83,6 +83,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 
 import { connectDb } from "./src/db/db.js";
+import { EventRegistration } from "./src/models/eventRegistration.model.js";
 
 
 const startServer = async () => {
@@ -90,6 +91,9 @@ const startServer = async () => {
     console.log("Connecting to database...");
     await connectDb();
     console.log("Database connected successfully");
+
+    // Global sync is disabled; create newer tables individually if missing
+    await EventRegistration.sync();
 
     const httpServer = createServer(app);
 

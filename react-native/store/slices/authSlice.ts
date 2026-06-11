@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import authService, { User } from '@/services/auth.service';
+import authService, { UpdateProfileData, User } from '@/services/auth.service';
 
 interface AuthState {
   user: User | null;
@@ -38,6 +38,21 @@ export const signup = createAsyncThunk(
   async (userData: any, { rejectWithValue }) => {
     try {
       const response = await authService.signup(userData);
+      if (response.success) {
+        return response.data;
+      }
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (data: UpdateProfileData, { rejectWithValue }) => {
+    try {
+      const response = await authService.updateProfile(data);
       if (response.success) {
         return response.data;
       }
@@ -113,6 +128,19 @@ const authSlice = createSlice({
       .addCase(signup.rejected, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = false;
+        state.error = action.payload as string;
+      });
+
+    // Update Profile
+    builder
+      .addCase(updateProfile.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        state.error = null;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.error = action.payload as string;
       });
 

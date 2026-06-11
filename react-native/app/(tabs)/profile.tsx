@@ -14,6 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import EditProfileModal from '@/components/EditProfileModal';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { fetchAttendance } from '@/store/slices/attendanceSlice';
 import { fetchMyListings } from '@/store/slices/marketplaceSlice';
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
   const { myListings } = useAppSelector((state) => state.marketplace);
   const { activities } = useAppSelector((state) => state.activity);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
     const loadStats = async () => {
@@ -78,6 +80,14 @@ export default function ProfileScreen() {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => setEditModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="pencil" size={18} color={COLORS.white} />
+          </TouchableOpacity>
+
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImagePlaceholder}>
               <Ionicons name="person" size={50} color={COLORS.white} />
@@ -132,7 +142,7 @@ export default function ProfileScreen() {
           <MenuItem
             icon="person-outline"
             label="Edit Profile"
-            onPress={() => alert('Edit Profile - Coming soon!')}
+            onPress={() => setEditModalVisible(true)}
           />
           <MenuItem
             icon="settings-outline"
@@ -174,6 +184,12 @@ export default function ProfileScreen() {
 
         <View style={{ height: SIZES.xxxl }} />
       </ScrollView>
+
+      <EditProfileModal
+        visible={editModalVisible}
+        user={user}
+        onClose={() => setEditModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -219,6 +235,19 @@ const styles = StyleSheet.create({
     padding: SIZES.xxxl,
     alignItems: 'center',
     paddingTop: SIZES.xxxxl,
+  },
+  editButton: {
+    position: 'absolute',
+    top: SIZES.xl,
+    right: SIZES.xl,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   profileImageContainer: {
     marginBottom: SIZES.lg,

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -18,24 +20,61 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchEvents, setEventFilter } from '@/store/slices/eventsSlice';
+import {
+  fetchEvents,
+  setEventFilter,
+  fetchMyRegistrations,
+  fetchRegistrationCounts,
+  registerForEvent,
+  unregisterFromEvent,
+} from '@/store/slices/eventsSlice';
+import { useAuth } from '@/contexts/AuthContext';
 import { Event, EventStatus, getEventStatus } from '@/services/events.service';
 
 const FILTERS = ['upcoming', 'ongoing', 'completed', 'all'] as const;
 
 export default function EventsScreen() {
   const dispatch = useAppDispatch();
-  const { filteredEvents, isLoading, error, eventFilter } = useAppSelector((state) => state.events);
+  const { isAuthenticated } = useAuth();
+  const {
+    filteredEvents,
+    isLoading,
+    error,
+    eventFilter,
+    registeredEventIds,
+    registrationCounts,
+    registeringEventId,
+  } = useAppSelector((state) => state.events);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     dispatch(fetchEvents());
-  }, [dispatch]);
+    dispatch(fetchRegistrationCounts());
+    if (isAuthenticated) {
+      dispatch(fetchMyRegistrations());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const onRefresh = async () => {
     setIsRefreshing(true);
-    await dispatch(fetchEvents());
+    await Promise.all([
+      dispatch(fetchEvents()),
+      dispatch(fetchRegistrationCounts()),
+      isAuthenticated ? dispatch(fetchMyRegistrations()) : Promise.resolve(),
+    ]);
     setIsRefreshing(false);
+  };
+
+  const handleToggleRegistration = async (event: Event, isRegistered: boolean) => {
+    if (!isAuthenticated) {
+      Alert.alert('Login Required', 'Please log in to register for events.');
+      return;
+    }
+    const action = isRegistered ? unregisterFromEvent : registerForEvent;
+    const result = await dispatch(action(event.id));
+    if (action.rejected.match(result)) {
+      Alert.alert('Error', (result.payload as string) || 'Something went wrong');
+    }
   };
 
   if (isLoading && !filteredEvents.length) {
@@ -98,7 +137,14 @@ export default function EventsScreen() {
         ) : (
           <View style={styles.eventsList}>
             {filteredEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
+              <EventCard
+                key={event.id}
+                event={event}
+                isRegistered={registeredEventIds.includes(event.id)}
+                registrationCount={registrationCounts[event.id] ?? 0}
+                isPending={registeringEventId === event.id}
+                onToggleRegistration={handleToggleRegistration}
+              />
             ))}
           </View>
         )}
@@ -107,7 +153,19 @@ export default function EventsScreen() {
   );
 }
 
-function EventCard({ event }: { event: Event }) {
+function EventCard({
+  event,
+  isRegistered,
+  registrationCount,
+  isPending,
+  onToggleRegistration,
+}: {
+  event: Event;
+  isRegistered: boolean;
+  registrationCount: number;
+  isPending: boolean;
+  onToggleRegistration: (event: Event, isRegistered: boolean) => void;
+}) {
   const statusColors: Record<EventStatus, string> = {
     upcoming: '#4facfe',
     ongoing: '#43e97b',
@@ -115,6 +173,7 @@ function EventCard({ event }: { event: Event }) {
   };
 
   const status = getEventStatus(event);
+  const canRegister = status !== 'completed';
   const image = event.images?.[0];
   const eventDate = new Date(event.date);
 
@@ -184,6 +243,50 @@ function EventCard({ event }: { event: Event }) {
             <Text style={styles.clubName}>{event.club.name}</Text>
           </View>
         )}
+
+        {/* Registration */}
+        <View style={styles.registrationRow}>
+          <View style={styles.registrationCount}>
+            <Ionicons name="people-outline" size={16} color={COLORS.textSecondary} />
+            <Text style={styles.registrationCountText}>
+              {registrationCount} registered
+            </Text>
+          </View>
+          {canRegister && (
+            <TouchableOpacity
+              style={[
+                styles.registerButton,
+                isRegistered && styles.registerButtonRegistered,
+              ]}
+              onPress={() => onToggleRegistration(event, isRegistered)}
+              disabled={isPending}
+              activeOpacity={0.7}
+            >
+              {isPending ? (
+                <ActivityIndicator
+                  size="small"
+                  color={isRegistered ? COLORS.primary : COLORS.white}
+                />
+              ) : (
+                <>
+                  <Ionicons
+                    name={isRegistered ? 'checkmark-circle' : 'add-circle-outline'}
+                    size={16}
+                    color={isRegistered ? COLORS.primary : COLORS.white}
+                  />
+                  <Text
+                    style={[
+                      styles.registerButtonText,
+                      isRegistered && styles.registerButtonTextRegistered,
+                    ]}
+                  >
+                    {isRegistered ? 'Registered' : 'Register'}
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -330,6 +433,46 @@ const styles = StyleSheet.create({
   clubName: {
     fontSize: 13,
     fontWeight: '600',
+    color: COLORS.primary,
+  },
+  registrationRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: SIZES.md,
+    marginTop: SIZES.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.backgroundDark,
+  },
+  registrationCount: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.xs,
+  },
+  registrationCountText: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+  registerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.xs,
+    backgroundColor: COLORS.primary,
+    paddingVertical: SIZES.sm,
+    paddingHorizontal: SIZES.lg,
+    borderRadius: 20,
+    minWidth: 110,
+    justifyContent: 'center',
+  },
+  registerButtonRegistered: {
+    backgroundColor: COLORS.backgroundDark,
+  },
+  registerButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  registerButtonTextRegistered: {
     color: COLORS.primary,
   },
 });

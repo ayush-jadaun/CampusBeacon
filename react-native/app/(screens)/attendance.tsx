@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -19,12 +21,33 @@ import ErrorState from '@/components/ErrorState';
 import { Subject } from '@/services/attendance.service';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchAttendance } from '@/store/slices/attendanceSlice';
+import { fetchAttendance, addAttendance } from '@/store/slices/attendanceSlice';
+
+type MarkStatus = 'Present' | 'Absent';
+
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+
+const getTodayDate = () => {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+};
+
+const getTodayLabel = () => {
+  const now = new Date();
+  return `${DAY_NAMES[now.getDay()]}, ${MONTH_NAMES[now.getMonth()]} ${now.getDate()}`;
+};
 
 export default function AttendanceScreen() {
   const dispatch = useAppDispatch();
   const { stats, isLoading, error } = useAppSelector((state) => state.attendance);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [marking, setMarking] = useState<{ subjectId: number; status: MarkStatus } | null>(null);
 
   useEffect(() => {
     dispatch(fetchAttendance());
@@ -34,6 +57,22 @@ export default function AttendanceScreen() {
     setIsRefreshing(true);
     await dispatch(fetchAttendance());
     setIsRefreshing(false);
+  };
+
+  const handleMark = async (subjectId: number, status: MarkStatus) => {
+    if (marking) return;
+    setMarking({ subjectId, status });
+    try {
+      await dispatch(addAttendance({ subjectId, date: getTodayDate(), status })).unwrap();
+    } catch (err) {
+      const message =
+        typeof err === 'string' && err.length > 0
+          ? err
+          : 'Failed to mark attendance. Please try again.';
+      Alert.alert('Attendance Not Marked', message);
+    } finally {
+      setMarking(null);
+    }
   };
 
   const getPercentageColor = (percentage: number) => {
@@ -60,10 +99,8 @@ export default function AttendanceScreen() {
     return (
       <EmptyState
         icon="calendar-outline"
-        title="No Attendance Data"
-        message="Start marking your attendance to track progress"
-        actionLabel="Add Attendance"
-        onAction={() => alert('Add attendance - Coming soon!')}
+        title="No Subjects Yet"
+        message="Subjects appear here once you're enrolled in them. After enrolling in your courses, come back to mark and track your daily attendance."
       />
     );
   }
@@ -77,7 +114,10 @@ export default function AttendanceScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Attendance Tracker</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Attendance Tracker</Text>
+          <Text style={styles.headerDate}>{getTodayLabel()}</Text>
+        </View>
         <TouchableOpacity onPress={() => alert('Analytics - Coming soon!')}>
           <Ionicons name="stats-chart" size={24} color={COLORS.primary} />
         </TouchableOpacity>
@@ -127,30 +167,29 @@ export default function AttendanceScreen() {
             key={subject.subjectId}
             subject={subject}
             onPress={() => alert(`Subject details: ${subject.name}`)}
+            onMark={(status) => handleMark(subject.subjectId, status)}
+            markingStatus={marking?.subjectId === subject.subjectId ? marking.status : null}
+            markDisabled={marking !== null}
           />
         ))}
       </ScrollView>
-
-      {/* FAB */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => alert('Mark attendance - Coming soon!')}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={['#4facfe', '#00f2fe']}
-          style={styles.fabGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Ionicons name="add" size={28} color={COLORS.white} />
-        </LinearGradient>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
-function SubjectCard({ subject, onPress }: { subject: Subject; onPress: () => void }) {
+function SubjectCard({
+  subject,
+  onPress,
+  onMark,
+  markingStatus,
+  markDisabled,
+}: {
+  subject: Subject;
+  onPress: () => void;
+  onMark: (status: MarkStatus) => void;
+  markingStatus: MarkStatus | null;
+  markDisabled: boolean;
+}) {
   const percentage = subject.percentage;
   const color = percentage >= 85 ? '#10B981' : percentage >= 75 ? '#F59E0B' : '#EF4444';
 
@@ -189,6 +228,42 @@ function SubjectCard({ subject, onPress }: { subject: Subject; onPress: () => vo
             <Text style={styles.creditsText}>{subject.credits} Credits</Text>
           )}
         </View>
+
+        <View style={styles.markRow}>
+          <Text style={styles.markLabel}>Mark today</Text>
+          <View style={styles.markActions}>
+            <TouchableOpacity
+              style={[styles.markButton, styles.presentButton, markDisabled && styles.markButtonDisabled]}
+              onPress={() => onMark('Present')}
+              disabled={markDisabled}
+              activeOpacity={0.7}
+            >
+              {markingStatus === 'Present' ? (
+                <ActivityIndicator size="small" color="#10B981" />
+              ) : (
+                <>
+                  <Ionicons name="checkmark-circle-outline" size={16} color="#10B981" />
+                  <Text style={[styles.markButtonText, styles.presentButtonText]}>Present</Text>
+                </>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.markButton, styles.absentButton, markDisabled && styles.markButtonDisabled]}
+              onPress={() => onMark('Absent')}
+              disabled={markDisabled}
+              activeOpacity={0.7}
+            >
+              {markingStatus === 'Absent' ? (
+                <ActivityIndicator size="small" color="#EF4444" />
+              ) : (
+                <>
+                  <Ionicons name="close-circle-outline" size={16} color="#EF4444" />
+                  <Text style={[styles.markButtonText, styles.absentButtonText]}>Absent</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -215,10 +290,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerCenter: {
+    alignItems: 'center',
+  },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.text,
+  },
+  headerDate: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginTop: 2,
   },
   scrollContent: {
     padding: SIZES.xl,
@@ -334,18 +417,54 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textLight,
   },
-  fab: {
-    position: 'absolute',
-    right: SIZES.xl,
-    bottom: SIZES.xxxl,
-    borderRadius: 28,
-    ...SHADOWS.large,
-  },
-  fabGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
+  markRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: SIZES.md,
+    paddingTop: SIZES.md,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.backgroundDark,
+  },
+  markLabel: {
+    fontSize: 12,
+    color: COLORS.textLight,
+  },
+  markActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  markButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SIZES.xs,
+    paddingHorizontal: SIZES.md,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginLeft: SIZES.sm,
+    minWidth: 84,
+  },
+  presentButton: {
+    borderColor: '#10B981',
+    backgroundColor: '#10B98115',
+  },
+  absentButton: {
+    borderColor: '#EF4444',
+    backgroundColor: '#EF444415',
+  },
+  markButtonDisabled: {
+    opacity: 0.5,
+  },
+  markButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: SIZES.xs,
+  },
+  presentButtonText: {
+    color: '#10B981',
+  },
+  absentButtonText: {
+    color: '#EF4444',
   },
 });

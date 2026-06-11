@@ -8,6 +8,9 @@ interface EventsState {
   isLoading: boolean;
   error: string | null;
   eventFilter: EventStatus | 'all';
+  registeredEventIds: number[];
+  registrationCounts: Record<number, number>;
+  registeringEventId: number | null;
 }
 
 const initialState: EventsState = {
@@ -17,6 +20,9 @@ const initialState: EventsState = {
   isLoading: false,
   error: null,
   eventFilter: 'upcoming',
+  registeredEventIds: [],
+  registrationCounts: {},
+  registeringEventId: null,
 };
 
 export const fetchEvents = createAsyncThunk(
@@ -38,6 +44,68 @@ export const fetchClubs = createAsyncThunk(
     try {
       const response = await eventsService.getClubs();
       if (response.success) return response.data;
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchMyRegistrations = createAsyncThunk(
+  'events/fetchMyRegistrations',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await eventsService.getMyRegistrations();
+      if (response.success) return response.data.registrations.map((r) => r.event_id);
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchRegistrationCounts = createAsyncThunk(
+  'events/fetchRegistrationCounts',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await eventsService.getRegistrationCounts();
+      if (response.success) {
+        const counts: Record<number, number> = {};
+        response.data.counts.forEach((c) => {
+          counts[c.event_id] = Number(c.count);
+        });
+        return counts;
+      }
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const registerForEvent = createAsyncThunk(
+  'events/registerForEvent',
+  async (eventId: number, { rejectWithValue }) => {
+    try {
+      const response = await eventsService.register(eventId);
+      if (response.success) {
+        return { eventId, registrationCount: response.data.registrationCount };
+      }
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const unregisterFromEvent = createAsyncThunk(
+  'events/unregisterFromEvent',
+  async (eventId: number, { rejectWithValue }) => {
+    try {
+      const response = await eventsService.unregister(eventId);
+      if (response.success) {
+        return { eventId, registrationCount: response.data.registrationCount };
+      }
       return rejectWithValue(response.message);
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -70,6 +138,38 @@ const eventsSlice = createSlice({
       })
       .addCase(fetchClubs.fulfilled, (state, action) => {
         state.clubs = action.payload;
+      })
+      .addCase(fetchMyRegistrations.fulfilled, (state, action) => {
+        state.registeredEventIds = action.payload;
+      })
+      .addCase(fetchRegistrationCounts.fulfilled, (state, action) => {
+        state.registrationCounts = action.payload;
+      })
+      .addCase(registerForEvent.pending, (state, action) => {
+        state.registeringEventId = action.meta.arg;
+      })
+      .addCase(registerForEvent.fulfilled, (state, action) => {
+        state.registeringEventId = null;
+        if (!state.registeredEventIds.includes(action.payload.eventId)) {
+          state.registeredEventIds.push(action.payload.eventId);
+        }
+        state.registrationCounts[action.payload.eventId] = action.payload.registrationCount;
+      })
+      .addCase(registerForEvent.rejected, (state) => {
+        state.registeringEventId = null;
+      })
+      .addCase(unregisterFromEvent.pending, (state, action) => {
+        state.registeringEventId = action.meta.arg;
+      })
+      .addCase(unregisterFromEvent.fulfilled, (state, action) => {
+        state.registeringEventId = null;
+        state.registeredEventIds = state.registeredEventIds.filter(
+          (id) => id !== action.payload.eventId
+        );
+        state.registrationCounts[action.payload.eventId] = action.payload.registrationCount;
+      })
+      .addCase(unregisterFromEvent.rejected, (state) => {
+        state.registeringEventId = null;
       });
   },
 });

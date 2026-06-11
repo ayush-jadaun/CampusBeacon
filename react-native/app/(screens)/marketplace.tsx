@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   RefreshControl,
   TextInput,
   Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -17,6 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LoadingState from '@/components/LoadingState';
 import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
+import SellItemModal from '@/components/SellItemModal';
 import marketplaceService, { MarketplaceItem } from '@/services/marketplace.service';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 
@@ -29,12 +31,9 @@ export default function MarketplaceScreen() {
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('All');
+  const [isSellModalVisible, setIsSellModalVisible] = useState(false);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       setError('');
       const response = await marketplaceService.getAll();
@@ -47,7 +46,11 @@ export default function MarketplaceScreen() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -72,7 +75,21 @@ export default function MarketplaceScreen() {
   };
 
   const handleItemPress = (item: MarketplaceItem) => {
-    alert(`Item details: ${item.item_name}\nPrice: ₹${item.price}`);
+    const details = [
+      `Price: ₹${item.price.toLocaleString()}`,
+      `Condition: ${item.item_condition}`,
+      item.description ? `\n${item.description}` : null,
+      item.owner_contact ? `\nContact: ${item.owner_contact}` : null,
+      `Posted: ${new Date(item.createdAt).toLocaleDateString()}`,
+    ]
+      .filter(Boolean)
+      .join('\n');
+    Alert.alert(item.item_name, details, [{ text: 'Close' }]);
+  };
+
+  const handleItemCreated = () => {
+    setIsSellModalVisible(false);
+    fetchItems();
   };
 
   if (isLoading) {
@@ -161,7 +178,7 @@ export default function MarketplaceScreen() {
                 : 'Be the first to sell something!'
             }
             actionLabel="Post Item"
-            onAction={() => alert('Create new listing - Coming soon!')}
+            onAction={() => setIsSellModalVisible(true)}
           />
         ) : (
           <View style={styles.itemsGrid}>
@@ -175,7 +192,7 @@ export default function MarketplaceScreen() {
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => alert('Create new listing - Coming soon!')}
+        onPress={() => setIsSellModalVisible(true)}
         activeOpacity={0.8}
       >
         <LinearGradient
@@ -187,6 +204,12 @@ export default function MarketplaceScreen() {
           <Ionicons name="add" size={28} color={COLORS.white} />
         </LinearGradient>
       </TouchableOpacity>
+
+      <SellItemModal
+        visible={isSellModalVisible}
+        onClose={() => setIsSellModalVisible(false)}
+        onCreated={handleItemCreated}
+      />
     </SafeAreaView>
   );
 }

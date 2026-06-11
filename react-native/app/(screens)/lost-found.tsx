@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LoadingState from '@/components/LoadingState';
 import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
+import ReportItemModal from '@/components/ReportItemModal';
 import { LostAndFoundItem } from '@/services/lostandfound.service';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -31,6 +32,7 @@ export default function LostAndFoundScreen() {
     (state) => state.lostFound
   );
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(fetchLostFoundItems());
@@ -106,7 +108,7 @@ export default function LostAndFoundScreen() {
                 : 'Be the first to post a lost or found item!'
             }
             actionLabel="Report Item"
-            onAction={() => alert('Create new item - Coming soon!')}
+            onAction={() => setIsReportModalVisible(true)}
           />
         ) : (
           <View style={styles.itemsGrid}>
@@ -120,7 +122,7 @@ export default function LostAndFoundScreen() {
       {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => alert('Create new item - Coming soon!')}
+        onPress={() => setIsReportModalVisible(true)}
         activeOpacity={0.8}
       >
         <LinearGradient
@@ -132,6 +134,11 @@ export default function LostAndFoundScreen() {
           <Ionicons name="add" size={28} color={COLORS.white} />
         </LinearGradient>
       </TouchableOpacity>
+
+      <ReportItemModal
+        visible={isReportModalVisible}
+        onClose={() => setIsReportModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }

@@ -10,6 +10,10 @@ import {
   getEventById,
   updateEvent,
   deleteEvent,
+  registerForEvent,
+  unregisterFromEvent,
+  getMyEventRegistrations,
+  getEventRegistrationCounts,
 } from "../controllers/events.controller.js";
 
 const router = express.Router();
@@ -27,7 +31,12 @@ router.post(
   createEvent
 );
 router.get("/events", getAllEvents);
+// Registration routes (static paths before "/events/:id")
+router.get("/events/registrations/me", authMiddleware, getMyEventRegistrations);
+router.get("/events/registrations/counts", getEventRegistrationCounts);
 router.get("/events/:id", getEventById);
+router.post("/events/:id/register", authMiddleware, registerForEvent);
+router.delete("/events/:id/register", authMiddleware, unregisterFromEvent);
 router.put(
   "/events/:id",
   authMiddleware,

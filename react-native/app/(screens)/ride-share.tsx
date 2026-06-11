@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   TextInput,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -16,16 +18,22 @@ import { LinearGradient } from 'expo-linear-gradient';
 import LoadingState from '@/components/LoadingState';
 import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
+import CreateRideModal from '@/components/CreateRideModal';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchRides, joinRide, leaveRide, setFilters, clearFilters } from '@/store/slices/ridesSlice';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Ride } from '@/services/rides.service';
 
 export default function RideShareScreen() {
   const dispatch = useAppDispatch();
-  const { filteredRides, isLoading, error, filters } = useAppSelector((state) => state.rides);
+  const { user } = useAuth();
+  const { filteredRides, isLoading, error, filters, actionRideId } = useAppSelector(
+    (state) => state.rides
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchRides());
@@ -35,6 +43,20 @@ export default function RideShareScreen() {
     setIsRefreshing(true);
     await dispatch(fetchRides());
     setIsRefreshing(false);
+  };
+
+  const handleJoin = async (rideId: number) => {
+    const result = await dispatch(joinRide(rideId));
+    if (joinRide.rejected.match(result)) {
+      Alert.alert('Error', (result.payload as string) || 'Failed to join ride');
+    }
+  };
+
+  const handleLeave = async (rideId: number) => {
+    const result = await dispatch(leaveRide(rideId));
+    if (leaveRide.rejected.match(result)) {
+      Alert.alert('Error', (result.payload as string) || 'Failed to leave ride');
+    }
   };
 
   if (isLoading && !filteredRides.length) {
@@ -101,7 +123,7 @@ export default function RideShareScreen() {
                 : 'Be the first to create a ride!'
             }
             actionLabel="Create Ride"
-            onAction={() => alert('Create ride - Coming soon!')}
+            onAction={() => setShowCreateModal(true)}
           />
         ) : (
           <View style={styles.ridesList}>
@@ -109,18 +131,22 @@ export default function RideShareScreen() {
               <RideCard
                 key={ride.id}
                 ride={ride}
-                onJoin={() => dispatch(joinRide(ride.id))}
-                onLeave={() => dispatch(leaveRide(ride.id))}
+                currentUserId={user?.id ?? null}
+                isPending={actionRideId === ride.id}
+                onJoin={() => handleJoin(ride.id)}
+                onLeave={() => handleLeave(ride.id)}
               />
             ))}
           </View>
         )}
       </ScrollView>
 
+      <CreateRideModal visible={showCreateModal} onClose={() => setShowCreateModal(false)} />
+
       {/* Create Ride FAB */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => alert('Create ride - Coming soon!')}
+        onPress={() => setShowCreateModal(true)}
         activeOpacity={0.8}
       >
         <LinearGradient
@@ -138,24 +164,33 @@ export default function RideShareScreen() {
 
 function RideCard({
   ride,
+  currentUserId,
+  isPending,
   onJoin,
   onLeave,
 }: {
   ride: Ride;
+  currentUserId: number | null;
+  isPending: boolean;
   onJoin: () => void;
   onLeave: () => void;
 }) {
-  const [hasJoined, setHasJoined] = useState(false);
-  const isAvailable = ride.availableSeats > 0;
   const departure = new Date(ride.departureDateTime);
+  const isCreator = currentUserId != null && ride.creatorId === currentUserId;
+  const hasJoined =
+    currentUserId != null &&
+    (ride.participants?.some((p) => p.userId === currentUserId) ?? false);
+  const participantCount = ride.participants?.length ?? ride.totalSeats - ride.availableSeats;
+  const canJoin =
+    !isCreator && !hasJoined && ride.status === 'OPEN' && ride.availableSeats > 0;
+  const showButton = hasJoined || canJoin;
 
   const handleAction = () => {
+    if (isPending) return;
     if (hasJoined) {
       onLeave();
-      setHasJoined(false);
-    } else if (isAvailable) {
+    } else if (canJoin) {
       onJoin();
-      setHasJoined(true);
     }
   };
 
@@ -211,22 +246,35 @@ function RideCard({
           <Text style={styles.rideSeats}>
             {ride.availableSeats}/{ride.totalSeats} seats available
           </Text>
+          <Text style={styles.rideSeats}>
+            {participantCount} {participantCount === 1 ? 'participant' : 'participants'}
+          </Text>
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.actionButton,
-            hasJoined && styles.actionButtonJoined,
-            !isAvailable && !hasJoined && styles.actionButtonDisabled,
-          ]}
-          onPress={handleAction}
-          disabled={!isAvailable && !hasJoined}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.actionButtonText}>
-            {hasJoined ? 'Leave' : isAvailable ? 'Join' : 'Full'}
-          </Text>
-        </TouchableOpacity>
+        {showButton ? (
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              hasJoined && styles.actionButtonJoined,
+              isPending && styles.actionButtonDisabled,
+            ]}
+            onPress={handleAction}
+            disabled={isPending}
+            activeOpacity={0.7}
+          >
+            {isPending ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={styles.actionButtonText}>{hasJoined ? 'Leave' : 'Join'}</Text>
+            )}
+          </TouchableOpacity>
+        ) : (
+          <View style={[styles.actionButton, styles.actionButtonDisabled]}>
+            <Text style={styles.actionButtonText}>
+              {isCreator ? 'Your Ride' : ride.status === 'FULL' ? 'Full' : ride.status}
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Driver Info */}

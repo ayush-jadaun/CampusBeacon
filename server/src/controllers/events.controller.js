@@ -2,12 +2,14 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { Event } from "../models/events.model.js";
 import { Club } from "../models/clubs.model.js";
 import { EventCoordinator } from "../models/eventcoordinator.model.js";
+import { EventRegistration } from "../models/eventRegistration.model.js";
 import {
   uploadImageToCloudinary,
   deleteImageFromCloudinary,
 } from "../utils/cloudinary.js";
 import { Coordinator } from "../models/coordinators.model.js";
 import ApiError from "../utils/apiError.js";
+import ApiResponse from "../utils/apiResponse.js";
 
 export const createEvent = asyncHandler(async (req, res) => {
   const {
@@ -294,10 +296,114 @@ export const deleteEvent = asyncHandler(async (req, res) => {
     where: { event_id: event.id },
   });
 
+  // Delete registrations
+  await EventRegistration.destroy({
+    where: { event_id: event.id },
+  });
+
   await event.destroy();
 
   return res.status(200).json({
     success: true,
     message: "Event deleted successfully",
   });
+});
+
+/*
+==============================
+     Event Registrations
+==============================
+*/
+
+export const registerForEvent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  const event = await Event.findByPk(id);
+  if (!event) {
+    throw new ApiError("Event not found", 404);
+  }
+
+  if (new Date(event.date) < new Date()) {
+    throw new ApiError("Cannot register for a past event", 400);
+  }
+
+  const [registration, created] = await EventRegistration.findOrCreate({
+    where: { event_id: event.id, user_id: userId },
+  });
+
+  if (!created) {
+    throw new ApiError("Already registered for this event", 409);
+  }
+
+  const registrationCount = await EventRegistration.count({
+    where: { event_id: event.id },
+  });
+
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(
+        201,
+        { registration, registrationCount },
+        "Registered for event"
+      )
+    );
+});
+
+export const unregisterFromEvent = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  const deleted = await EventRegistration.destroy({
+    where: { event_id: id, user_id: userId },
+  });
+
+  if (!deleted) {
+    throw new ApiError("You are not registered for this event", 404);
+  }
+
+  const registrationCount = await EventRegistration.count({
+    where: { event_id: id },
+  });
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, { registrationCount }, "Unregistered from event")
+    );
+});
+
+export const getMyEventRegistrations = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const registrations = await EventRegistration.findAll({
+    where: { user_id: userId },
+    attributes: ["id", "event_id", "createdAt"],
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { registrations }, "My event registrations"));
+});
+
+export const getEventRegistrationCounts = asyncHandler(async (req, res) => {
+  const counts = await EventRegistration.findAll({
+    attributes: [
+      "event_id",
+      [
+        EventRegistration.sequelize.fn(
+          "COUNT",
+          EventRegistration.sequelize.col("id")
+        ),
+        "count",
+      ],
+    ],
+    group: ["event_id"],
+    raw: true,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { counts }, "Event registration counts"));
 });

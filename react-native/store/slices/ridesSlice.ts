@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import ridesService, { Ride, CreateRideData } from '@/services/rides.service';
+import ridesService, { Ride, CreateRideData, RideParticipant } from '@/services/rides.service';
 
 interface RidesState {
   rides: Ride[];
   filteredRides: Ride[];
   myRides: Ride[];
   isLoading: boolean;
+  isCreating: boolean;
+  actionRideId: number | null;
   error: string | null;
   filters: {
     from: string;
@@ -19,6 +21,8 @@ const initialState: RidesState = {
   filteredRides: [],
   myRides: [],
   isLoading: false,
+  isCreating: false,
+  actionRideId: null,
   error: null,
   filters: {
     from: '',
@@ -71,7 +75,7 @@ export const joinRide = createAsyncThunk(
   async (rideId: number, { rejectWithValue }) => {
     try {
       const response = await ridesService.join(rideId);
-      if (response.success) return rideId;
+      if (response.success) return { rideId, participants: response.data };
       return rejectWithValue(response.message);
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -84,7 +88,7 @@ export const leaveRide = createAsyncThunk(
   async (rideId: number, { rejectWithValue }) => {
     try {
       const response = await ridesService.leave(rideId);
-      if (response.success) return rideId;
+      if (response.success) return { rideId, participants: response.data };
       return rejectWithValue(response.message);
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -122,30 +126,54 @@ const ridesSlice = createSlice({
       .addCase(fetchMyRides.fulfilled, (state, action) => {
         state.myRides = action.payload;
       })
+      .addCase(createRide.pending, (state) => {
+        state.isCreating = true;
+      })
       .addCase(createRide.fulfilled, (state, action) => {
+        state.isCreating = false;
         state.rides.unshift(action.payload);
         state.filteredRides = filterRides(state);
       })
+      .addCase(createRide.rejected, (state) => {
+        state.isCreating = false;
+      })
+      .addCase(joinRide.pending, (state, action) => {
+        state.actionRideId = action.meta.arg;
+      })
       .addCase(joinRide.fulfilled, (state, action) => {
-        const ride = state.rides.find((r) => r.id === action.payload);
-        if (ride && ride.availableSeats > 0) {
-          ride.availableSeats -= 1;
-          if (ride.availableSeats === 0) {
-            ride.status = 'FULL';
-          }
-        }
+        state.actionRideId = null;
+        applyParticipants(state, action.payload.rideId, action.payload.participants);
+      })
+      .addCase(joinRide.rejected, (state) => {
+        state.actionRideId = null;
+      })
+      .addCase(leaveRide.pending, (state, action) => {
+        state.actionRideId = action.meta.arg;
       })
       .addCase(leaveRide.fulfilled, (state, action) => {
-        const ride = state.rides.find((r) => r.id === action.payload);
-        if (ride) {
-          ride.availableSeats += 1;
-          if (ride.status === 'FULL') {
-            ride.status = 'OPEN';
-          }
-        }
+        state.actionRideId = null;
+        applyParticipants(state, action.payload.rideId, action.payload.participants);
+      })
+      .addCase(leaveRide.rejected, (state) => {
+        state.actionRideId = null;
       });
   },
 });
+
+function applyParticipants(state: RidesState, rideId: number, participants: RideParticipant[]) {
+  for (const list of [state.rides, state.filteredRides, state.myRides]) {
+    const ride = list.find((r) => r.id === rideId);
+    if (ride) {
+      ride.participants = participants;
+      ride.availableSeats = Math.max(ride.totalSeats - participants.length, 0);
+      if (ride.status === 'OPEN' && ride.availableSeats === 0) {
+        ride.status = 'FULL';
+      } else if (ride.status === 'FULL' && ride.availableSeats > 0) {
+        ride.status = 'OPEN';
+      }
+    }
+  }
+}
 
 function filterRides(state: RidesState): Ride[] {
   let filtered = [...state.rides];
