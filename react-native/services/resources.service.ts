@@ -32,7 +32,7 @@ const resourcesService = {
   // Get all branches
   async getBranches(): Promise<{ success: boolean; data: Branch[] }> {
     try {
-      const response = await api.get('/resource/branches');
+      const response = await api.get('/resources/branches');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch branches');
@@ -42,7 +42,7 @@ const resourcesService = {
   // Get years for a branch
   async getYears(branchId: string): Promise<{ success: boolean; data: Year[] }> {
     try {
-      const response = await api.get(`/resource/branch/${branchId}/years`);
+      const response = await api.get(`/resources/branch/${branchId}/years`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch years');
@@ -52,7 +52,7 @@ const resourcesService = {
   // Get subjects for a year
   async getSubjects(yearId: string): Promise<{ success: boolean; data: any[] }> {
     try {
-      const response = await api.get(`/resource/year/${yearId}/subjects`);
+      const response = await api.get(`/resources/year/${yearId}/subjects`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch subjects');
@@ -62,7 +62,7 @@ const resourcesService = {
   // Get study materials for a subject
   async getMaterials(subjectId: string): Promise<{ success: boolean; data: StudyMaterial[] }> {
     try {
-      const response = await api.get(`/resource/subject/${subjectId}/materials`);
+      const response = await api.get(`/resources/subject/${subjectId}/materials`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch materials');
@@ -72,7 +72,7 @@ const resourcesService = {
   // Upload study material
   async upload(data: FormData): Promise<{ success: boolean; data: StudyMaterial }> {
     try {
-      const response = await api.post('/resource/upload', data, {
+      const response = await api.post('/resources/upload', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

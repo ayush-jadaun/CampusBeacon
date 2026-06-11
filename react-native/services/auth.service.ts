@@ -35,7 +35,9 @@ const authService = {
   // Login
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/user/login', credentials);
+      console.log('🔐 Attempting login with:', credentials.email);
+      const response = await api.post<AuthResponse>('/users/login', credentials);
+      console.log('✅ Login response:', response.data);
 
       if (response.data.success && response.data.data.token) {
         // Store token and user data
@@ -45,6 +47,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
+      console.error('❌ Login error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   },
@@ -52,9 +55,12 @@ const authService = {
   // Signup
   async signup(data: SignupData): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/user/signup', data);
+      console.log('📝 Attempting signup with:', data.email);
+      const response = await api.post<AuthResponse>('/users/signup', data);
+      console.log('✅ Signup response:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('❌ Signup error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Signup failed');
     }
   },
@@ -62,7 +68,8 @@ const authService = {
   // Google OAuth
   async googleAuth(idToken: string): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/user/google-auth', {
+      console.log('🔑 Attempting Google OAuth');
+      const response = await api.post<AuthResponse>('/users/google-auth', {
         idToken,
       });
 
@@ -74,6 +81,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
+      console.error('❌ Google auth error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Google authentication failed');
     }
   },
@@ -81,21 +89,21 @@ const authService = {
   // Logout
   async logout(): Promise<void> {
     try {
-      await api.post('/user/logout');
+      await api.post('/users/logout');
       await storage.removeAuthToken();
       await storage.removeUserData();
     } catch (error: any) {
       // Even if API call fails, clear local storage
       await storage.removeAuthToken();
       await storage.removeUserData();
-      throw new Error(error.response?.data?.message || 'Logout failed');
+      console.error('⚠️ Logout error (cleared local storage anyway):', error.message);
     }
   },
 
   // Verify Email
   async verifyEmail(token: string): Promise<AuthResponse> {
     try {
-      const response = await api.get<AuthResponse>(`/user/verify-email/${token}`);
+      const response = await api.get<AuthResponse>(`/users/verify-email?token=${token}`);
 
       if (response.data.success && response.data.data.token) {
         await storage.setAuthToken(response.data.data.token);
@@ -104,6 +112,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
+      console.error('❌ Email verification error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Email verification failed');
     }
   },
@@ -111,9 +120,10 @@ const authService = {
   // Forgot Password
   async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.post('/user/forgot-password', { email });
+      const response = await api.post('/users/forgot-password', { email });
       return response.data;
     } catch (error: any) {
+      console.error('❌ Forgot password error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Failed to send reset email');
     }
   },
@@ -121,11 +131,13 @@ const authService = {
   // Reset Password
   async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.post(`/user/reset-password/${token}`, {
+      const response = await api.post(`/users/reset-password`, {
+        token,
         password: newPassword,
       });
       return response.data;
     } catch (error: any) {
+      console.error('❌ Reset password error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Password reset failed');
     }
   },
@@ -133,7 +145,7 @@ const authService = {
   // Get Profile
   async getProfile(): Promise<AuthResponse> {
     try {
-      const response = await api.get<AuthResponse>('/user/profile');
+      const response = await api.get<AuthResponse>('/users/profile');
 
       if (response.data.success) {
         await storage.setUserData(response.data.data.user);
@@ -141,6 +153,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
+      console.error('❌ Get profile error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Failed to fetch profile');
     }
   },
@@ -148,7 +161,7 @@ const authService = {
   // Update Profile
   async updateProfile(data: Partial<SignupData>): Promise<AuthResponse> {
     try {
-      const response = await api.put<AuthResponse>('/user/profile', data);
+      const response = await api.put<AuthResponse>('/users/profile', data);
 
       if (response.data.success) {
         await storage.setUserData(response.data.data.user);
@@ -156,6 +169,7 @@ const authService = {
 
       return response.data;
     } catch (error: any) {
+      console.error('❌ Update profile error:', error.response?.data || error.message);
       throw new Error(error.response?.data?.message || 'Failed to update profile');
     }
   },

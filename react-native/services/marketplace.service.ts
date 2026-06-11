@@ -47,17 +47,27 @@ const marketplaceService = {
       if (filters?.maxPrice) params.append('maxPrice', filters.maxPrice.toString());
       if (filters?.search) params.append('search', filters.search);
 
-      const response = await api.get(`/buyandsell?${params.toString()}`);
+      const response = await api.get(`/buy-and-sell/items?${params.toString()}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');
     }
   },
 
+  // Get my items (current user)
+  async getMyItems(): Promise<{ success: boolean; data: MarketplaceItem[] }> {
+    try {
+      const response = await api.get('/buy-and-sell/user/items');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch my items');
+    }
+  },
+
   // Get item by ID
   async getById(id: string): Promise<{ success: boolean; data: MarketplaceItem }> {
     try {
-      const response = await api.get(`/buyandsell/${id}`);
+      const response = await api.get(`/buy-and-sell/items/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch item');
@@ -67,7 +77,7 @@ const marketplaceService = {
   // Create new item
   async create(data: CreateMarketplaceData): Promise<{ success: boolean; data: MarketplaceItem }> {
     try {
-      const response = await api.post('/buyandsell', data);
+      const response = await api.post('/buy-and-sell/items', data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create item');
@@ -77,7 +87,7 @@ const marketplaceService = {
   // Update item
   async update(id: string, data: Partial<CreateMarketplaceData>): Promise<{ success: boolean; data: MarketplaceItem }> {
     try {
-      const response = await api.put(`/buyandsell/${id}`, data);
+      const response = await api.put(`/buy-and-sell/items/${id}`, data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update item');
@@ -87,7 +97,7 @@ const marketplaceService = {
   // Delete item
   async delete(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.delete(`/buyandsell/${id}`);
+      const response = await api.delete(`/buy-and-sell/items/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete item');
@@ -97,7 +107,7 @@ const marketplaceService = {
   // Mark as sold
   async markAsSold(id: string): Promise<{ success: boolean; data: MarketplaceItem }> {
     try {
-      const response = await api.put(`/buyandsell/${id}`, { isSold: true });
+      const response = await api.put(`/buy-and-sell/items/${id}`, { isSold: true });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to mark as sold');

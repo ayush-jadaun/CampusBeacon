@@ -18,9 +18,14 @@ import RecentActivityCard from '@/components/RecentActivityCard';
 import { COLORS, SIZES } from '@/constants/theme';
 import { SERVICES } from '@/constants/services';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { fetchRecentActivities } from '@/store/slices/activitySlice';
+import ChatbotWidget from '@/components/ChatbotWidget';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const dispatch = useAppDispatch();
+  const { activities, isLoading: activitiesLoading } = useAppSelector((state) => state.activity);
   const [refreshing, setRefreshing] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
   const fadeAnim = new Animated.Value(0);
@@ -31,12 +36,14 @@ export default function HomeScreen() {
       duration: 800,
       useNativeDriver: true,
     }).start();
-  }, []);
+
+    // Fetch recent activities on mount
+    dispatch(fetchRecentActivities(5));
+  }, [dispatch]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await dispatch(fetchRecentActivities(5)).unwrap();
     setRefreshing(false);
   };
 
@@ -77,6 +84,23 @@ export default function HomeScreen() {
       router.push(screenPath as any);
     } else {
       alert(`${route} - Coming Soon!`);
+    }
+  };
+
+  const handleActivityPress = (activity: any) => {
+    // Navigate based on activity type
+    const activityRoutes: Record<string, string> = {
+      marketplace: '/(screens)/marketplace',
+      lost_found: '/(screens)/lost-found',
+      ride: '/(screens)/ride-share',
+      event: '/(screens)/events',
+      resource: '/(screens)/resources',
+      hostel: '/(screens)/hostel',
+    };
+
+    const route = activityRoutes[activity.type];
+    if (route) {
+      router.push(route as any);
     }
   };
 
@@ -176,66 +200,44 @@ export default function HomeScreen() {
           <View style={[styles.section, styles.lastSection]}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Recent Activities</Text>
-              <TouchableOpacity>
-                <Text style={styles.seeAll}>See All</Text>
+              <TouchableOpacity onPress={() => dispatch(fetchRecentActivities(5))}>
+                <Text style={styles.seeAll}>Refresh</Text>
               </TouchableOpacity>
             </View>
 
-            <RecentActivityCard
-              icon="cart-outline"
-              iconColor="#f5576c"
-              iconBg="#f5576c20"
-              title="New Item in Marketplace"
-              description="iPhone 13 Pro Max - 128GB available for ₹45,000"
-              time="2 hours ago"
-              onPress={() => alert('Marketplace item - Coming Soon!')}
-            />
-
-            <RecentActivityCard
-              icon="search-outline"
-              iconColor="#764ba2"
-              iconBg="#764ba220"
-              title="Lost Item Found"
-              description="Water bottle found near Library - Check Lost & Found"
-              time="5 hours ago"
-              onPress={() => alert('Lost & Found - Coming Soon!')}
-            />
-
-            <RecentActivityCard
-              icon="car-outline"
-              iconColor="#330867"
-              iconBg="#30cfd020"
-              title="New Ride Available"
-              description="Delhi to Campus - Tomorrow 8:00 AM, 2 seats available"
-              time="1 day ago"
-              onPress={() => alert('Ride Share - Coming Soon!')}
-            />
-
-            <RecentActivityCard
-              icon="restaurant-outline"
-              iconColor="#38f9d7"
-              iconBg="#43e97b20"
-              title="Mess Menu Updated"
-              description="Special dinner menu for Friday - Paneer Butter Masala!"
-              time="2 days ago"
-              onPress={() => alert('Mess Menu - Coming Soon!')}
-            />
-
-            <RecentActivityCard
-              icon="book-outline"
-              iconColor="#fee140"
-              iconBg="#fa709a20"
-              title="New Study Material"
-              description="Operating Systems - Mid-Sem notes uploaded by senior"
-              time="3 days ago"
-              onPress={() => alert('Resources - Coming Soon!')}
-            />
+            {activitiesLoading && activities.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading activities...</Text>
+              </View>
+            ) : activities.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Ionicons name="file-tray-outline" size={48} color={COLORS.textLight} />
+                <Text style={styles.emptyText}>No recent activities</Text>
+                <Text style={styles.emptySubtext}>Check back later for updates</Text>
+              </View>
+            ) : (
+              activities.map((activity) => (
+                <RecentActivityCard
+                  key={activity.id}
+                  icon={activity.icon}
+                  iconColor={activity.iconColor}
+                  iconBg={activity.iconBg}
+                  title={activity.title}
+                  description={activity.description}
+                  time={activity.time}
+                  onPress={() => handleActivityPress(activity)}
+                />
+              ))
+            )}
           </View>
 
           {/* Footer Spacing */}
           <View style={styles.footer} />
         </Animated.View>
       </ScrollView>
+
+      {/* Floating Chatbot Widget */}
+      <ChatbotWidget />
     </SafeAreaView>
   );
 }
@@ -331,5 +333,28 @@ const styles = StyleSheet.create({
   },
   footer: {
     height: SIZES.xxxl,
+  },
+  loadingContainer: {
+    paddingVertical: SIZES.xxxl,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+  },
+  emptyContainer: {
+    paddingVertical: SIZES.xxxl,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginTop: SIZES.md,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: SIZES.xs,
   },
 });

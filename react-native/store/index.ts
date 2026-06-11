@@ -21,6 +21,9 @@ import ridesReducer from './slices/ridesSlice';
 import eventsReducer from './slices/eventsSlice';
 import eateriesReducer from './slices/eateriesSlice';
 import resourcesReducer from './slices/resourcesSlice';
+import chatbotReducer from './slices/chatbotSlice';
+import activityReducer from './slices/activitySlice';
+import chatReducer from './slices/chatSlice';
 
 // Persist config
 const persistConfig = {
@@ -40,6 +43,9 @@ const rootReducer = combineReducers({
   events: eventsReducer,
   eateries: eateriesReducer,
   resources: resourcesReducer,
+  chatbot: chatbotReducer,
+  activity: activityReducer,
+  chat: chatReducer,
 });
 
 // Create persisted reducer

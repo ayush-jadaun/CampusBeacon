@@ -225,11 +225,13 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
       )}
 
       {/* Condition Badge */}
-      <View style={[styles.conditionBadge, { backgroundColor: getConditionColor() }]}>
-        <Text style={styles.conditionBadgeText}>
-          {item.condition.replace('-', ' ').toUpperCase()}
-        </Text>
-      </View>
+      {item.condition && (
+        <View style={[styles.conditionBadge, { backgroundColor: getConditionColor() }]}>
+          <Text style={styles.conditionBadgeText}>
+            {item.condition.replace('-', ' ').toUpperCase()}
+          </Text>
+        </View>
+      )}
 
       {/* Content */}
       <View style={styles.cardContent}>

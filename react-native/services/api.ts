@@ -1,12 +1,18 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { storage } from '@/utils/storage';
+import Constants from 'expo-constants';
 
-// Get API URL from environment or use default
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000/api/v1';
+// Get API URL from environment or use default localhost
+const API_BASE_URL =
+  Constants.expoConfig?.extra?.apiUrl ||
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  "http://172.30.130.175:5000/api";
+
+console.log('🌐 API Base URL:', API_BASE_URL);
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },

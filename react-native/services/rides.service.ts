@@ -58,7 +58,7 @@ const ridesService = {
       if (filters?.to) params.append('to', filters.to);
       if (filters?.date) params.append('date', filters.date);
 
-      const response = await api.get(`/ride?${params.toString()}`);
+      const response = await api.get(`/rides?${params.toString()}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch rides');
@@ -68,7 +68,7 @@ const ridesService = {
   // Get ride by ID
   async getById(id: string): Promise<{ success: boolean; data: Ride }> {
     try {
-      const response = await api.get(`/ride/${id}`);
+      const response = await api.get(`/rides/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch ride');
@@ -78,7 +78,7 @@ const ridesService = {
   // Create new ride
   async create(data: CreateRideData): Promise<{ success: boolean; data: Ride }> {
     try {
-      const response = await api.post('/ride', data);
+      const response = await api.post('/rides', data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create ride');
@@ -88,7 +88,7 @@ const ridesService = {
   // Join ride
   async join(rideId: string, seatsBooked: number): Promise<{ success: boolean; data: RideParticipant }> {
     try {
-      const response = await api.post(`/ride/${rideId}/join`, { seatsBooked });
+      const response = await api.post(`/rides/${rideId}/join`, { seatsBooked });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to join ride');
@@ -98,7 +98,7 @@ const ridesService = {
   // Leave ride
   async leave(rideId: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.delete(`/ride/${rideId}/leave`);
+      const response = await api.delete(`/rides/${rideId}/join`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to leave ride');
@@ -108,7 +108,7 @@ const ridesService = {
   // Delete ride
   async delete(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.delete(`/ride/${id}`);
+      const response = await api.delete(`/rides/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete ride');

@@ -56,7 +56,7 @@ export const fetchHostels = createAsyncThunk(
   'hostel/fetchHostels',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await hostelService.getHostels();
+      const response = await hostelService.getAll();
       if (response.success) return response.data;
       return rejectWithValue(response.message);
     } catch (error: any) {
@@ -69,7 +69,7 @@ export const fetchMessMenu = createAsyncThunk(
   'hostel/fetchMessMenu',
   async (hostelId: string, { rejectWithValue }) => {
     try {
-      const response = await hostelService.getMessMenu(hostelId);
+      const response = await hostelService.getMenu(hostelId);
       if (response.success) return response.data;
       return rejectWithValue(response.message);
     } catch (error: any) {

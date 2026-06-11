@@ -64,7 +64,7 @@ export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await eventsService.getEvents();
+      const response = await eventsService.getAll();
       if (response.success) return response.data;
       return rejectWithValue(response.message);
     } catch (error: any) {

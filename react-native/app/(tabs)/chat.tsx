@@ -1,153 +1,307 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  TextInput,
   TouchableOpacity,
-  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
-
-// Mock data for demonstration
-const mockChats = [
-  {
-    id: '1',
-    name: 'Campus Updates',
-    lastMessage: 'New event: Tech Talk on AI',
-    time: '10:30 AM',
-    unread: 2,
-    isGroup: true,
-    avatar: null,
-  },
-  {
-    id: '2',
-    name: 'Lost & Found Group',
-    lastMessage: 'Found a laptop near library',
-    time: 'Yesterday',
-    unread: 0,
-    isGroup: true,
-    avatar: null,
-  },
-  {
-    id: '3',
-    name: 'Marketplace Deals',
-    lastMessage: 'Check out new textbooks!',
-    time: '2 days ago',
-    unread: 5,
-    isGroup: true,
-    avatar: null,
-  },
-];
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  fetchMyChannels,
+  fetchChannelMessages,
+  sendMessage,
+  setActiveChannel,
+  addMessageToChannel,
+} from '@/store/slices/chatSlice';
+import chatService from '@/services/chat.service';
 
 export default function ChatScreen() {
+  const dispatch = useAppDispatch();
+  const { user } = useAuth();
+  const { channels, activeChannelId, messages, isLoading } = useAppSelector((state) => state.chat);
+  const [inputText, setInputText] = useState('');
+  const [showChannelList, setShowChannelList] = useState(true);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const [subscription, setSubscription] = useState<any>(null);
+
+  useEffect(() => {
+    // Load user's channels
+    dispatch(fetchMyChannels());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (activeChannelId) {
+      // Load messages for active channel
+      dispatch(fetchChannelMessages({ channelId: activeChannelId }));
+      setShowChannelList(false);
+
+      // Subscribe to realtime updates
+      const sub = chatService.subscribeToChannel(activeChannelId, (newMessage) => {
+        dispatch(addMessageToChannel({ channelId: activeChannelId, message: newMessage }));
+      });
+
+      setSubscription(sub);
+
+      return () => {
+        if (sub) {
+          chatService.unsubscribeFromChannel(sub);
+        }
+      };
+    }
+  }, [activeChannelId, dispatch]);
+
+  useEffect(() => {
+    // Auto-scroll to bottom when new messages arrive
+    if (scrollViewRef.current && activeChannelId && messages[activeChannelId]?.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages, activeChannelId]);
+
+  const handleSend = async () => {
+    if (inputText.trim() === '' || !activeChannelId || !user) return;
+
+    const content = inputText.trim();
+    setInputText('');
+
+    try {
+      await dispatch(sendMessage({
+        channelId: activeChannelId,
+        content,
+        userId: user.id,
+      })).unwrap();
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
+  };
+
+  const handleChannelPress = (channelId: number) => {
+    dispatch(setActiveChannel(channelId));
+  };
+
+  const handleBackToChannels = () => {
+    setShowChannelList(true);
+    dispatch(setActiveChannel(null as any));
+  };
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const activeChannel = channels.find(c => c.id === activeChannelId);
+  const activeMessages = activeChannelId ? messages[activeChannelId] || [] : [];
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <StatusBar style="dark" />
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Messages</Text>
-        <TouchableOpacity onPress={() => alert('Search - Coming soon!')}>
-          <Ionicons name="search" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Chats List */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {mockChats.map((chat) => (
-          <ChatCard key={chat.id} chat={chat} />
-        ))}
-
-        {/* Coming Soon Message */}
-        <View style={styles.comingSoonCard}>
-          <LinearGradient
-            colors={['#667eea', '#764ba2']}
-            style={styles.comingSoonGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Ionicons name="chatbubbles" size={48} color={COLORS.white} />
-            <Text style={styles.comingSoonTitle}>Real-time Chat Coming Soon!</Text>
-            <Text style={styles.comingSoonMessage}>
-              We're working on bringing you a fully-featured chat system to connect with your campus community.
+        {!showChannelList && (
+          <TouchableOpacity onPress={handleBackToChannels} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+        )}
+        <View style={styles.headerContent}>
+          {showChannelList ? (
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.headerIcon}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Ionicons name="chatbubbles" size={24} color={COLORS.white} />
+            </LinearGradient>
+          ) : null}
+          <View>
+            <Text style={styles.headerTitle}>
+              {showChannelList ? 'Messages' : activeChannel?.name || 'Chat'}
             </Text>
-          </LinearGradient>
-        </View>
-      </ScrollView>
-
-      {/* FAB */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => alert('New chat - Coming soon!')}
-        activeOpacity={0.8}
-      >
-        <LinearGradient
-          colors={['#667eea', '#764ba2']}
-          style={styles.fabGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Ionicons name="create" size={24} color={COLORS.white} />
-        </LinearGradient>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
-}
-
-function ChatCard({ chat }: { chat: any }) {
-  return (
-    <TouchableOpacity
-      style={styles.chatCard}
-      onPress={() => alert(`Opening chat: ${chat.name}`)}
-      activeOpacity={0.7}
-    >
-      {/* Avatar */}
-      <View style={styles.avatarContainer}>
-        {chat.avatar ? (
-          <Image source={{ uri: chat.avatar }} style={styles.avatar} />
-        ) : (
-          <LinearGradient
-            colors={['#4facfe', '#00f2fe']}
-            style={styles.avatarPlaceholder}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Ionicons
-              name={chat.isGroup ? 'people' : 'person'}
-              size={24}
-              color={COLORS.white}
-            />
-          </LinearGradient>
-        )}
-        {chat.unread > 0 && (
-          <View style={styles.unreadBadge}>
-            <Text style={styles.unreadText}>{chat.unread}</Text>
+            {!showChannelList && activeChannel?.type && (
+              <Text style={styles.headerSubtitle}>
+                {activeChannel.type === 'direct' ? 'Direct Message' : activeChannel.type}
+              </Text>
+            )}
           </View>
+        </View>
+        {!showChannelList && (
+          <TouchableOpacity onPress={() => alert('Channel info')}>
+            <Ionicons name="information-circle-outline" size={24} color={COLORS.text} />
+          </TouchableOpacity>
         )}
       </View>
 
-      {/* Content */}
-      <View style={styles.chatContent}>
-        <View style={styles.chatHeader}>
-          <Text style={styles.chatName}>{chat.name}</Text>
-          <Text style={styles.chatTime}>{chat.time}</Text>
-        </View>
-        <Text
-          style={[styles.chatMessage, chat.unread > 0 && styles.chatMessageUnread]}
-          numberOfLines={1}
+      {showChannelList ? (
+        // Channel List
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.channelList}>
+          {isLoading && channels.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+              <Text style={styles.loadingText}>Loading channels...</Text>
+            </View>
+          ) : channels.length === 0 ? (
+            <View style={styles.emptyState}>
+              <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                style={styles.emptyIcon}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Ionicons name="chatbubbles" size={48} color={COLORS.white} />
+              </LinearGradient>
+              <Text style={styles.emptyTitle}>No Conversations Yet</Text>
+              <Text style={styles.emptyMessage}>
+                Start chatting with other students or join event channels
+              </Text>
+            </View>
+          ) : (
+            channels.map((channel) => (
+              <TouchableOpacity
+                key={channel.id}
+                style={styles.channelCard}
+                onPress={() => handleChannelPress(channel.id)}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={channel.type === 'direct' ? ['#4facfe', '#00f2fe'] : ['#43e97b', '#38f9d7']}
+                  style={styles.channelAvatar}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Ionicons
+                    name={channel.type === 'direct' ? 'person' : 'people'}
+                    size={24}
+                    color={COLORS.white}
+                  />
+                </LinearGradient>
+                <View style={styles.channelInfo}>
+                  <Text style={styles.channelName}>{channel.name}</Text>
+                  {channel.description && (
+                    <Text style={styles.channelDescription} numberOfLines={1}>
+                      {channel.description}
+                    </Text>
+                  )}
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={COLORS.textLight} />
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      ) : (
+        // Messages View
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.flex}
+          keyboardVerticalOffset={90}
         >
-          {chat.lastMessage}
-        </Text>
-      </View>
-    </TouchableOpacity>
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.messagesContainer}
+            contentContainerStyle={styles.messagesContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {isLoading && activeMessages.length === 0 ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color={COLORS.primary} />
+              </View>
+            ) : activeMessages.length === 0 ? (
+              <View style={styles.emptyMessagesState}>
+                <Text style={styles.emptyMessagesText}>No messages yet</Text>
+                <Text style={styles.emptyMessagesSubtext}>Start the conversation!</Text>
+              </View>
+            ) : (
+              activeMessages.map((message, index) => {
+                const isMyMessage = message.userId === user?.id;
+                return (
+                  <View
+                    key={message.id}
+                    style={[
+                      styles.messageContainer,
+                      isMyMessage ? styles.myMessageContainer : styles.otherMessageContainer,
+                    ]}
+                  >
+                    {!isMyMessage && (
+                      <View style={styles.messageAvatar}>
+                        <Ionicons name="person-circle" size={32} color={COLORS.primary} />
+                      </View>
+                    )}
+                    <View
+                      style={[
+                        styles.messageBubble,
+                        isMyMessage ? styles.myMessageBubble : styles.otherMessageBubble,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.messageText,
+                          isMyMessage ? styles.myMessageText : styles.otherMessageText,
+                        ]}
+                      >
+                        {message.content}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.messageTime,
+                          isMyMessage ? styles.myMessageTime : styles.otherMessageTime,
+                        ]}
+                      >
+                        {formatTime(message.createdAt)}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })
+            )}
+          </ScrollView>
+
+          {/* Input Area */}
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="Type your message..."
+                placeholderTextColor={COLORS.textLight}
+                value={inputText}
+                onChangeText={setInputText}
+                multiline
+                maxLength={1000}
+                onSubmitEditing={handleSend}
+                blurOnSubmit={false}
+              />
+              <TouchableOpacity
+                style={[styles.sendButton, !inputText.trim() && styles.sendButtonDisabled]}
+                onPress={handleSend}
+                disabled={!inputText.trim() || isLoading}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={inputText.trim() ? ['#667eea', '#764ba2'] : ['#ccc', '#ccc']}
+                  style={styles.sendButtonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Ionicons name="send" size={20} color={COLORS.white} />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      )}
+    </SafeAreaView>
   );
 }
 
@@ -156,129 +310,212 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.backgroundDark,
   },
+  flex: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SIZES.xl,
     paddingVertical: SIZES.lg,
     backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  backButton: {
+    marginRight: SIZES.md,
+  },
+  headerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SIZES.md,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.text,
   },
-  scrollContent: {
-    padding: SIZES.xl,
-    paddingBottom: SIZES.xxxl * 2,
+  headerSubtitle: {
+    fontSize: 12,
+    color: COLORS.textLight,
   },
-  chatCard: {
+  channelList: {
+    padding: SIZES.xl,
+  },
+  channelCard: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 16,
     padding: SIZES.lg,
     marginBottom: SIZES.md,
     ...SHADOWS.small,
   },
-  avatarContainer: {
-    position: 'relative',
+  channelAvatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: SIZES.md,
   },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-  },
-  avatarPlaceholder: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  unreadBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    backgroundColor: COLORS.error,
-    borderRadius: 12,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: SIZES.xs,
-    borderWidth: 2,
-    borderColor: COLORS.white,
-  },
-  unreadText: {
-    color: COLORS.white,
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  chatContent: {
+  channelInfo: {
     flex: 1,
-    justifyContent: 'center',
   },
-  chatHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SIZES.xs,
-  },
-  chatName: {
+  channelName: {
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.text,
-    flex: 1,
+    marginBottom: SIZES.xs / 2,
   },
-  chatTime: {
-    fontSize: 12,
-    color: COLORS.textLight,
-  },
-  chatMessage: {
+  channelDescription: {
     fontSize: 14,
     color: COLORS.textSecondary,
   },
-  chatMessageUnread: {
+  messagesContainer: {
+    flex: 1,
+  },
+  messagesContent: {
+    padding: SIZES.xl,
+    paddingBottom: SIZES.md,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    marginBottom: SIZES.md,
+  },
+  myMessageContainer: {
+    justifyContent: 'flex-end',
+  },
+  otherMessageContainer: {
+    justifyContent: 'flex-start',
+  },
+  messageAvatar: {
+    marginRight: SIZES.sm,
+  },
+  messageBubble: {
+    maxWidth: '75%',
+    borderRadius: 16,
+    paddingVertical: SIZES.md,
+    paddingHorizontal: SIZES.lg,
+    ...SHADOWS.small,
+  },
+  myMessageBubble: {
+    backgroundColor: '#667eea',
+    borderTopRightRadius: 4,
+  },
+  otherMessageBubble: {
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 4,
+  },
+  messageText: {
+    fontSize: 15,
+    lineHeight: 20,
+    marginBottom: SIZES.xs / 2,
+  },
+  myMessageText: {
+    color: COLORS.white,
+  },
+  otherMessageText: {
+    color: COLORS.text,
+  },
+  messageTime: {
+    fontSize: 10,
+  },
+  myMessageTime: {
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'right',
+  },
+  otherMessageTime: {
+    color: COLORS.textLight,
+  },
+  loadingContainer: {
+    paddingVertical: SIZES.xxxl,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: SIZES.md,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SIZES.xxxl * 2,
+  },
+  emptyIcon: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SIZES.lg,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: SIZES.xs,
+  },
+  emptyMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+  emptyMessagesState: {
+    alignItems: 'center',
+    paddingVertical: SIZES.xxxl,
+  },
+  emptyMessagesText: {
+    fontSize: 16,
     fontWeight: '600',
     color: COLORS.text,
   },
-  comingSoonCard: {
-    marginTop: SIZES.xl,
+  emptyMessagesSubtext: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: SIZES.xs,
+  },
+  inputContainer: {
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    paddingHorizontal: SIZES.xl,
+    paddingVertical: SIZES.md,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
+  input: {
+    flex: 1,
+    backgroundColor: COLORS.backgroundDark,
+    borderRadius: 20,
+    paddingHorizontal: SIZES.lg,
+    paddingVertical: SIZES.md,
+    fontSize: 15,
+    color: COLORS.text,
+    maxHeight: 100,
+    marginRight: SIZES.sm,
+  },
+  sendButton: {
     borderRadius: 20,
     overflow: 'hidden',
-    ...SHADOWS.medium,
   },
-  comingSoonGradient: {
-    padding: SIZES.xxxl,
-    alignItems: 'center',
+  sendButtonDisabled: {
+    opacity: 0.5,
   },
-  comingSoonTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.white,
-    marginTop: SIZES.lg,
-    marginBottom: SIZES.md,
-    textAlign: 'center',
-  },
-  comingSoonMessage: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  fab: {
-    position: 'absolute',
-    right: SIZES.xl,
-    bottom: SIZES.xxxl,
-    borderRadius: 28,
-    ...SHADOWS.large,
-  },
-  fabGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  sendButtonGradient: {
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
   },

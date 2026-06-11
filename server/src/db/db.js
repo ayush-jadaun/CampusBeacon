@@ -21,15 +21,15 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
   },
 });
 
-// Sync Database
-sequelize
-  .sync({alter:true})
-  .then(() => {
-    console.log("Database & tables have been updated!");
-  })
-  .catch((error) => {
-    console.error("Error updating database schema:", error);
-  });
+// // Sync Database
+// sequelize
+//   // .sync({alter:true})
+//   .then(() => {
+//     console.log("Database & tables have been updated!");
+//   })
+//   .catch((error) => {
+//     console.error("Error updating database schema:", error);
+//   });
 
 // Connect to Database
 export const connectDb = asyncHandler(async () => {

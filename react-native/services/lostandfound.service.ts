@@ -44,7 +44,7 @@ const lostAndFoundService = {
       if (filters?.itemType) params.append('itemType', filters.itemType);
       if (filters?.search) params.append('search', filters.search);
 
-      const response = await api.get(`/lostandfound?${params.toString()}`);
+      const response = await api.get(`/lost-and-found/lost-items?${params.toString()}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');
@@ -54,7 +54,7 @@ const lostAndFoundService = {
   // Get item by ID
   async getById(id: string): Promise<{ success: boolean; data: LostAndFoundItem }> {
     try {
-      const response = await api.get(`/lostandfound/${id}`);
+      const response = await api.get(`/lost-and-found/lost-items/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch item');
@@ -64,7 +64,7 @@ const lostAndFoundService = {
   // Create new item
   async create(data: CreateLostAndFoundData): Promise<{ success: boolean; data: LostAndFoundItem }> {
     try {
-      const response = await api.post('/lostandfound', data);
+      const response = await api.post('/lost-and-found/lost-items', data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to create item');
@@ -74,7 +74,7 @@ const lostAndFoundService = {
   // Update item
   async update(id: string, data: Partial<CreateLostAndFoundData>): Promise<{ success: boolean; data: LostAndFoundItem }> {
     try {
-      const response = await api.put(`/lostandfound/${id}`, data);
+      const response = await api.put(`/lost-and-found/lost-items/${id}`, data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to update item');
@@ -84,7 +84,7 @@ const lostAndFoundService = {
   // Delete item
   async delete(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await api.delete(`/lostandfound/${id}`);
+      const response = await api.delete(`/lost-and-found/lost-items/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete item');

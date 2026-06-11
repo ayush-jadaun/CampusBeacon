@@ -42,7 +42,7 @@ const hostelService = {
   // Get all hostels
   async getAll(): Promise<{ success: boolean; data: Hostel[] }> {
     try {
-      const response = await api.get('/hostel');
+      const response = await api.get('/hostels');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch hostels');
@@ -52,7 +52,7 @@ const hostelService = {
   // Get hostel details
   async getById(id: string): Promise<{ success: boolean; data: Hostel }> {
     try {
-      const response = await api.get(`/hostel/${id}`);
+      const response = await api.get(`/hostels/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch hostel');
@@ -62,7 +62,7 @@ const hostelService = {
   // Get mess menu
   async getMenu(hostelId: string): Promise<{ success: boolean; data: HostelMenu[] }> {
     try {
-      const response = await api.get(`/hostel/${hostelId}/menu`);
+      const response = await api.get(`/hostels/menus/hostel/${hostelId}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch menu');
@@ -72,7 +72,7 @@ const hostelService = {
   // Get hostel officials
   async getOfficials(hostelId: string): Promise<{ success: boolean; data: HostelOfficial[] }> {
     try {
-      const response = await api.get(`/hostel/${hostelId}/officials`);
+      const response = await api.get(`/hostels/officials/hostel/${hostelId}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch officials');
@@ -82,7 +82,7 @@ const hostelService = {
   // Get complaints
   async getComplaints(hostelId: string): Promise<{ success: boolean; data: HostelComplaint[] }> {
     try {
-      const response = await api.get(`/hostel/${hostelId}/complaints`);
+      const response = await api.get(`/hostels/complaints/hostel/${hostelId}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch complaints');
@@ -97,7 +97,7 @@ const hostelService = {
     category: string;
   }): Promise<{ success: boolean; data: HostelComplaint }> {
     try {
-      const response = await api.post(`/hostel/${data.hostelId}/complaint`, data);
+      const response = await api.post('/hostels/complaints', data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to submit complaint');

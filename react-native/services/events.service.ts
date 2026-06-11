@@ -67,7 +67,7 @@ const eventsService = {
       if (filters?.status) params.append('status', filters.status);
       if (filters?.clubId) params.append('clubId', filters.clubId);
 
-      const response = await api.get(`/event?${params.toString()}`);
+      const response = await api.get(`/events/events?${params.toString()}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch events');
@@ -77,7 +77,7 @@ const eventsService = {
   // Get event by ID
   async getById(id: string): Promise<{ success: boolean; data: Event }> {
     try {
-      const response = await api.get(`/event/${id}`);
+      const response = await api.get(`/events/events/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch event');
@@ -111,6 +111,26 @@ const eventsService = {
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch coordinators');
+    }
+  },
+
+  // Register for event
+  async registerForEvent(eventId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.post(`/events/events/${eventId}/register`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to register for event');
+    }
+  },
+
+  // Unregister from event
+  async unregisterFromEvent(eventId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await api.delete(`/events/events/${eventId}/register`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to unregister from event');
     }
   },
 };

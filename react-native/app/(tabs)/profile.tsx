@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -13,10 +14,49 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
+import { fetchAttendance } from '@/store/slices/attendanceSlice';
+import { fetchMyListings } from '@/store/slices/marketplaceSlice';
+import { fetchRecentActivities } from '@/store/slices/activitySlice';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const dispatch = useAppDispatch();
+  const { stats } = useAppSelector((state) => state.attendance);
+  const { myListings } = useAppSelector((state) => state.marketplace);
+  const { activities } = useAppSelector((state) => state.activity);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      setStatsLoading(true);
+      try {
+        await Promise.all([
+          dispatch(fetchAttendance()).unwrap(),
+          dispatch(fetchMyListings()).unwrap(),
+          dispatch(fetchRecentActivities(50)).unwrap(),
+        ]);
+      } catch (error) {
+        console.error('Failed to load profile stats:', error);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, [dispatch]);
+
+  const calculateOverallAttendance = () => {
+    const subjects = stats?.subjects;
+    if (!subjects || subjects.length === 0) return '0.0%';
+
+    const totalClasses = subjects.reduce((sum, subject) => sum + subject.totalClasses, 0);
+    const totalAttended = subjects.reduce((sum, subject) => sum + subject.attendedClasses, 0);
+
+    if (totalClasses === 0) return '0.0%';
+    return ((totalAttended / totalClasses) * 100).toFixed(1) + '%';
+  };
 
   const handleLogout = async () => {
     try {
@@ -63,9 +103,33 @@ export default function ProfileScreen() {
 
         {/* Stats Cards */}
         <View style={styles.statsContainer}>
-          <StatCard label="Attendance" value="87.5%" icon="calendar" color="#4facfe" />
-          <StatCard label="Posts" value="12" icon="create" color="#f093fb" />
-          <StatCard label="Activities" value="45" icon="flash" color="#43e97b" />
+          {statsLoading ? (
+            <View style={styles.statsLoading}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+              <Text style={styles.statsLoadingText}>Loading stats...</Text>
+            </View>
+          ) : (
+            <>
+              <StatCard
+                label="Attendance"
+                value={calculateOverallAttendance()}
+                icon="calendar"
+                color="#4facfe"
+              />
+              <StatCard
+                label="Marketplace Posts"
+                value={myListings?.length || 0}
+                icon="cart"
+                color="#f093fb"
+              />
+              <StatCard
+                label="Activities"
+                value={activities?.length || 0}
+                icon="flash"
+                color="#43e97b"
+              />
+            </>
+          )}
         </View>
 
         {/* Menu Items */}
@@ -122,9 +186,9 @@ export default function ProfileScreen() {
 function StatCard({ label, value, icon, color }: any) {
   return (
     <View style={[styles.statCard, { borderLeftColor: color }]}>
-      <Ionicons name={icon} size={24} color={color} />
+      <Ionicons name={icon as any} size={24} color={color} />
       <View style={styles.statContent}>
-        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statValue}>{String(value)}</Text>
         <Text style={styles.statLabel}>{label}</Text>
       </View>
     </View>
@@ -204,6 +268,16 @@ const styles = StyleSheet.create({
   statsContainer: {
     padding: SIZES.xl,
     gap: SIZES.md,
+  },
+  statsLoading: {
+    paddingVertical: SIZES.xxxl,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statsLoadingText: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginTop: SIZES.md,
   },
   statCard: {
     flexDirection: 'row',

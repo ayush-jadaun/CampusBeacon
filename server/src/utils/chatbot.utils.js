@@ -120,6 +120,7 @@ class AdvancedLanguageProcessor {
     // (Keep your extensive default list here as in the original)
     return {
         phrases: [
+          // === GREETINGS & CASUAL ===
           {
             question: "hello",
             answer:
@@ -145,6 +146,12 @@ class AdvancedLanguageProcessor {
             category: "greetings",
           },
           {
+            question: "good afternoon",
+            answer:
+              "Good afternoon! Welcome to CampusBeacon. How can I help you today?",
+            category: "greetings",
+          },
+          {
             question: "good evening",
             answer:
               "Good evening! Feel free to explore CampusBeacon's features anytime.",
@@ -157,210 +164,490 @@ class AdvancedLanguageProcessor {
             category: "casual",
           },
           {
+            question: "thank you",
+            answer:
+              "You're welcome! Let me know if you need anything else.",
+            category: "casual",
+          },
+          {
+            question: "thanks",
+            answer:
+              "Happy to help! Feel free to ask if you have more questions.",
+            category: "casual",
+          },
+          {
+            question: "bye",
+            answer:
+              "Goodbye! Come back anytime you need help with CampusBeacon.",
+            category: "casual",
+          },
+
+          // === GENERAL INFORMATION ===
+          {
             question: "What is CampusBeacon?",
             answer:
-              "CampusBeacon is a comprehensive platform that connects campus communities with events, academic resources, forums, and more. We strive to make campus life easier and more engaging.",
+              "CampusBeacon is a comprehensive platform exclusively for MNNIT students. It connects the campus community with features like Lost & Found, Marketplace, Attendance Tracking, Mess Menu, Resources, Ride Sharing, Events, Clubs, Eateries, and Hostel Management. We make campus life easier and more connected!",
             category: "general",
           },
+          {
+            question: "Who can use CampusBeacon?",
+            answer:
+              "CampusBeacon is exclusively for MNNIT students. You need a valid @mnnit.ac.in email address to register and use the platform.",
+            category: "general",
+          },
+          {
+            question: "Is CampusBeacon free to use?",
+            answer:
+              "Yes! CampusBeacon is completely free for all MNNIT students. No hidden charges, no subscriptions.",
+            category: "general",
+          },
+          {
+            question: "What features does CampusBeacon have?",
+            answer:
+              "CampusBeacon offers 10 major features: Lost & Found, Marketplace, Attendance Tracker, Mess Menu, Resource Hub, Ride Sharing, Events, Clubs, Eateries, and Hostel Management. Plus authentication, chat, and profile management!",
+            category: "general",
+          },
+          {
+            question: "Is there a mobile app?",
+            answer:
+              "Yes! We have a React Native mobile app for both iOS and Android. It includes all features from the web version with beautiful UI, Redux state management, and offline support. Download it to stay connected on the go!",
+            category: "general",
+          },
+
+          // === AUTHENTICATION & REGISTRATION ===
           {
             question: "How do I sign up for CampusBeacon?",
             answer:
-              "Signing up is quick and easy! Just click on 'Register' on our homepage, enter your email and password, and you're all set.",
+              "Click 'Register' on the homepage, enter your MNNIT email (@mnnit.ac.in), create a password, and fill in your details. You'll receive a verification email to activate your account.",
             category: "registration",
           },
           {
-            question: "What services does CampusBeacon offer?",
+            question: "Can I use my personal email?",
             answer:
-              "We offer real-time event updates, lost and found, buy and sell boards, academic collaboration tools, forums, and more. Check our site for a full list of features!",
-            category: "services",
+              "No, CampusBeacon only accepts MNNIT email addresses (@mnnit.ac.in) to ensure the platform is exclusive to MNNIT students.",
+            category: "registration",
           },
           {
-            question: "How can I contact CampusBeacon support?",
+            question: "I forgot my password",
             answer:
-              "For support, visit our 'Contact Us' page or send an email to campusbeacon0@gmail.com. We'll get back to you soon!",
-            category: "support",
+              "Click 'Forgot Password' on the login page, enter your MNNIT email, and you'll receive a password reset link. Follow the instructions to create a new password.",
+            category: "registration",
           },
           {
-            question: "Is my personal data safe on CampusBeacon?",
+            question: "Can I login with Google?",
             answer:
-              "Yes, we employ industry-standard security measures to keep your data safe. Please see our Privacy Policy for more details.",
-            category: "privacy",
+              "Yes! We support Google OAuth for quick login. However, your Google account must use your MNNIT email (@mnnit.ac.in).",
+            category: "registration",
           },
           {
-            question: "What campus events are coming up?",
+            question: "How do I verify my email?",
             answer:
-              "Check out the dynamic events calendar on CampusBeacon to see what's happening. You can also filter by categories or dates.",
-            category: "events",
+              "After registration, check your MNNIT email inbox for a verification link. Click it to activate your account. If you don't see it, check your spam folder.",
+            category: "registration",
           },
+
+          // === LOST & FOUND ===
           {
-            question: "How do I find events on CampusBeacon?",
+            question: "How do I report a lost item?",
             answer:
-              "Just head to our 'Events' section. You can browse upcoming events by date, category, or campus location.",
-            category: "events",
-          },
-          {
-            question: "I need help",
-            answer:
-              "Let me know what you need help with specifically, and I'll do my best to assist!",
-            category: "help",
-          },
-          {
-            question: "How can I access the hostel section?",
-            answer:
-              "You can access the hostel section by clicking on the 'Hostel' button in the navbar. There, you can check hostel details, officials, and other features.",
-            category: "hostel",
-          },
-          {
-            question: "How can I submit a complaint about hostel issues?",
-            answer:
-              "To submit a complaint, go to the hostel section and find the 'Complaint Box'. You can enter your issue, and the hostel administration will review it.",
-            category: "hostel",
-          },
-          {
-            question: "Where can I see hostel notifications?",
-            answer:
-              "You can check hostel-related notifications in the 'Notification Box' inside the hostel section. Admins post important updates there.",
-            category: "notification",
-          },
-          {
-            question: "How can I view hostel officials?",
-            answer:
-              "You can find the list of hostel officials in the 'Hostel Officials' section. It includes details like their name, position, and contact info.",
-            category: "officials",
-          },
-          {
-            question: "How can I check my attendance?",
-            answer:
-              "Your attendance records are available in the 'Attendance' section. It shows your subject-wise attendance percentage.",
-            category: "attendance",
-          },
-          {
-            question: "How can I access study materials?",
-            answer:
-              "You can find study materials, PDFs, and images categorized by branches and semesters in the 'Resource Hub' section.",
-            category: "resource_hub",
-          },
-          {
-            question: "How can I buy an item from another student?",
-            answer:
-              "Go to the 'Buy & Sell' section to browse items listed by other students. You can contact the seller and negotiate the price.",
-            category: "buy_sell",
-          },
-          {
-            question: "How can I sell my items to other students?",
-            answer:
-              "In the 'Buy & Sell' section, click on 'Sell an Item' and upload details about the product, including images, description, and price.",
-            category: "buy_sell",
-          },
-          {
-            question: "Where can I check the menu of canteens?",
-            answer:
-              "You can check the menu of different canteens in the 'Eateries' section. It shows the available food items and their prices.",
-            category: "eateries",
-          },
-          {
-            question: "Can I rate the food in canteens?",
-            answer:
-              "Yes, you can rate and review the food in the 'Eateries' section to help other students choose the best options.",
-            category: "eateries",
-          },
-          {
-            question: "How can I take a ride?",
-            answer:
-              "To take a ride, go to the 'Rides' section and check available rides. You can book a ride based on your destination and time preference.",
-            category: "rides",
-          },
-          {
-            question: "How can I share a ride?",
-            answer:
-              "If you want to share a ride, go to the 'Rides' section and list your ride details, including start location, destination, and available seats.",
-            category: "rides",
-          },
-          {
-            question: "How can I view upcoming exams?",
-            answer:
-              "You can check upcoming exams in the 'Exam Schedule' section, where dates and subjects are listed.",
-            category: "resource_hub",
-          },
-          {
-            question: "Can I view my class timetable?",
-            answer:
-              "Yes, your class timetable is available in the 'Timetable' section under Resource Hub.",
-            category: "resource_hub",
-          },
-          {
-            question: "How do I find past year question papers?",
-            answer:
-              "Past year question papers are available in the 'Resource Hub' under the study materials section.",
-            category: "resource_hub",
-          },
-          {
-            question: "How do I contact hostel officials?",
-            answer:
-              "Hostel officials' contact details are listed in the 'Hostel Officials' section.",
-            category: "officials",
-          },
-          {
-            question: "Can I request maintenance for my hostel room?",
-            answer:
-              "Yes, you can request maintenance by submitting a complaint in the 'Complaint Box' under the hostel section.",
-            category: "hostel",
-          },
-          {
-            question: "How do I book a ride to the railway station?",
-            answer:
-              "You can check for available rides in the 'Rides' section and book one that suits your schedule.",
-            category: "rides",
-          },
-          {
-            question: "Can I list multiple items for sale?",
-            answer:
-              "Yes, you can list multiple items in the 'Buy & Sell' section.",
-            category: "buy_sell",
-          },
-          {
-            question:
-              "How do I know if my attendance is below the required percentage?",
-            answer:
-              "You will see a warning in the 'Attendance' section if your attendance is below the minimum percentage required.",
-            category: "attendance",
-          },
-          {
-            question: "Where can I download assignment PDFs?",
-            answer:
-              "You can download assignment PDFs from the 'Resource Hub' under your branch and semester.",
-            category: "resource_hub",
-          },
-          {
-            question:
-              "Can I search for specific food items in the eateries section?",
-            answer:
-              "Yes, you can search for specific food items and their availability in the 'Eateries' section.",
-            category: "eateries",
-          },
-          {
-            question: "How do I report a lost or found item?",
-            answer:
-              "You can report lost and found items in the 'Lost & Found' section.",
+              "Go to the Lost & Found section, click 'Report Lost Item', add photos, description, location where lost, date, and your contact info. Other students can help you find it!",
             category: "lost_found",
           },
           {
-            question: "Is there a way to check hostel mess timings?",
+            question: "How do I report a found item?",
             answer:
-              "Yes, you can check hostel mess timings in the 'Hostel' section.",
+              "In Lost & Found, click 'Report Found Item', upload photos of the item, describe it, mention where you found it, and provide your contact details so the owner can reach you.",
+            category: "lost_found",
+          },
+          {
+            question: "Can I search for my lost item?",
+            answer:
+              "Yes! Use the search bar and filters in Lost & Found to find items by category (phone, wallet, keys, etc.), location, date, or keywords in the description.",
+            category: "lost_found",
+          },
+          {
+            question: "What categories are available in Lost & Found?",
+            answer:
+              "We have categories like Electronics (phones, laptops), Documents (IDs, certificates), Accessories (bags, wallets, keys), Clothing, Books, and Others.",
+            category: "lost_found",
+          },
+          {
+            question: "How do I mark an item as found?",
+            answer:
+              "If you're the owner and someone found your item, go to your Lost & Found post and click 'Mark as Found'. This helps keep the listings up to date!",
+            category: "lost_found",
+          },
+
+          // === MARKETPLACE ===
+          {
+            question: "How can I sell items on CampusBeacon?",
+            answer:
+              "Go to Marketplace, click 'Sell Item', upload photos, add title, description, price, condition (new/used), category, and your contact info. Your listing will be visible to all students!",
+            category: "buy_sell",
+          },
+          {
+            question: "How do I buy items from the marketplace?",
+            answer:
+              "Browse the Marketplace, use filters to find what you need, click on an item to see details, and contact the seller directly via WhatsApp or email to negotiate and arrange pickup.",
+            category: "buy_sell",
+          },
+          {
+            question: "What can I sell on the marketplace?",
+            answer:
+              "You can sell books, electronics, furniture, clothing, cycles, sports equipment, and more! Just make sure items are appropriate for a campus community.",
+            category: "buy_sell",
+          },
+          {
+            question: "How do I mark an item as sold?",
+            answer:
+              "Once you've sold your item, go to your listing in Marketplace and click 'Mark as Sold'. This removes it from active listings.",
+            category: "buy_sell",
+          },
+          {
+            question: "Can I negotiate prices?",
+            answer:
+              "Absolutely! Contact the seller directly and negotiate a fair price. CampusBeacon facilitates the connection, but transactions are between students.",
+            category: "buy_sell",
+          },
+          {
+            question: "What are the marketplace categories?",
+            answer:
+              "We have Books, Electronics, Furniture, Clothing, Cycles, Sports Equipment, Stationery, and Others. Use category filters to find exactly what you need!",
+            category: "buy_sell",
+          },
+
+          // === ATTENDANCE TRACKER ===
+          {
+            question: "How does attendance tracking work?",
+            answer:
+              "The Attendance section tracks your class attendance subject-wise. You can see overall percentage, subject-wise breakdown, color-coded warnings (red < 75%, yellow 75-85%, green > 85%), and forecasts.",
+            category: "attendance",
+          },
+          {
+            question: "How do I add attendance?",
+            answer:
+              "Go to Attendance, select a subject, and manually add attended/missed classes. The system calculates your percentage automatically.",
+            category: "attendance",
+          },
+          {
+            question: "What if my attendance is below 75%?",
+            answer:
+              "You'll see a red warning indicator. The system shows how many more classes you need to attend to reach the safe zone (75% or above).",
+            category: "attendance",
+          },
+          {
+            question: "Can I view attendance analytics?",
+            answer:
+              "Yes! View graphs showing attendance trends over time, subject-wise comparisons, and forecasts predicting your final attendance based on current patterns.",
+            category: "attendance",
+          },
+          {
+            question: "Does CampusBeacon sync with official attendance?",
+            answer:
+              "Currently, you manually enter your attendance. We're working on integrating with the official system for automatic syncing in future updates.",
+            category: "attendance",
+          },
+
+          // === MESS MENU & HOSTEL ===
+          {
+            question: "How do I check the mess menu?",
+            answer:
+              "Go to Mess Menu, select your hostel (there are chips for each hostel), choose the meal type (breakfast, lunch, dinner), and view today's menu plus the weekly schedule!",
             category: "hostel",
           },
           {
-            question: "Can I update my profile details?",
+            question: "Can I see menus for other hostels?",
             answer:
-              "Yes, you can edit your profile details in the 'Profile' section.",
+              "Yes! Just tap on a different hostel chip at the top of the Mess Menu screen to see their menu.",
+            category: "hostel",
+          },
+          {
+            question: "How do I submit a mess complaint?",
+            answer:
+              "In the Mess Menu or Hostel section, find the 'Submit Complaint' button. Describe your issue (food quality, hygiene, timings, etc.), and the mess officials will review it.",
+            category: "hostel",
+          },
+          {
+            question: "Who are the hostel officials?",
+            answer:
+              "Check the Hostel section > Officials tab to see the warden, caretaker, mess secretary, and other officials with their contact details (phone, email).",
+            category: "officials",
+          },
+          {
+            question: "What are the mess timings?",
+            answer:
+              "Mess timings are displayed in the Hostel section. Generally: Breakfast 7:30-9:30 AM, Lunch 12:30-2:30 PM, Snacks 5:00-6:00 PM, Dinner 8:00-10:00 PM. Check your specific hostel for exact times.",
+            category: "hostel",
+          },
+          {
+            question: "How do I request hostel maintenance?",
+            answer:
+              "Go to Hostel > Complaints tab, submit a maintenance request describing the issue (electrical, plumbing, furniture, etc.), and the hostel administration will address it.",
+            category: "hostel",
+          },
+
+          // === RESOURCE HUB ===
+          {
+            question: "Where can I find study materials?",
+            answer:
+              "Go to Resource Hub, select your branch (CSE, ECE, ME, etc.), then year (1st, 2nd, 3rd, 4th), then subject. You'll find notes, books, PDFs, past year questions, and more!",
+            category: "resource_hub",
+          },
+          {
+            question: "Can I download study materials?",
+            answer:
+              "Yes! All resources in the Resource Hub have download buttons. PDFs, images, and documents can be downloaded directly to your device.",
+            category: "resource_hub",
+          },
+          {
+            question: "How do I upload study materials?",
+            answer:
+              "In Resource Hub, click the 'Upload' FAB button, select branch, year, subject, upload your file (PDF, image, doc), add a description, and share with fellow students!",
+            category: "resource_hub",
+          },
+          {
+            question: "What types of resources are available?",
+            answer:
+              "You'll find lecture notes, textbooks, past year question papers (PYQs), assignment solutions, lab manuals, reference materials, and quick revision notes.",
+            category: "resource_hub",
+          },
+          {
+            question: "Are there resources for all branches?",
+            answer:
+              "Yes! We have resources for CSE, ECE, ME, CE, IT, Chemical, Bio-Tech, and all other MNNIT branches. Content is organized by branch, year, and subject.",
+            category: "resource_hub",
+          },
+
+          // === RIDE SHARING ===
+          {
+            question: "How does ride sharing work?",
+            answer:
+              "Students offer rides or look for rides. Go to Ride Share, enter from/to/date filters to find rides, or create your own ride listing with details like vehicle, seats available, and price per seat.",
+            category: "rides",
+          },
+          {
+            question: "How do I create a ride?",
+            answer:
+              "Click 'Create Ride' in Ride Share, enter starting point, destination, date & time, vehicle type, total seats, price per seat, and your contact info. Others can join your ride!",
+            category: "rides",
+          },
+          {
+            question: "How do I join a ride?",
+            answer:
+              "Find a ride going your way, check availability, and click 'Join Ride'. You can see the driver's contact info to coordinate pickup details.",
+            category: "rides",
+          },
+          {
+            question: "Can I cancel a ride?",
+            answer:
+              "Yes! If you joined a ride and need to cancel, click 'Leave Ride'. If you created a ride and need to cancel it, edit or delete your listing.",
+            category: "rides",
+          },
+          {
+            question: "How is the cost calculated?",
+            answer:
+              "The ride creator sets the price per seat. Total cost = price per seat × number of seats you book. Split fuel costs fairly with fellow passengers!",
+            category: "rides",
+          },
+          {
+            question: "What routes are popular?",
+            answer:
+              "Popular routes include Campus to Railway Station, Campus to Airport, Campus to City Center, and inter-city routes during breaks (Delhi, Lucknow, Kanpur, etc.).",
+            category: "rides",
+          },
+
+          // === EVENTS & CLUBS ===
+          {
+            question: "How do I find campus events?",
+            answer:
+              "Go to the Events section and filter by status (Upcoming, Ongoing, Completed). You'll see tech fests, cultural events, workshops, seminars, club activities, and more!",
+            category: "events",
+          },
+          {
+            question: "How do I register for an event?",
+            answer:
+              "Click on an event to see details, then click 'Register'. You'll get confirmation and updates about the event. Some events may have limited seats!",
+            category: "events",
+          },
+          {
+            question: "Can I see which club is hosting an event?",
+            answer:
+              "Yes! Each event shows the organizing club with their logo. Click on the club name to see more details about them and their other events.",
+            category: "events",
+          },
+          {
+            question: "What clubs are on campus?",
+            answer:
+              "Check the Clubs section to see all campus clubs categorized as Technical (coding, robotics), Cultural (music, dance), Sports, Literary (debate, writing), and Social Service clubs.",
+            category: "events",
+          },
+          {
+            question: "How do I join a club?",
+            answer:
+              "View club details in the Clubs section, check their recruitment events, follow their social media links, and contact coordinators listed on their profile.",
+            category: "events",
+          },
+          {
+            question: "Can I view past events?",
+            answer:
+              "Yes! Filter by 'Completed' in Events to see past events, including photos, highlights, and outcomes. Great for seeing what you missed!",
+            category: "events",
+          },
+
+          // === EATERIES ===
+          {
+            question: "Where can I find food options on campus?",
+            answer:
+              "Check the Eateries section for all campus food outlets including canteens, cafeterias, juice shops, and food stalls with menus, prices, ratings, and opening hours.",
+            category: "eateries",
+          },
+          {
+            question: "Can I see restaurant ratings?",
+            answer:
+              "Yes! Each eatery has star ratings (1-5 stars) and reviews from students. You can see the average rating and read what others think about the food quality and service.",
+            category: "eateries",
+          },
+          {
+            question: "How do I rate an eatery?",
+            answer:
+              "Go to an eatery's detail page, click 'Rate', give stars (1-5), write a review (optional), and submit. Your feedback helps other students choose!",
+            category: "eateries",
+          },
+          {
+            question: "What information is shown for eateries?",
+            answer:
+              "You'll see the name, type (veg/non-veg), location, opening hours, menu with prices, contact number, ratings, reviews, and popular items!",
+            category: "eateries",
+          },
+          {
+            question: "Can I call the eatery directly?",
+            answer:
+              "Yes! Each eatery listing has a 'Call' button that directly dials their number for takeout orders or inquiries.",
+            category: "eateries",
+          },
+
+          // === SUPPORT & PRIVACY ===
+          {
+            question: "How can I contact CampusBeacon support?",
+            answer:
+              "For support, email us at campusbeacon0@gmail.com or use the 'Contact Us' form on the website. We typically respond within 24 hours!",
+            category: "support",
+          },
+          {
+            question: "Is my data safe on CampusBeacon?",
+            answer:
+              "Absolutely! We use industry-standard encryption, secure authentication (JWT tokens), and follow best practices for data protection. Your personal information is never shared without permission.",
+            category: "privacy",
+          },
+          {
+            question: "Can I delete my account?",
+            answer:
+              "Yes. Go to Profile > Settings > Delete Account. Note that this permanently removes all your data, listings, and activity from CampusBeacon.",
+            category: "support",
+          },
+          {
+            question: "How do I report inappropriate content?",
+            answer:
+              "If you see inappropriate listings, posts, or behavior, use the 'Report' button on that item or email us at campusbeacon0@gmail.com with details. We take community safety seriously!",
+            category: "support",
+          },
+
+          // === PROFILE & SETTINGS ===
+          {
+            question: "How do I update my profile?",
+            answer:
+              "Go to Profile section, click 'Edit Profile', update your name, photo, registration number, branch, year, or contact info, then save changes.",
             category: "general",
           },
           {
-            question: "How do I view my exam results?",
+            question: "Can I change my profile picture?",
             answer:
-              "Your exam results are available in the 'Exam Results' section of the Resource Hub.",
-            category: "resource_hub",
+              "Yes! In Profile > Edit Profile, click on your photo, choose a new image from your device, crop if needed, and save. It'll update across all your posts and listings.",
+            category: "general",
+          },
+          {
+            question: "What appears on my profile?",
+            answer:
+              "Your profile shows your name, registration number, branch, year, profile picture, and stats (attendance percentage, number of posts, activities). You control what's public!",
+            category: "general",
+          },
+          {
+            question: "How do I enable notifications?",
+            answer:
+              "Go to Profile > Settings > Notifications. Toggle on/off notifications for events, messages, lost & found matches, ride updates, marketplace activity, etc.",
+            category: "general",
+          },
+
+          // === MOBILE APP SPECIFIC ===
+          {
+            question: "Does the mobile app have all features?",
+            answer:
+              "Yes! The mobile app has 100% feature parity with the web version, including all 10 main features, Redux state management, offline support, and beautiful gradients!",
+            category: "general",
+          },
+          {
+            question: "Is the mobile app available for iOS?",
+            answer:
+              "Yes! The React Native app works on both iOS (App Store) and Android (Play Store). Download it to stay connected on the go!",
+            category: "general",
+          },
+          {
+            question: "Does the app work offline?",
+            answer:
+              "Partially. You can view previously loaded content offline (cached data). Creating new posts, listings, or viewing real-time updates requires internet.",
+            category: "general",
+          },
+
+          // === TECHNICAL & TROUBLESHOOTING ===
+          {
+            question: "The website is slow",
+            answer:
+              "Try refreshing the page or clearing your browser cache. If the issue persists, check your internet connection or contact us at campusbeacon0@gmail.com.",
+            category: "support",
+          },
+          {
+            question: "I can't upload images",
+            answer:
+              "Make sure your image is under 5MB and in JPG, PNG, or WebP format. Try compressing the image or using a different browser. Still having issues? Contact support!",
+            category: "support",
+          },
+          {
+            question: "My email verification link expired",
+            answer:
+              "Login to your account and request a new verification email from your profile settings. The new link will be valid for 24 hours.",
+            category: "support",
+          },
+          {
+            question: "What browsers are supported?",
+            answer:
+              "CampusBeacon works best on Chrome, Firefox, Safari, and Edge (latest versions). For the best experience, keep your browser updated!",
+            category: "support",
+          },
+
+          // === MISCELLANEOUS ===
+          {
+            question: "I need help",
+            answer:
+              "I'm here to help! Tell me specifically what you need assistance with - Lost & Found, Marketplace, Attendance, Events, or something else?",
+            category: "help",
+          },
+          {
+            question: "What's new on CampusBeacon?",
+            answer:
+              "We recently launched the mobile app with Redux state management, added 7 new feature screens, improved UI with gradients, and enhanced search functionality across all sections!",
+            category: "general",
+          },
+          {
+            question: "Can I suggest new features?",
+            answer:
+              "Absolutely! We love feedback. Email your suggestions to campusbeacon0@gmail.com or use the feedback form in Profile > Settings. Your ideas help make CampusBeacon better!",
+            category: "support",
+          },
+          {
+            question: "Who created CampusBeacon?",
+            answer:
+              "CampusBeacon was created by Team BrainWashingtonEC: Ayush Jadaun and Ayush Agarwal, MNNIT students passionate about solving real campus problems through technology!",
+            category: "general",
           },
         ].map((p) => ({ ...p, lowercaseQuestion: p.question.toLowerCase() })), // Ensure defaults also have lowercase
     };

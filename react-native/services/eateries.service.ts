@@ -42,7 +42,7 @@ const eateriesService = {
   // Get all eateries
   async getAll(): Promise<{ success: boolean; data: Eatery[] }> {
     try {
-      const response = await api.get('/eatery');
+      const response = await api.get('/eateries');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch eateries');
@@ -52,7 +52,7 @@ const eateriesService = {
   // Get eatery by ID
   async getById(id: string): Promise<{ success: boolean; data: Eatery }> {
     try {
-      const response = await api.get(`/eatery/${id}`);
+      const response = await api.get(`/eateries/${id}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch eatery');
@@ -65,7 +65,7 @@ const eateriesService = {
     review: string;
   }): Promise<{ success: boolean; data: EateryRating }> {
     try {
-      const response = await api.post(`/eatery/${eateryId}/rate`, data);
+      const response = await api.post(`/eateries/${eateryId}/rate`, data);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to rate eatery');

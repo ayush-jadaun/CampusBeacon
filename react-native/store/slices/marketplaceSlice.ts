@@ -23,6 +23,7 @@ interface MarketplaceItem {
 interface MarketplaceState {
   items: MarketplaceItem[];
   filteredItems: MarketplaceItem[];
+  myListings: MarketplaceItem[];
   isLoading: boolean;
   error: string | null;
   searchQuery: string;
@@ -34,6 +35,7 @@ interface MarketplaceState {
 const initialState: MarketplaceState = {
   items: [],
   filteredItems: [],
+  myListings: [],
   isLoading: false,
   error: null,
   searchQuery: '',
@@ -48,6 +50,21 @@ export const fetchMarketplaceItems = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await marketplaceService.getAll();
+      if (response.success) {
+        return response.data;
+      }
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchMyListings = createAsyncThunk(
+  'marketplace/fetchMyListings',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await marketplaceService.getMyItems();
       if (response.success) {
         return response.data;
       }
@@ -144,6 +161,21 @@ const marketplaceSlice = createSlice({
         state.filteredItems = filterItems(state);
       })
       .addCase(fetchMarketplaceItems.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      });
+
+    // Fetch my listings
+    builder
+      .addCase(fetchMyListings.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMyListings.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.myListings = action.payload;
+      })
+      .addCase(fetchMyListings.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });
