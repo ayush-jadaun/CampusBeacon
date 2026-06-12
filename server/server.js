@@ -82,7 +82,7 @@ app.use("/api/events", eventRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 
-import { connectDb } from "./src/db/db.js";
+import sequelize, { connectDb } from "./src/db/db.js";
 import { EventRegistration } from "./src/models/eventRegistration.model.js";
 
 
@@ -92,8 +92,11 @@ const startServer = async () => {
     await connectDb();
     console.log("Database connected successfully");
 
-    // Global sync is disabled; create newer tables individually if missing
+    // Global sync is disabled; create newer tables/columns individually
     await EventRegistration.sync();
+    await sequelize.query(
+      "ALTER TABLE events ADD COLUMN IF NOT EXISTS max_participants INTEGER;"
+    );
 
     const httpServer = createServer(app);
 

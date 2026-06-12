@@ -20,10 +20,19 @@ export const createEvent = asyncHandler(async (req, res) => {
     location,
     social_media_links,
     coordinator_ids,
+    max_participants,
   } = req.body;
 
   if (!name || !description || !club_id || !date || !location) {
     throw new ApiError(400, "Missing required event details");
+  }
+
+  let maxParticipants = null;
+  if (max_participants !== undefined && max_participants !== null && max_participants !== "") {
+    maxParticipants = parseInt(max_participants, 10);
+    if (isNaN(maxParticipants) || maxParticipants < 1) {
+      throw new ApiError("max_participants must be a positive integer", 400);
+    }
   }
 
   // Check if club exists
@@ -59,6 +68,7 @@ export const createEvent = asyncHandler(async (req, res) => {
     location,
     images: imageUrls,
     videos: videoUrls,
+    max_participants: maxParticipants,
     social_media_links: social_media_links
       ? JSON.parse(social_media_links)
       : [],
@@ -164,12 +174,25 @@ export const updateEvent = asyncHandler(async (req, res) => {
     location,
     social_media_links,
     coordinator_ids,
+    max_participants,
   } = req.body;
 
   const event = await Event.findByPk(id);
 
   if (!event) {
     throw new ApiError(404, "Event not found");
+  }
+
+  if (max_participants !== undefined) {
+    if (max_participants === null || max_participants === "") {
+      event.max_participants = null;
+    } else {
+      const maxParticipants = parseInt(max_participants, 10);
+      if (isNaN(maxParticipants) || maxParticipants < 1) {
+        throw new ApiError("max_participants must be a positive integer", 400);
+      }
+      event.max_participants = maxParticipants;
+    }
   }
 
   // Check if club exists if club_id is provided
@@ -326,6 +349,15 @@ export const registerForEvent = asyncHandler(async (req, res) => {
 
   if (new Date(event.date) < new Date()) {
     throw new ApiError("Cannot register for a past event", 400);
+  }
+
+  if (event.max_participants !== null && event.max_participants !== undefined) {
+    const currentCount = await EventRegistration.count({
+      where: { event_id: event.id },
+    });
+    if (currentCount >= event.max_participants) {
+      throw new ApiError("Event is full", 409);
+    }
   }
 
   const [registration, created] = await EventRegistration.findOrCreate({

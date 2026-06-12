@@ -5,7 +5,9 @@
       "Bash(cat:*)",
       "Bash(find:*)",
       "Bash(ls:*)",
-      "PowerShell(Get-Content *)"
+      "PowerShell(Get-Content *)",
+      "PowerShell(node --check \"E:\\\\Web dev\\\\CampusBeacon\\\\server\\\\server.js\"; node --check \"E:\\\\Web dev\\\\CampusBeacon\\\\server\\\\src\\\\controllers\\\\events.controller.js\"; node --check \"E:\\\\Web dev\\\\CampusBeacon\\\\server\\\\src\\\\routes\\\\events.routes.js\"; node --check \"E:\\\\Web dev\\\\CampusBeacon\\\\server\\\\src\\\\middlewares\\\\role.middleware.js\"; node --check \"E:\\\\Web dev\\\\CampusBeacon\\\\server\\\\src\\\\models\\\\events.model.js\"; \"Server OK\")",
+      "PowerShell(Remove-Item *)"
     ]
   }
 }

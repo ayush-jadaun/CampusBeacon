@@ -145,6 +145,11 @@ export default function ProfileScreen() {
             onPress={() => setEditModalVisible(true)}
           />
           <MenuItem
+            icon="ticket-outline"
+            label="My Events"
+            onPress={() => router.push('/(screens)/my-events' as any)}
+          />
+          <MenuItem
             icon="settings-outline"
             label="Settings"
             onPress={() => alert('Settings - Coming soon!')}

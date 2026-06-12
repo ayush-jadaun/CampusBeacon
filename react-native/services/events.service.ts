@@ -10,6 +10,7 @@ export interface Event {
   club_id: number;
   date: string;
   location: string;
+  max_participants?: number | null;
   createdAt: string;
   updatedAt: string;
   club?: {

@@ -1,6 +1,7 @@
 import express from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { requireRole } from "../middlewares/role.middleware.js";
 import filterInputMiddleware from "../middlewares/filter.middleware.js";
 
 
@@ -23,6 +24,7 @@ const router = express.Router();
 router.post(
   "/events",
   authMiddleware,
+  requireRole("admin", "coordinator"),
   upload.fields([
     { name: "images", maxCount: 10 },
     { name: "videos", maxCount: 5 },
@@ -40,6 +42,7 @@ router.delete("/events/:id/register", authMiddleware, unregisterFromEvent);
 router.put(
   "/events/:id",
   authMiddleware,
+  requireRole("admin", "coordinator"),
   upload.fields([
     { name: "images", maxCount: 10 },
     { name: "videos", maxCount: 5 },
@@ -47,6 +50,11 @@ router.put(
   filterInputMiddleware,
   updateEvent
 );
-router.delete("/events/:id", authMiddleware, deleteEvent);
+router.delete(
+  "/events/:id",
+  authMiddleware,
+  requireRole("admin", "coordinator"),
+  deleteEvent
+);
 
 export default router;

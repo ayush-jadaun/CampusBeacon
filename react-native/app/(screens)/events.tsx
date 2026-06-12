@@ -95,9 +95,14 @@ export default function EventsScreen() {
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Events</Text>
-        <TouchableOpacity onPress={() => router.push('/(screens)/clubs' as any)}>
-          <Ionicons name="people" size={24} color={COLORS.primary} />
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity onPress={() => router.push('/(screens)/my-events' as any)}>
+            <Ionicons name="ticket-outline" size={24} color={COLORS.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push('/(screens)/clubs' as any)}>
+            <Ionicons name="people" size={24} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Filters */}
@@ -174,6 +179,8 @@ function EventCard({
 
   const status = getEventStatus(event);
   const canRegister = status !== 'completed';
+  const hasCapacity = event.max_participants != null;
+  const isFull = hasCapacity && registrationCount >= (event.max_participants as number);
   const image = event.images?.[0];
   const eventDate = new Date(event.date);
 
@@ -249,10 +256,17 @@ function EventCard({
           <View style={styles.registrationCount}>
             <Ionicons name="people-outline" size={16} color={COLORS.textSecondary} />
             <Text style={styles.registrationCountText}>
-              {registrationCount} registered
+              {hasCapacity
+                ? `${registrationCount}/${event.max_participants} registered`
+                : `${registrationCount} registered`}
             </Text>
+            {isFull && !isRegistered && (
+              <View style={styles.fullBadge}>
+                <Text style={styles.fullBadgeText}>Full</Text>
+              </View>
+            )}
           </View>
-          {canRegister && (
+          {canRegister && (isRegistered || !isFull) && (
             <TouchableOpacity
               style={[
                 styles.registerButton,
@@ -317,6 +331,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.text,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SIZES.lg,
   },
   filtersScroll: {
     flexGrow: 0,
@@ -474,5 +493,17 @@ const styles = StyleSheet.create({
   },
   registerButtonTextRegistered: {
     color: COLORS.primary,
+  },
+  fullBadge: {
+    backgroundColor: '#EF4444',
+    paddingVertical: 2,
+    paddingHorizontal: SIZES.sm,
+    borderRadius: 10,
+    marginLeft: SIZES.xs,
+  },
+  fullBadgeText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: COLORS.white,
   },
 });

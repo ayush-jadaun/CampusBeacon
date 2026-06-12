@@ -46,6 +46,10 @@ export const Event = sequelize.define(
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
     },
+    max_participants: {
+      type: DataTypes.INTEGER,
+      allowNull: true, // null = unlimited
+    },
   },
   {
     timestamps: true,
