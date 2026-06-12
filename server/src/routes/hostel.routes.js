@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import filterInputMiddleware from "../middlewares/filter.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { requireRole } from "../middlewares/role.middleware.js";
 
 import {
   createHostel,
@@ -38,33 +39,40 @@ import {
 
 const router = express.Router();
 const upload = multer({ dest: "./public/temp" });
+const hostelStaff = requireRole("admin", "hostel_president");
 
 /*
 =============================
         Hostel Routes
 =============================
 */
-router.post("/", authMiddleware, createHostel);
+router.post("/", authMiddleware, requireRole("admin"), createHostel);
 router.get("/", authMiddleware, getAllHostels);
 router.get("/:id", authMiddleware, getHostelById);
-router.put("/:id", authMiddleware, editHostel);
-router.delete("/:id", authMiddleware, deleteHostel);
+router.put("/:id", authMiddleware, requireRole("admin"), editHostel);
+router.delete("/:id", authMiddleware, requireRole("admin"), deleteHostel);
 
 /*
 =============================
         Menu Routes
 =============================
 */
-router.post("/menus", authMiddleware, createMenu);
+router.post("/menus", authMiddleware, hostelStaff, createMenu);
 router.get("/menus/hostel/:hostel_id", authMiddleware, getMenuByHostel);
 router.get("/menus/:menu_id", authMiddleware, getMenuById);
 router.get("/menus/meal/:hostel_id/:day/:meal", authMiddleware, getMenuMeal);
 // New route for updating entire menu
-router.put("/menus/:menu_id", authMiddleware, updateMenu);
-router.put("/menus/meal/:hostel_id/:day/:meal", authMiddleware, updateMenuMeal);
+router.put("/menus/:menu_id", authMiddleware, hostelStaff, updateMenu);
+router.put(
+  "/menus/meal/:hostel_id/:day/:meal",
+  authMiddleware,
+  hostelStaff,
+  updateMenuMeal
+);
 router.delete(
   "/menus/meal/:hostel_id/:day/:meal",
   authMiddleware,
+  hostelStaff,
   deleteMenuMeal
 );
 
@@ -73,7 +81,7 @@ router.delete(
         Officials Routes
 =============================
 */
-router.post("/officials", authMiddleware, createOfficial);
+router.post("/officials", authMiddleware, hostelStaff, createOfficial);
 router.get("/officials", authMiddleware, getAllOfficials);
 router.get(
   "/officials/hostel/:hostel_id",
@@ -81,8 +89,18 @@ router.get(
   getOfficialsByHostel
 );
 router.get("/officials/:official_id", authMiddleware, getOfficialById);
-router.put("/officials/:official_id", authMiddleware, editOfficial);
-router.delete("/officials/:official_id", authMiddleware, deleteOfficial);
+router.put(
+  "/officials/:official_id",
+  authMiddleware,
+  hostelStaff,
+  editOfficial
+);
+router.delete(
+  "/officials/:official_id",
+  authMiddleware,
+  hostelStaff,
+  deleteOfficial
+);
 
 /*
 =============================
@@ -109,6 +127,7 @@ router.post(
   "/notifications",
   upload.single("file"),
   authMiddleware,
+  hostelStaff,
   filterInputMiddleware,
   createNotification
 );
@@ -118,12 +137,14 @@ router.put(
   "/notifications/:notification_id",
   upload.single("file"),
   authMiddleware,
+  hostelStaff,
   filterInputMiddleware,
   updateNotification
 );
 router.delete(
   "/notifications/:notification_id",
   authMiddleware,
+  hostelStaff,
   deleteNotification
 );
 

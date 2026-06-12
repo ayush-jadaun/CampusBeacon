@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,7 +9,6 @@ import {
   FiPlus,
   FiLoader,
   FiClock,
-  FiUsers,
   FiFilter,
   FiSearch,
   FiChevronDown,
@@ -20,7 +19,12 @@ import {
   fetchEvents,
   deleteEvent,
   clearEventError,
+  fetchRegistrationCounts,
+  fetchMyRegistrations,
 } from "../../slices/eventSlice";
+import RegisterButton, {
+  RegistrationCount,
+} from "../events/RegisterButton";
 
 // Helper to format date
 const formatDate = (dateString) => {
@@ -31,7 +35,7 @@ const formatDate = (dateString) => {
       month: "short",
       day: "numeric",
     });
-  } catch (e) {
+  } catch {
     console.error("Invalid date format:", dateString);
     return "Invalid Date";
   }
@@ -55,19 +59,29 @@ const getTimeUntil = (dateString) => {
     if (diffDays <= 7) return { text: `${diffDays} days away`, isSoon: true };
 
     return { text: `${diffDays} days away` };
-  } catch (e) {
+  } catch {
     return null;
   }
 };
+
+const filterPillClass = (active) =>
+  `px-4 py-1.5 rounded-full font-mono text-xs uppercase tracking-widest border transition-colors duration-300 ${
+    active
+      ? "bg-beacon text-ink border-beacon"
+      : "border-ink-line text-dim hover:text-paper hover:border-dim"
+  }`;
 
 const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { events, loading, error } = useSelector((state) => state.events);
+  const { events, loading, error, myRegistrations } = useSelector(
+    (state) => state.events
+  );
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState("all"); // all, upcoming, past
+  const [filterType, setFilterType] = useState("all"); // all, upcoming, past, mine
   const [showFilters, setShowFilters] = useState(false);
 
   // Fetch events when component mounts or clubId changes
@@ -75,6 +89,7 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
     if (clubId) {
       dispatch(fetchEvents(clubId));
     }
+    dispatch(fetchRegistrationCounts());
 
     return () => {
       if (error) {
@@ -82,6 +97,12 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
       }
     };
   }, [dispatch, clubId, error]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchMyRegistrations());
+    }
+  }, [dispatch, isAuthenticated]);
 
   // Filter events based on search and filters
   useEffect(() => {
@@ -110,6 +131,9 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
       case "past":
         result = result.filter((event) => new Date(event.date) < now);
         break;
+      case "mine":
+        result = result.filter((event) => myRegistrations.includes(event.id));
+        break;
       default:
         // "all" - no filtering needed
         break;
@@ -119,7 +143,7 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
     result.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     setFilteredEvents(result);
-  }, [events, searchTerm, filterType]);
+  }, [events, searchTerm, filterType, myRegistrations]);
 
   const handleDeleteEvent = (id) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
@@ -134,7 +158,6 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
   const onEventClick =
     handleEventClick ||
     ((eventId) => {
-      console.log("Event card clicked, navigating to:", eventId);
       navigate(`/events/${eventId}`);
     });
 
@@ -147,20 +170,16 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
       {/* Header with Stats */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
         <div>
-          <h2 className="text-3xl md:text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 flex items-center">
-            <FiCalendar className="mr-3 mb-1 inline-block" />
-            Club Events
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-beacon mb-2">
+            ( Events )
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl font-medium text-paper">
+            Club events
           </h2>
           {!loading && !error && (
-            <div className="flex gap-3 mt-2 text-sm text-gray-400">
-              <span className="flex items-center">
-                <span className="h-2 w-2 rounded-full bg-purple-400 mr-2"></span>
-                {events.length} Total
-              </span>
-              <span className="flex items-center">
-                <span className="h-2 w-2 rounded-full bg-green-400 mr-2"></span>
-                {upcomingCount} Upcoming
-              </span>
+            <div className="flex gap-4 mt-3 font-mono text-[11px] uppercase tracking-widest text-dim">
+              <span>{events.length} total</span>
+              <span className="text-beacon">{upcomingCount} upcoming</span>
             </div>
           )}
         </div>
@@ -168,69 +187,65 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
         {isAdmin && (
           <button
             onClick={() => openModal("event", "create", { club_id: clubId })}
-            className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg text-sm transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            className="flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-beacon text-ink font-mono text-xs uppercase tracking-widest hover:bg-beacon-soft transition-colors duration-300 disabled:opacity-60"
             disabled={loading}
           >
-            <FiPlus className="mr-1" /> Add Event
+            <FiPlus /> Add event
           </button>
         )}
       </div>
 
       {/* Search and Filters */}
       {!loading && !error && events.length > 0 && (
-        <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/60">
+        <div className="bg-ink-2 border border-ink-line rounded-sm p-4">
           <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
             {/* Search */}
             <div className="relative flex-grow w-full md:w-auto">
-              <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-dim" />
               <input
                 type="text"
-                placeholder="Search events..."
+                placeholder="Search events…"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-900/50 border border-gray-700 rounded-lg w-full pl-10 pr-4 py-2 text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="bg-ink border border-ink-line rounded-full w-full pl-10 pr-4 py-2 text-sm text-paper placeholder:text-dim focus:outline-none focus:border-beacon transition-colors duration-300"
               />
             </div>
 
-            <div className="flex gap-2 items-center w-full md:w-auto">
+            <div className="flex gap-2 items-center w-full md:w-auto flex-wrap">
               {/* Filter Pills */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setFilterType("all")}
-                  className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                    filterType === "all"
-                      ? "bg-purple-500/30 border-purple-500 text-purple-200"
-                      : "border-gray-700 text-gray-400 hover:border-purple-500/50"
-                  }`}
+                  className={filterPillClass(filterType === "all")}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setFilterType("upcoming")}
-                  className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                    filterType === "upcoming"
-                      ? "bg-green-500/20 border-green-500 text-green-200"
-                      : "border-gray-700 text-gray-400 hover:border-green-500/50"
-                  }`}
+                  className={filterPillClass(filterType === "upcoming")}
                 >
                   Upcoming
                 </button>
                 <button
                   onClick={() => setFilterType("past")}
-                  className={`px-3 py-1 rounded-full text-xs border transition-colors ${
-                    filterType === "past"
-                      ? "bg-gray-600/30 border-gray-500 text-gray-300"
-                      : "border-gray-700 text-gray-400 hover:border-gray-500/50"
-                  }`}
+                  className={filterPillClass(filterType === "past")}
                 >
                   Past
                 </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={() => setFilterType("mine")}
+                    className={filterPillClass(filterType === "mine")}
+                  >
+                    My events
+                  </button>
+                )}
               </div>
 
               {/* Advanced Filters Toggle */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center text-xs text-gray-400 hover:text-purple-300 transition-colors"
+                className="flex items-center font-mono text-xs text-dim hover:text-beacon transition-colors duration-300"
               >
                 <FiFilter className="mr-1" />
                 <FiChevronDown
@@ -252,11 +267,9 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-700/50">
-                  {/* Additional filters would go here */}
-                  <div className="text-xs text-gray-400">
-                    More filtering options can be added here based on event
-                    properties
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t border-ink-line">
+                  <div className="font-mono text-[11px] uppercase tracking-widest text-dim">
+                    More filtering options coming soon
                   </div>
                 </div>
               </motion.div>
@@ -268,23 +281,25 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
       {/* Loading State */}
       {loading && (
         <div className="flex justify-center items-center py-12">
-          <div className="flex flex-col items-center">
-            <FiLoader className="animate-spin text-purple-400 text-4xl mb-3" />
-            <span className="text-gray-400">Loading Events...</span>
+          <div className="flex flex-col items-center gap-3">
+            <FiLoader className="animate-spin text-beacon text-3xl" />
+            <span className="font-mono text-xs uppercase tracking-widest text-dim">
+              Loading events…
+            </span>
           </div>
         </div>
       )}
 
       {/* Error State */}
       {!loading && error && (
-        <div className="text-center py-10 text-red-400 bg-red-900/20 rounded-lg border border-red-700 p-4">
-          <p>Error loading events:</p>
-          <p className="font-semibold">{error}</p>
+        <div className="text-center py-10 bg-ink-2 border border-ink-line rounded-sm p-6">
+          <p className="text-dim">Error loading events:</p>
+          <p className="text-paper font-medium mt-1">{error}</p>
           <button
             onClick={() => {
               if (clubId) dispatch(fetchEvents(clubId));
             }}
-            className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm transition-colors"
+            className="mt-5 px-6 py-2.5 rounded-full bg-beacon text-ink font-mono text-xs uppercase tracking-widest hover:bg-beacon-soft transition-colors duration-300"
           >
             Retry
           </button>
@@ -295,147 +310,142 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
       {!loading && !error && (
         <>
           {filteredEvents.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {filteredEvents.map((event, index) => {
                 const timeUntil = getTimeUntil(event.date);
+                const isRegistered = myRegistrations.includes(event.id);
 
                 return (
                   <motion.div
                     key={event.id}
-                    className="bg-gray-800/50 rounded-xl overflow-hidden border border-gray-700/60 shadow-lg hover:shadow-purple-500/20 hover:border-purple-600/70 transition-all duration-300 group relative cursor-pointer flex flex-col"
+                    className="group relative flex flex-col bg-ink-2 border border-ink-line rounded-sm overflow-hidden cursor-pointer transition-colors duration-300 hover:border-beacon/50"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.08 }}
                     onClick={() => onEventClick(event.id)}
                     layout
-                    whileHover={{ y: -5 }}
                   >
                     {/* Status Badge */}
                     {timeUntil && (
                       <div
-                        className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium z-10 ${
-                          timeUntil.isPast
-                            ? "bg-gray-700/80 text-gray-300"
-                            : timeUntil.isToday
-                            ? "bg-purple-600/90 text-white"
-                            : timeUntil.isSoon
-                            ? "bg-green-600/80 text-white"
-                            : "bg-blue-600/80 text-white"
+                        className={`absolute top-3 left-3 px-3 py-1 rounded-full font-mono text-[10px] uppercase tracking-widest z-10 border ${
+                          timeUntil.isToday
+                            ? "bg-beacon text-ink border-beacon"
+                            : timeUntil.isPast
+                            ? "bg-ink/85 text-dim border-ink-line"
+                            : "bg-ink/85 text-paper border-ink-line"
                         }`}
                       >
                         {timeUntil.text}
                       </div>
                     )}
 
+                    {/* Registered marker */}
+                    {isRegistered && !timeUntil?.isPast && (
+                      <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-beacon font-mono text-[10px] uppercase tracking-widest text-ink z-10">
+                        Registered
+                      </div>
+                    )}
+
                     {/* Admin Buttons */}
                     {isAdmin && (
-                      <div className="absolute top-3 right-3 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <div className="absolute bottom-3 right-3 flex space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             openModal("event", "edit", event);
                           }}
-                          className="p-1.5 bg-blue-600/90 hover:bg-blue-500 rounded-full text-white text-xs transform hover:scale-110 transition-transform shadow-lg"
+                          className="p-2 bg-ink border border-ink-line hover:border-beacon hover:text-beacon rounded-full text-dim transition-colors duration-300"
                           aria-label="Edit Event"
                         >
-                          <FiEdit size={14} />
+                          <FiEdit size={13} />
                         </button>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteEvent(event.id);
-                            }}
-                            className="p-1.5 bg-red-600/90 hover:bg-red-500 rounded-full text-white text-xs transform hover:scale-110 transition-transform shadow-lg"
-                            aria-label="Delete Event"
-                          >
-                            <FiTrash2 size={14} />
-                          </button>
-                          </div>
-                        )}
+                          }}
+                          className="p-2 bg-ink border border-ink-line hover:border-beacon hover:text-beacon rounded-full text-dim transition-colors duration-300"
+                          aria-label="Delete Event"
+                        >
+                          <FiTrash2 size={13} />
+                        </button>
+                      </div>
+                    )}
 
-                        {/* Event Image with Gradient Overlay */}
-                        <div className="h-48 w-full bg-gray-900/50 overflow-hidden relative">
-                          <img
-                          src={
-                            Array.isArray(event.images) && event.images.length > 0
+                    {/* Event Image */}
+                    <div className="h-44 w-full bg-ink-3 overflow-hidden relative border-b border-ink-line">
+                      <img
+                        src={
+                          Array.isArray(event.images) &&
+                          event.images.length > 0
                             ? event.images[0]
                             : `https://source.unsplash.com/400x240/?event,${encodeURIComponent(
-                              event.name
+                                event.name
                               )}`
-                          }
-                          alt={`Image for ${event.name}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = `https://picsum.photos/400/240?random=${event.id}`;
-                          }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent"></div>
-                        </div>
+                        }
+                        alt={`Image for ${event.name}`}
+                        className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `https://picsum.photos/400/240?random=${event.id}`;
+                        }}
+                      />
+                      <div
+                        className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent"
+                        aria-hidden="true"
+                      />
+                    </div>
 
-                        {/* Event Info */}
-                    <div className="p-5 flex-grow flex flex-col justify-between">
+                    {/* Event Info */}
+                    <div className="p-5 flex-grow flex flex-col">
                       <div>
-                        <h3 className="text-lg font-semibold text-white mb-1.5 truncate group-hover:text-purple-300 transition-colors">
+                        <h3 className="font-display text-lg font-medium text-paper mb-1.5 truncate group-hover:text-beacon transition-colors duration-300">
                           {event.name}
                         </h3>
-                        <p className="text-sm text-gray-400 mb-4 line-clamp-2 min-h-[2.5rem]">
+                        <p className="text-sm text-dim mb-4 line-clamp-2 min-h-[2.5rem]">
                           {event.description || "No description available."}
                         </p>
                       </div>
 
                       {/* Event Meta Info */}
-                      <div className="space-y-2">
-                        <div className="flex items-center text-xs text-gray-400">
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center font-mono text-[11px] uppercase tracking-widest text-dim">
                           <FiCalendar
                             size={12}
-                            className="mr-2 text-purple-400 flex-shrink-0"
+                            className="mr-2 text-beacon flex-shrink-0"
                           />
                           <span>{formatDate(event.date)}</span>
                         </div>
 
                         {event.time && (
-                          <div className="flex items-center text-xs text-gray-400">
+                          <div className="flex items-center font-mono text-[11px] uppercase tracking-widest text-dim">
                             <FiClock
                               size={12}
-                              className="mr-2 text-purple-400 flex-shrink-0"
+                              className="mr-2 text-beacon flex-shrink-0"
                             />
                             <span>{event.time}</span>
                           </div>
                         )}
 
-                        <div className="flex items-center text-xs text-gray-400">
+                        <div className="flex items-center font-mono text-[11px] uppercase tracking-widest text-dim">
                           <FiMapPin
                             size={12}
-                            className="mr-2 text-purple-400 flex-shrink-0"
+                            className="mr-2 text-beacon flex-shrink-0"
                           />
                           <span className="truncate">
                             {event.location || "Location TBA"}
                           </span>
                         </div>
-
-                        {event.attendees && (
-                          <div className="flex items-center text-xs text-gray-400">
-                            <FiUsers
-                              size={12}
-                              className="mr-2 text-purple-400 flex-shrink-0"
-                            />
-                            <span>
-                              {typeof event.attendees === "number"
-                                ? `${event.attendees} attending`
-                                : event.attendees}
-                            </span>
-                          </div>
-                        )}
                       </div>
 
                       {/* Tags/Categories */}
                       {event.tags && event.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-gray-700/50">
+                        <div className="flex flex-wrap gap-1.5 mt-4">
                           {event.tags.map((tag, i) => (
                             <span
                               key={i}
-                              className="px-2 py-0.5 bg-purple-900/30 text-purple-300 text-xs rounded-full flex items-center"
+                              className="px-2.5 py-0.5 border border-ink-line text-dim font-mono text-[10px] uppercase tracking-widest rounded-full flex items-center"
                             >
                               <FiTag size={8} className="mr-1" />
                               {tag}
@@ -443,10 +453,19 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
                           ))}
                         </div>
                       )}
-                    </div>
 
-                    {/* Hover effect - Gradient Border */}
-                    <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-purple-500/30 pointer-events-none transition-all duration-300"></div>
+                      {/* Registration */}
+                      <div className="mt-auto pt-4 border-t border-ink-line flex items-center justify-between gap-3">
+                        <RegistrationCount event={event} />
+                        {timeUntil?.isPast ? (
+                          <span className="font-mono text-[11px] uppercase tracking-widest text-dim">
+                            Event ended
+                          </span>
+                        ) : (
+                          <RegisterButton event={event} compact />
+                        )}
+                      </div>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -455,12 +474,12 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center bg-gray-800/30 border border-gray-700/50 rounded-lg p-8 flex flex-col items-center"
+              className="text-center bg-ink-2 border border-ink-line rounded-sm p-10 flex flex-col items-center"
             >
               {searchTerm || filterType !== "all" ? (
                 <>
-                  <FiFilter className="text-gray-500 text-4xl mb-3" />
-                  <p className="text-gray-400">
+                  <FiFilter className="text-dim text-3xl mb-4" />
+                  <p className="text-dim">
                     No events match your current filters.
                   </p>
                   <button
@@ -468,15 +487,15 @@ const EventList = ({ isAdmin, openModal, clubId, handleEventClick }) => {
                       setSearchTerm("");
                       setFilterType("all");
                     }}
-                    className="mt-4 text-sm text-purple-400 hover:text-purple-300"
+                    className="mt-4 link-sweep font-mono text-xs uppercase tracking-widest text-beacon"
                   >
                     Clear all filters
                   </button>
                 </>
               ) : (
                 <>
-                  <FiCalendar className="text-gray-500 text-4xl mb-3" />
-                  <p className="text-gray-500 italic">
+                  <FiCalendar className="text-dim text-3xl mb-4" />
+                  <p className="text-dim italic">
                     No events listed for this club yet.
                     {isAdmin && " Add one using the button above!"}
                   </p>

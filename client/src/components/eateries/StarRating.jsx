@@ -8,7 +8,7 @@ const StarRating = ({ rating, setRating }) => {
         <Star
           key={star}
           className={`w-8 h-8 cursor-pointer transition-all duration-300 hover:scale-110 ${
-            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-400"
+            star <= rating ? "text-beacon fill-beacon" : "text-dim"
           }`}
           onClick={() => setRating(star)}
         />

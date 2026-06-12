@@ -104,14 +104,14 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   const token = jwt.sign(
     { id: user.id, email: user.email, roles },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    maxAge: 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   console.log(`User ${email} logged in at ${getCurrentUTCDateTime()}`);
@@ -353,14 +353,14 @@ export const googleAuth = asyncHandler(async (req, res, next) => {
   const token = jwt.sign(
     { id: user.id, email: user.email, roles },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.cookie("token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    maxAge: 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   console.log(
@@ -424,14 +424,14 @@ export const verifyEmail = asyncHandler(async (req, res, next) => {
   const authToken = jwt.sign(
     { id: user.id, email: user.email, roles },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 
   res.cookie("token", authToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    maxAge: 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   res.status(200).json(
@@ -483,7 +483,7 @@ const sendVerificationEmailToUser = async (user) => {
   const token = jwt.sign(
     { id: user.id, email: user.email },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "24h" }
   );
   const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
 

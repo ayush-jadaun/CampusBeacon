@@ -9,11 +9,21 @@ import {
 } from "../utils/cloudinary.js";
 
 export const createLostItem = asyncHandler(async (req, res) => {
-  const { item_name, description, location_found, date_found, owner_contact } =
-    req.body;
+  const {
+    item_name,
+    description,
+    location_found,
+    date_found,
+    owner_contact,
+    status,
+  } = req.body;
 
   if (!item_name?.trim()) {
     throw new ApiError("Item name is required", 400);
+  }
+
+  if (status && !["lost", "found"].includes(status)) {
+    throw new ApiError("Status must be 'lost' or 'found'", 400);
   }
 
   if (!req.user || !req.user.id) {
@@ -33,6 +43,7 @@ export const createLostItem = asyncHandler(async (req, res) => {
     owner_contact,
     image_url,
     userId: req.user.id,
+    status: status || "lost",
   });
 
   return res
@@ -44,15 +55,30 @@ export const createLostItem = asyncHandler(async (req, res) => {
 
 export const updateLostItem = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { item_name, description, location_found, date_found, owner_contact } =
-    req.body;
+  const {
+    item_name,
+    description,
+    location_found,
+    date_found,
+    owner_contact,
+    status,
+  } = req.body;
 
   const item = await LostAndFound.findByPk(id);
   if (!item) {
     throw new ApiError("Item not found", 404);
   }
 
- 
+  if (
+    item.userId !== req.user?.id &&
+    !req.user?.roles?.includes("admin")
+  ) {
+    throw new ApiError("User is not authorized to update this item", 403);
+  }
+
+  if (status && !["lost", "found"].includes(status)) {
+    throw new ApiError("Status must be 'lost' or 'found'", 400);
+  }
 
   let image_url = item.image_url;
   if (req.file) {
@@ -77,6 +103,7 @@ export const updateLostItem = asyncHandler(async (req, res) => {
   item.location_found = location_found || item.location_found;
   item.date_found = date_found || item.date_found;
   item.owner_contact = owner_contact || item.owner_contact;
+  item.status = status || item.status;
   item.image_url = image_url;
 
   await item.save();
@@ -96,10 +123,7 @@ export const deleteLostItem = asyncHandler(async (req, res) => {
     throw new ApiError("Item not found", 404);
   }
 
-  if (
-    (!req.user || item.userId !== req.user.id) &&
-    (!req.user || req.user.role !== "admin")
-  ) {
+  if (item.userId !== req.user?.id && !req.user?.roles?.includes("admin")) {
     throw new ApiError("User is not authorized to delete this item", 403);
   }
 
@@ -142,8 +166,18 @@ export const getLostItem = asyncHandler(async (req, res) => {
 });
 
 export const getAllLostItems = asyncHandler(async (req, res) => {
+  const { status, limit, offset } = req.query;
+
+  const where = {};
+  if (status && ["lost", "found"].includes(status)) {
+    where.status = status;
+  }
+
   const items = await LostAndFound.findAll({
+    where,
     order: [["createdAt", "DESC"]],
+    ...(limit ? { limit: Math.min(parseInt(limit, 10) || 50, 100) } : {}),
+    ...(offset ? { offset: parseInt(offset, 10) || 0 } : {}),
   });
 
   return res

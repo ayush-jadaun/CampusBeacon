@@ -81,17 +81,17 @@ const HostelPage = () => {
   // Show loading UI if the page-specific fetch is in progress
   if (isFetchingPageData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 via-black to-purple-900 py-8">
-        <div className="container mx-auto px-4">
+      <div className="min-h-screen bg-ink py-24">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8">
           {/* Re-use the existing pulse animation for loading */}
           <div className="animate-pulse">
-            <div className="h-8 bg-purple-500/20 rounded w-1/3 mb-8"></div>
+            <div className="h-10 bg-ink-2 rounded-sm w-1/3 mb-10"></div>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="h-64 bg-purple-500/20 rounded-xl"
+                    className="h-64 bg-ink-2 rounded-sm"
                   ></div>
                 ))}
               </div>
@@ -99,7 +99,7 @@ const HostelPage = () => {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-64 bg-purple-500/20 rounded-xl"
+                    className="h-64 bg-ink-2 rounded-sm"
                   ></div>
                 ))}
               </div>
@@ -114,18 +114,18 @@ const HostelPage = () => {
   // Show error UI if a page-specific error occurred during fetch
   if (pageError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-950 via-black to-purple-900 py-8">
-        <div className="container mx-auto px-4">
-          <div className="bg-red-500/20 border border-red-500 rounded-xl p-6 text-white">
-            <h2 className="text-xl font-bold mb-2">
+      <div className="min-h-screen bg-ink py-24">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8">
+          <div className="bg-ink-2 border border-red-500/50 rounded-sm p-6 text-paper">
+            <h2 className="font-display text-xl font-semibold mb-2">
               Error Loading Hostel Data
             </h2>
-            <p>{pageError}</p>
+            <p className="text-dim">{pageError}</p>
             <button
               // Retry button calls fetchHostelData with the current hostelId
               onClick={() => fetchHostelData(hostelId)}
               disabled={isFetchingPageData} // Disable while fetching
-              className={`mt-4 px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors ${
+              className={`mt-4 px-5 py-2 bg-beacon text-ink font-semibold rounded-full hover:bg-beacon-soft transition-colors ${
                 isFetchingPageData ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -162,12 +162,20 @@ const HostelPage = () => {
   // --- Success State Rendering ---
   // If no loading and no error, render the main content
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-950 via-black to-purple-900 py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-white mb-8">
-          {/* Safely access hostel name, provide fallback */}
-          {currentHostel?.hostel_name || `Hostel ${hostelId}`}
-        </h1>
+    <div className="min-h-screen bg-ink text-paper py-24">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8">
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="font-mono text-xs text-beacon tracking-[0.25em] uppercase">
+              ( Hostel )
+            </span>
+            <span className="h-px flex-1 bg-ink-line" aria-hidden="true" />
+          </div>
+          <h1 className="font-display text-4xl sm:text-5xl font-semibold text-paper">
+            {/* Safely access hostel name, provide fallback */}
+            {currentHostel?.hostel_name || `Hostel ${hostelId}`}
+          </h1>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left side: Pass the current hostelId to child components */}
           {/* These components will select their specific data from Redux using this ID */}

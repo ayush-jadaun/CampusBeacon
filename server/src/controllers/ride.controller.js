@@ -198,6 +198,7 @@ export const getRide = asyncHandler(async (req, res) => {
 
 export const getAllRides = asyncHandler(async (req, res) => {
   try {
+    const { limit, offset } = req.query;
     const rides = await Rides.findAll({
       where: {
         status: "OPEN",
@@ -205,6 +206,8 @@ export const getAllRides = asyncHandler(async (req, res) => {
           [Op.gt]: new Date(),
         },
       },
+      ...(limit ? { limit: Math.min(parseInt(limit, 10) || 50, 100) } : {}),
+      ...(offset ? { offset: parseInt(offset, 10) || 0 } : {}),
       order: [["departureDateTime", "ASC"]],
       include: [
         {

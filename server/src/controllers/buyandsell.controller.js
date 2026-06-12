@@ -99,15 +99,23 @@ export const updateBuyAndSellItem = asyncHandler(async (req, res) => {
     owner_contact,
     item_condition,
     price,
+    category,
+    is_sold,
   } = req.body;
 
   const item = await BuyAndSell.findByPk(id);
   if (!item) throw new ApiError("Item not found", 404);
 
+  if (item.userId !== req.user?.id && !req.user?.roles?.includes("admin")) {
+    throw new ApiError("User is not authorized to update this item", 403);
+  }
 
-  if (item_condition && !["Good", "Fair", "Poor"].includes(item_condition)) {
+  if (
+    item_condition &&
+    !["New", "Like New", "Good", "Fair", "Poor"].includes(item_condition)
+  ) {
     throw new ApiError(
-      "Valid item condition is required (Good, Fair, or Poor)",
+      "Valid item condition is required (New, Like New, Good, Fair, or Poor)",
       400
     );
   }
@@ -143,6 +151,11 @@ export const updateBuyAndSellItem = asyncHandler(async (req, res) => {
     date_bought: date_bought ?? item.date_bought,
     owner_contact: owner_contact ?? item.owner_contact,
     item_condition: item_condition ?? item.item_condition,
+    category: category ?? item.category,
+    is_sold:
+      is_sold === undefined
+        ? item.is_sold
+        : is_sold === true || is_sold === "true",
     image_url,
     price: price ?? item.price,
   });
@@ -159,10 +172,7 @@ export const deleteBuyAndSellItem = asyncHandler(async (req, res) => {
   const item = await BuyAndSell.findByPk(id);
   if (!item) throw new ApiError("Item not found", 404);
 
- if (
-   (!req.user || item.userId !== req.user.id) &&
-   (!req.user || req.user.role !== "admin")
- ) {
+ if (item.userId !== req.user?.id && !req.user?.roles?.includes("admin")) {
    throw new ApiError("User is not authorized to delete this item", 403);
  }
 
@@ -200,8 +210,17 @@ export const getBuyAndSellItem = asyncHandler(async (req, res) => {
 });
 
 export const getAllBuyAndSellItems = asyncHandler(async (req, res) => {
+  const { category, include_sold, limit, offset } = req.query;
+
+  const where = {};
+  if (category) where.category = category;
+  if (include_sold !== "true") where.is_sold = false;
+
   const items = await BuyAndSell.findAll({
+    where,
     order: [["createdAt", "DESC"]],
+    ...(limit ? { limit: Math.min(parseInt(limit, 10) || 50, 100) } : {}),
+    ...(offset ? { offset: parseInt(offset, 10) || 0 } : {}),
   });
 
   return res

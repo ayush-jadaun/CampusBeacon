@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  server:
+    name: Server syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Syntax-check all server modules
+        working-directory: server
+        run: |
+          set -e
+          find . -path ./node_modules -prune -o -name "*.js" -print | while read f; do
+            node --check "$f"
+          done
+
+  client:
+    name: Web client build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install
+        working-directory: client
+        run: npm ci
+      - name: Lint (non-blocking)
+        working-directory: client
+        run: npx eslint . || true
+      - name: Build
+        working-directory: client
+        run: npm run build
+
+  app:
+    name: Mobile app typecheck + lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: react-native/package-lock.json
+      - name: Install
+        working-directory: react-native
+        run: npm ci
+      - name: TypeScript
+        working-directory: react-native
+        run: npx tsc --noEmit
+      - name: ESLint
+        working-directory: react-native
+        run: npx expo lint

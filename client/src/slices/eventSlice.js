@@ -81,6 +81,78 @@ export const deleteEvent = createAsyncThunk(
   }
 );
 
+/* ----------------------------------------------------------------
+   Event registrations (new endpoints — responses use the
+   { statusCode, success, data, message } wrapper)
+---------------------------------------------------------------- */
+
+export const fetchRegistrationCounts = createAsyncThunk(
+  "events/fetchRegistrationCounts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/events/events/registrations/counts");
+      return response.data?.data?.counts || [];
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch registration counts"
+      );
+    }
+  }
+);
+
+export const fetchMyRegistrations = createAsyncThunk(
+  "events/fetchMyRegistrations",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/events/events/registrations/me");
+      return response.data?.data?.registrations || [];
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch your registrations"
+      );
+    }
+  }
+);
+
+export const registerForEvent = createAsyncThunk(
+  "events/registerForEvent",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/events/events/${eventId}/register`);
+      const data = response.data?.data || {};
+      toast.success("Registered for event");
+      return { eventId, registrationCount: data.registrationCount };
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to register for event";
+      toast.error(message);
+      return rejectWithValue({
+        eventId,
+        message,
+        alreadyRegistered:
+          error.response?.status === 409 && /already registered/i.test(message),
+      });
+    }
+  }
+);
+
+export const unregisterFromEvent = createAsyncThunk(
+  "events/unregisterFromEvent",
+  async (eventId, { rejectWithValue }) => {
+    try {
+      const response = await api.delete(`/events/events/${eventId}/register`);
+      const data = response.data?.data || {};
+      toast.success("Registration cancelled");
+      return { eventId, registrationCount: data.registrationCount };
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to cancel registration";
+      toast.error(message);
+      return rejectWithValue({ eventId, message });
+    }
+  }
+);
+
 const eventSlice = createSlice({
   name: "events",
   initialState: {
@@ -88,6 +160,12 @@ const eventSlice = createSlice({
     currentEvent: null,
     loading: false,
     error: null,
+    // event_id -> number of registrations
+    registrationCounts: {},
+    // event ids the logged-in user is registered for
+    myRegistrations: [],
+    // event_id -> true while a register/unregister request is in flight
+    registering: {},
   },
   reducers: {
     clearEventError: (state) => {
@@ -167,6 +245,59 @@ const eventSlice = createSlice({
       .addCase(deleteEvent.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchRegistrationCounts.fulfilled, (state, action) => {
+        const counts = {};
+        for (const row of action.payload) {
+          counts[row.event_id] = Number(row.count) || 0;
+        }
+        state.registrationCounts = counts;
+      })
+      .addCase(fetchMyRegistrations.fulfilled, (state, action) => {
+        state.myRegistrations = action.payload.map((r) => r.event_id);
+      })
+      .addCase(fetchMyRegistrations.rejected, (state) => {
+        state.myRegistrations = [];
+      })
+      .addCase(registerForEvent.pending, (state, action) => {
+        state.registering[action.meta.arg] = true;
+      })
+      .addCase(registerForEvent.fulfilled, (state, action) => {
+        const { eventId, registrationCount } = action.payload;
+        delete state.registering[eventId];
+        if (!state.myRegistrations.includes(eventId)) {
+          state.myRegistrations.push(eventId);
+        }
+        if (registrationCount !== undefined && registrationCount !== null) {
+          state.registrationCounts[eventId] = Number(registrationCount) || 0;
+        }
+      })
+      .addCase(registerForEvent.rejected, (state, action) => {
+        const eventId = action.payload?.eventId ?? action.meta.arg;
+        delete state.registering[eventId];
+        if (
+          action.payload?.alreadyRegistered &&
+          !state.myRegistrations.includes(eventId)
+        ) {
+          state.myRegistrations.push(eventId);
+        }
+      })
+      .addCase(unregisterFromEvent.pending, (state, action) => {
+        state.registering[action.meta.arg] = true;
+      })
+      .addCase(unregisterFromEvent.fulfilled, (state, action) => {
+        const { eventId, registrationCount } = action.payload;
+        delete state.registering[eventId];
+        state.myRegistrations = state.myRegistrations.filter(
+          (id) => id !== eventId
+        );
+        if (registrationCount !== undefined && registrationCount !== null) {
+          state.registrationCounts[eventId] = Number(registrationCount) || 0;
+        }
+      })
+      .addCase(unregisterFromEvent.rejected, (state, action) => {
+        const eventId = action.payload?.eventId ?? action.meta.arg;
+        delete state.registering[eventId];
       });
   },
 });

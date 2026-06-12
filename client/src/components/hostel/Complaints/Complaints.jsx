@@ -230,14 +230,14 @@ const Complaints = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-purple-500/50"
+        className="bg-ink-2 rounded-sm p-6 border border-ink-line"
       >
         <div className="animate-pulse">
-          <div className="h-8 bg-purple-500/20 rounded w-1/3 mb-6"></div>
+          <div className="h-8 bg-ink-3 rounded-sm w-1/3 mb-6"></div>
           <div className="space-y-4">
-            <div className="h-10 bg-purple-500/20 rounded"></div>
-            <div className="h-32 bg-purple-500/20 rounded"></div>
-            <div className="h-10 bg-purple-500/20 rounded"></div>
+            <div className="h-10 bg-ink-3 rounded-sm"></div>
+            <div className="h-32 bg-ink-3 rounded-sm"></div>
+            <div className="h-10 bg-ink-3 rounded-sm"></div>
           </div>
         </div>
       </motion.div>
@@ -249,7 +249,7 @@ const Complaints = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-red-500/50"
+        className="bg-ink-2 rounded-sm p-6 border border-red-500/40"
       >
         <div className="flex items-center text-red-400">
           <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
@@ -263,21 +263,21 @@ const Complaints = ({ hostelId }) => {
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
-      className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-purple-500/50"
+      className="bg-ink-2 rounded-sm p-6 border border-ink-line"
     >
-      <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-        <Wrench className="mr-2" /> Complaints
+      <h2 className="font-display text-2xl font-semibold text-paper mb-6 flex items-center">
+        <Wrench className="mr-2 text-beacon" /> Complaints
       </h2>
 
       {/* Complaint Filing Section */}
       <div className="mb-8">
-        <h3 className="text-lg font-semibold text-white mb-4">
+        <h3 className="font-mono text-xs uppercase tracking-widest text-dim mb-4">
           File a Complaint
         </h3>
 
         {/* Warning if user has no name - only show when user data is fully loaded */}
         {isUserDataLoaded && !userHasName && (
-          <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg text-yellow-300 flex items-center text-sm">
+          <div className="mb-4 p-3 bg-beacon/10 border border-beacon/40 rounded-sm text-beacon-soft flex items-center text-sm">
             <Info className="w-5 h-5 mr-2 flex-shrink-0" />
             <span>
               Please update your profile with your name to file a complaint.
@@ -290,7 +290,7 @@ const Complaints = ({ hostelId }) => {
         <select
           value={selectedComplaintType}
           onChange={(e) => setSelectedComplaintType(e.target.value)}
-          className="w-full p-2 mb-4 bg-black/30 rounded-lg text-white border border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full p-2.5 mb-4 bg-ink rounded-sm text-paper border border-ink-line focus:outline-none focus:border-beacon transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           required
           disabled={isSubmitting || !userHasName} // Disable if no name
         >
@@ -305,7 +305,7 @@ const Complaints = ({ hostelId }) => {
           value={complaintDescription}
           onChange={(e) => setComplaintDescription(e.target.value)}
           placeholder="Describe your complaint in detail (min. 10 characters)..."
-          className="w-full p-2 mb-4 bg-black/30 rounded-lg text-white h-32 resize-none border border-purple-400/50 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full p-2.5 mb-4 bg-ink rounded-sm text-paper h-32 resize-none border border-ink-line focus:outline-none focus:border-beacon transition-colors placeholder:text-dim disabled:opacity-50 disabled:cursor-not-allowed"
           required
           minLength={10}
           disabled={isSubmitting || !userHasName} // Disable if no name
@@ -314,7 +314,7 @@ const Complaints = ({ hostelId }) => {
           <button
             onClick={() => setShowOfficialDialog(true)}
             disabled={isSubmitting || !userHasName} // Disable if no name
-            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg border border-purple-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-full border border-ink-line text-dim hover:border-beacon hover:text-beacon transition-colors font-mono text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {selectedOfficials.length > 0
               ? `Selected Officials: ${selectedOfficials.length}`
@@ -325,7 +325,7 @@ const Complaints = ({ hostelId }) => {
         <button
           onClick={submitComplaint}
           disabled={isSubmitting || !userHasName} // Disable if submitting or no name
-          className={`w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full bg-beacon hover:bg-beacon-soft text-ink font-semibold py-2.5 px-4 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {isSubmitting ? "Submitting..." : "Submit Complaint"}
         </button>
@@ -337,47 +337,47 @@ const Complaints = ({ hostelId }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }} // Added for smooth exit if using AnimatePresence
-          className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4"
+          className="fixed inset-0 flex items-center justify-center bg-ink/80 z-50 p-4"
           onClick={() => setShowOfficialDialog(false)} // Close on backdrop click
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-gray-900 p-6 rounded-lg w-full max-w-md relative border border-purple-400/50 shadow-xl"
+            className="bg-ink-2 p-6 rounded-sm w-full max-w-md relative border border-ink-line shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside dialog
           >
             <button
               onClick={() => setShowOfficialDialog(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700"
+              className="absolute top-3 right-3 text-dim hover:text-beacon p-1 rounded-full transition-colors"
               aria-label="Close dialog"
             >
               <XCircle className="w-6 h-6" />
             </button>
-            <h3 className="text-xl font-bold text-white mb-4">
+            <h3 className="font-display text-xl font-semibold text-paper mb-4">
               Select Official(s)
             </h3>
             {hostelOfficials.length === 0 ? (
-              <p className="text-gray-400">
+              <p className="text-dim">
                 No officials found for this hostel.
               </p>
             ) : (
-              <div className="space-y-3 max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-800">
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                 {hostelOfficials.map((official) => (
                   <label
                     key={official.official_id}
                     htmlFor={`official-${official.official_id}`}
-                    className="flex items-center p-2 rounded hover:bg-gray-800 cursor-pointer"
+                    className="flex items-center p-2 rounded-sm border border-transparent hover:border-ink-line hover:bg-ink-3 cursor-pointer transition-colors"
                   >
                     <input
                       type="checkbox"
                       id={`official-${official.official_id}`}
                       checked={selectedOfficials.includes(official.official_id)}
                       onChange={() => toggleOfficial(official.official_id)}
-                      className="mr-3 h-4 w-4 rounded text-purple-500 focus:ring-purple-500 border-gray-600 bg-gray-700"
+                      className="mr-3 h-4 w-4 rounded-sm accent-[#ffb224] border-ink-line bg-ink"
                     />
-                    <span className="text-white">{official.name}</span>
-                    <span className="text-gray-400 text-sm ml-2">
+                    <span className="text-paper">{official.name}</span>
+                    <span className="text-dim text-sm ml-2">
                       {" "}
                       - {official.designation}
                     </span>
@@ -388,7 +388,7 @@ const Complaints = ({ hostelId }) => {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setShowOfficialDialog(false)}
-                className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2 rounded-lg font-semibold"
+                className="bg-beacon hover:bg-beacon-soft text-ink px-6 py-2 rounded-full font-semibold transition-colors"
               >
                 Done
               </button>
@@ -399,12 +399,12 @@ const Complaints = ({ hostelId }) => {
 
       {/* Recent Complaints List */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center mb-4 border-t border-purple-500/30 pt-6 mt-8">
-          <h3 className="text-lg font-semibold text-white">
+        <div className="flex justify-between items-center mb-4 border-t border-ink-line pt-6 mt-8">
+          <h3 className="font-mono text-xs uppercase tracking-widest text-dim">
             Complaint History
           </h3>
           {filteredComplaints.length > 0 && (
-            <div className="text-sm text-gray-400">
+            <div className="font-mono text-xs uppercase tracking-widest text-dim">
               {filteredComplaints.filter((c) => c.status === "pending").length}{" "}
               Pending
             </div>
@@ -412,7 +412,7 @@ const Complaints = ({ hostelId }) => {
         </div>
 
         {filteredComplaints.length === 0 && !hostelLoading && (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-dim">
             No complaints filed yet for this hostel.
           </div>
         )}
@@ -425,28 +425,28 @@ const Complaints = ({ hostelId }) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }} // Requires AnimatePresence around the mapping if needed
             transition={{ duration: 0.3 }}
-            className={`p-4 rounded-lg border ${
+            className={`p-4 rounded-sm bg-ink border ${
               complaint.status === "pending"
-                ? "bg-yellow-600/10 border-yellow-500/50"
+                ? "border-beacon/40"
                 : complaint.status === "resolved"
-                ? "bg-green-600/10 border-green-500/50"
-                : "bg-red-600/10 border-red-500/50" // Assuming 'rejected' status is possible
+                ? "border-green-500/40"
+                : "border-red-500/40" // Assuming 'rejected' status is possible
             }`}
           >
             <div className="flex justify-between items-start gap-4">
               {/* Complaint Details */}
               <div className="flex-grow">
                 <div className="flex justify-between items-center mb-1">
-                  <h4 className="text-white font-semibold">
+                  <h4 className="text-paper font-semibold">
                     {complaint.complaint_type}
                   </h4>
                   <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    className={`font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full border ${
                       complaint.status === "pending"
-                        ? "bg-yellow-500/30 text-yellow-300"
+                        ? "border-beacon/40 text-beacon"
                         : complaint.status === "resolved"
-                        ? "bg-green-500/30 text-green-300"
-                        : "bg-red-500/30 text-red-300" // Adjust for other statuses like 'rejected'
+                        ? "border-green-500/40 text-green-400"
+                        : "border-red-500/40 text-red-400" // Adjust for other statuses like 'rejected'
                     }`}
                   >
                     {complaint.status
@@ -455,26 +455,26 @@ const Complaints = ({ hostelId }) => {
                       : ""}
                   </span>
                 </div>
-                <p className="text-gray-300 text-sm mt-2 break-words">
+                <p className="text-paper-2 text-sm mt-2 break-words">
                   {complaint.complaint_description}
                 </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-gray-400 items-center">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 font-mono text-xs text-dim items-center">
                   <p>
                     Filed by:{" "}
-                    <span className="text-gray-200">
+                    <span className="text-paper">
                       {complaint.student_name || "N/A"}
                     </span>
                   </p>
                   <p>
                     On:{" "}
-                    <span className="text-gray-200">
+                    <span className="text-paper">
                       {formatDate(complaint.createdAt)}
                     </span>
                   </p>
                   {complaint.due_date && (
                     <p>
                       Due:{" "}
-                      <span className="text-gray-200">
+                      <span className="text-paper">
                         {formatDate(complaint.due_date)}
                       </span>
                     </p>
@@ -492,7 +492,7 @@ const Complaints = ({ hostelId }) => {
                         onClick={() =>
                           handleStatusUpdate(complaint.complaint_id, "resolved")
                         }
-                        className="flex items-center justify-center text-green-400 hover:text-green-300 transition-colors p-1.5 rounded-lg hover:bg-green-500/10 border border-green-500/30 hover:border-green-500/50"
+                        className="flex items-center justify-center text-green-400 hover:text-green-300 transition-colors p-1.5 rounded-full hover:bg-green-500/10 border border-green-500/30 hover:border-green-500/50"
                         title="Mark as Resolved"
                       >
                         <CheckCircle className="w-5 h-5" />
@@ -506,7 +506,7 @@ const Complaints = ({ hostelId }) => {
                     onClick={() =>
                       handleDeleteComplaint(complaint.complaint_id)
                     }
-                    className="flex items-center justify-center text-red-400 hover:text-red-300 transition-colors p-1.5 rounded-lg hover:bg-red-500/10 border border-red-500/30 hover:border-red-500/50"
+                    className="flex items-center justify-center text-red-400 hover:text-red-300 transition-colors p-1.5 rounded-full hover:bg-red-500/10 border border-red-500/30 hover:border-red-500/50"
                     title="Delete Complaint"
                   >
                     <XCircle className="w-5 h-5" />

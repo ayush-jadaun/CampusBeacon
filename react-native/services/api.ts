@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
+import { router } from 'expo-router';
 import { storage } from '@/utils/storage';
 import Constants from 'expo-constants';
 
@@ -71,6 +72,8 @@ api.interceptors.request.use(
 );
 
 // Response interceptor - Handle errors globally
+let isRedirectingToLogin = false;
+
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -78,7 +81,15 @@ api.interceptors.response.use(
       // Token expired or invalid - logout user
       await storage.removeAuthToken();
       await storage.removeUserData();
-      // You can add navigation to login screen here if needed
+      const url = error.config?.url ?? '';
+      const isAuthEndpoint = url.includes('/users/login') || url.includes('/users/signup');
+      if (!isAuthEndpoint && !isRedirectingToLogin) {
+        isRedirectingToLogin = true;
+        router.replace('/(auth)/login');
+        setTimeout(() => {
+          isRedirectingToLogin = false;
+        }, 1000);
+      }
     }
     return Promise.reject(error);
   }

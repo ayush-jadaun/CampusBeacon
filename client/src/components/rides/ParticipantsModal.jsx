@@ -10,66 +10,66 @@ const ParticipantsModal = ({ isOpen, onClose, participants, rideDetails }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-ink/80 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <motion.div
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
-        className="bg-gray-900 p-6 sm:p-8 rounded-xl max-w-2xl w-full border-2 border-purple-500/30 shadow-xl"
+        className="bg-ink-2 p-6 sm:p-8 rounded-sm max-w-2xl w-full border border-ink-line shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-bold text-white flex items-center">
-            <Users className="mr-3 text-purple-400" /> Ride Participants
+          <h3 className="font-display text-2xl font-semibold text-paper flex items-center">
+            <Users className="mr-3 text-beacon" /> Ride Participants
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-dim hover:text-paper transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
-        <div className="mb-6">
-          <h4 className="text-lg font-semibold text-white mb-2">
+        <div className="mb-6 pb-6 border-b border-ink-line">
+          <h4 className="font-mono text-[11px] uppercase tracking-widest text-dim mb-2">
             Ride Details
           </h4>
-          <p className="text-gray-300">
+          <p className="text-paper font-display text-lg">
             {rideDetails.pickupLocation} → {rideDetails.dropLocation}
           </p>
-          <p className="text-gray-400 text-sm">
+          <p className="font-mono text-xs text-dim mt-1">
             {new Date(rideDetails.departureDateTime).toLocaleString()}
           </p>
         </div>
 
         <div>
-          <h4 className="text-lg font-semibold text-white mb-4">
+          <h4 className="font-mono text-[11px] uppercase tracking-widest text-dim mb-4">
             Participants ({participants.length})
           </h4>
           <div className="space-y-3">
             {participants.map((participant) => (
               <div
                 key={participant.id}
-                className="bg-gray-800 p-4 rounded-lg flex items-center justify-between"
+                className="bg-ink border border-ink-line p-4 rounded-sm flex items-center justify-between"
               >
                 <div>
-                  <p className="text-white font-medium">
+                  <p className="text-paper font-medium">
                     {participant.participant.name ||
                       participant.participant.email}
                   </p>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-dim font-mono text-xs mt-0.5">
                     {participant.participant.email}
                   </p>
                 </div>
-                <div className="text-purple-400">
+                <div className="text-beacon">
                   <Users className="w-5 h-5" />
                 </div>
               </div>
             ))}
             {participants.length === 0 && (
-              <p className="text-gray-400 text-center py-4">
+              <p className="text-dim text-center py-4">
                 No participants yet
               </p>
             )}

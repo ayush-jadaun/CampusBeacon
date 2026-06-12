@@ -23,15 +23,15 @@ const SubjectBreakdownSection = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className={`${themeStyles.cardBg} rounded-xl p-5 md:p-6 mb-8 border ${themeStyles.borderColor}`}
+            className={`${themeStyles.cardBg} rounded-sm p-5 md:p-6 mb-8 border ${themeStyles.borderColor}`}
         >
             <div className="flex justify-between items-center mb-4">
                 <h2
-                    className={`text-xl font-semibold ${themeStyles.headingColor} flex items-center`}
+                    className={`font-display text-xl font-semibold ${themeStyles.headingColor} flex items-center`}
                 >
-                    <FiBookOpen className="mr-2" /> Subject Breakdown
+                    <FiBookOpen className="mr-2 text-beacon" /> Subject Breakdown
                 </h2>
-                <span className="text-sm text-gray-400">
+                <span className="font-mono text-xs uppercase tracking-widest text-dim">
                     {userEnrollments.length} Subject(s)
                 </span>
             </div>
@@ -50,7 +50,7 @@ const SubjectBreakdownSection = ({
                 userEnrollments.length > 0 &&
                 subjectPercentageList.length === 0 &&
                 !errorSubjectPercentages && (
-                    <p className="text-sm text-gray-500 italic text-center py-4">
+                    <p className="text-sm text-dim italic text-center py-4">
                         No attendance marked for any enrolled subject yet.
                     </p>
                 )}

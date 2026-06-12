@@ -9,7 +9,6 @@ import {
   User,
   Loader2,
   Eye,
-  MapPin,
   Calendar,
 } from "lucide-react";
 import { formatDateTime, isRideActive } from "../../utils/dateUtils";
@@ -36,50 +35,44 @@ const RideCard = ({
   const [isHovered, setIsHovered] = useState(false);
 
   if (!ride) {
-    return <div className="p-6 text-red-500">Invalid ride data</div>;
+    return <div className="p-6 text-red-400">Invalid ride data</div>;
   }
 
   const isActive = isRideActive(ride.departureDateTime);
   const cardStatusClass = isCreator
-    ? "border-l-4 border-purple-500"
+    ? "border-l-2 border-l-beacon"
     : !isActive
-    ? "border-l-4 border-gray-500"
+    ? "border-l-2 border-l-ink-line"
     : ride.availableSeats === 0
-    ? "border-l-4 border-red-500"
-    : "border-l-4 border-green-500";
+    ? "border-l-2 border-l-red-500/70"
+    : "border-l-2 border-l-beacon-deep";
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{
-        y: -5,
-        boxShadow: "0 10px 30px -15px rgba(138, 75, 235, 0.3)",
-      }}
+      whileHover={{ y: -4 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className={`p-5 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-lg ${cardStatusClass} overflow-hidden relative`}
+      className={`p-5 bg-ink-2 ${cardStatusClass} overflow-hidden relative h-full`}
     >
-      {/* Background pattern for visual interest */}
-      <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_15%_50%,rgba(138,75,235,0.8),transparent_30%),radial-gradient(circle_at_85%_30%,rgba(59,130,246,0.8),transparent_30%)]"></div>
-
       <div className="relative">
         {/* Header */}
         <div className="flex justify-between items-start mb-4">
           <div>
             <motion.h2
               layout
-              className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300 mb-1"
+              className="font-display text-xl sm:text-2xl font-semibold text-paper mb-2 leading-snug"
             >
               {ride.pickupLocation} &rarr; {ride.dropLocation}
             </motion.h2>
-            <div className="flex items-center text-gray-400 mb-1">
-              <Calendar className="w-4 h-4 mr-2 text-blue-400" />
+            <div className="flex items-center font-mono text-xs text-dim mb-1.5">
+              <Calendar className="w-3.5 h-3.5 mr-2 text-beacon" />
               <span>{formatDateTime(ride.departureDateTime)}</span>
             </div>
-            <div className="flex items-center text-gray-400">
-              <User className="w-4 h-4 mr-2 text-purple-400" />
+            <div className="flex items-center text-sm text-dim">
+              <User className="w-3.5 h-3.5 mr-2 text-beacon" />
               <span>
                 {ride.creator?.name || ride.creator?.email || "Anonymous"}
               </span>
@@ -91,10 +84,10 @@ const RideCard = ({
               {ride.participants && ride.participants.length > 0 && (
                 <motion.button
                   initial={{ scale: 1 }}
-                  whileHover={{ scale: 1.1, backgroundColor: "#9061F9" }}
+                  whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setShowParticipants(true)}
-                  className="bg-purple-600 p-2 rounded-full text-white transition-all shadow-md"
+                  className="border border-ink-line p-2 rounded-full text-dim hover:border-beacon hover:text-beacon transition-colors"
                   aria-label="View participants"
                 >
                   <Eye className="w-4 h-4" />
@@ -104,20 +97,20 @@ const RideCard = ({
                 <>
                   <motion.button
                     initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.1, backgroundColor: "#3B82F6" }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onEdit(ride)}
-                    className="bg-blue-600 p-2 rounded-full text-white transition-all shadow-md"
+                    className="border border-ink-line p-2 rounded-full text-dim hover:border-beacon hover:text-beacon transition-colors"
                     aria-label="Edit ride"
                   >
                     <Edit className="w-4 h-4" />
                   </motion.button>
                   <motion.button
                     initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.1, backgroundColor: "#EF4444" }}
+                    whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => onDelete(ride.id)}
-                    className="bg-red-600 p-2 rounded-full text-white transition-all shadow-md"
+                    className="border border-ink-line p-2 rounded-full text-red-400 hover:border-red-500/60 hover:text-red-300 transition-colors"
                     aria-label="Delete ride"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -130,39 +123,39 @@ const RideCard = ({
 
         {/* Details */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center text-gray-300">
+          <div className="flex justify-between items-center">
             <motion.div
-              className="flex items-center bg-purple-500/10 px-3 py-1 rounded-full"
+              className="flex items-center border border-ink-line px-3 py-1 rounded-full font-mono text-xs text-dim"
               whileHover={{ scale: 1.05 }}
             >
-              <Users className="w-4 h-4 mr-2 text-purple-400" />
+              <Users className="w-3.5 h-3.5 mr-2 text-beacon" />
               <span>
                 {ride.availableSeats}/{ride.totalSeats} seats
               </span>
             </motion.div>
             <motion.div
-              className="flex items-center bg-green-500/10 px-3 py-1 rounded-full"
+              className="flex items-center border border-beacon/40 px-3 py-1 rounded-full font-mono text-xs text-beacon"
               whileHover={{ scale: 1.05 }}
             >
-              <IndianRupee className="w-4 h-4 mr-1 text-green-400" />
+              <IndianRupee className="w-3.5 h-3.5 mr-1" />
               <span>{ride.estimatedCost || "Free"}</span>
             </motion.div>
           </div>
 
           {ride.phoneNumber && (
             <motion.div
-              className="text-gray-300 flex items-center"
+              className="text-dim flex items-center font-mono text-xs"
               initial={{ opacity: 0.8 }}
               whileHover={{ opacity: 1, x: 5 }}
             >
-              <Phone className="w-4 h-4 mr-2 text-blue-400" />{" "}
+              <Phone className="w-3.5 h-3.5 mr-2 text-beacon" />{" "}
               {ride.phoneNumber}
             </motion.div>
           )}
 
           {ride.description && (
             <motion.div
-              className="bg-gray-800/50 p-3 rounded-lg mt-2 text-gray-300 text-sm italic border-l-2 border-purple-500/50"
+              className="bg-ink p-3 rounded-sm mt-2 text-dim text-sm italic border-l-2 border-ink-line"
               initial={{ opacity: 0.8 }}
               whileHover={{ opacity: 1 }}
             >
@@ -176,19 +169,21 @@ const RideCard = ({
               whileHover={{ opacity: 1 }}
               className="mt-3"
             >
-              <p className="text-gray-400 mb-2 text-sm">Participants:</p>
+              <p className="font-mono text-[11px] uppercase tracking-widest text-dim mb-2">
+                Participants
+              </p>
               <div className="flex flex-wrap gap-2">
                 {ride.participants.slice(0, 3).map((participant) => (
                   <span
                     key={participant.id}
-                    className="bg-blue-500/20 text-blue-200 text-xs px-3 py-1 rounded-full"
+                    className="border border-ink-line text-dim text-xs px-3 py-1 rounded-full"
                   >
                     {participant.participant?.name ||
                       participant.participant?.email}
                   </span>
                 ))}
                 {ride.participants.length > 3 && (
-                  <span className="bg-purple-500/20 text-purple-200 text-xs px-3 py-1 rounded-full">
+                  <span className="border border-beacon/40 text-beacon text-xs px-3 py-1 rounded-full">
                     +{ride.participants.length - 3} more
                   </span>
                 )}
@@ -206,7 +201,7 @@ const RideCard = ({
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onUnjoin(ride.id)}
                 disabled={isLoading}
-                className={`w-full py-2 rounded-lg shadow-lg bg-gradient-to-r from-red-600 to-red-500 text-white transition-all ${
+                className={`w-full py-2 rounded-full border border-red-500/50 text-red-400 hover:bg-red-500/10 font-medium transition-colors ${
                   isLoading ? "opacity-75 cursor-not-allowed" : ""
                 }`}
               >
@@ -225,10 +220,10 @@ const RideCard = ({
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onJoin(ride.id)}
                 disabled={ride.availableSeats === 0 || isLoading}
-                className={`w-full py-2 rounded-lg shadow-lg transition-all ${
+                className={`w-full py-2 rounded-full font-semibold transition-colors ${
                   ride.availableSeats === 0 || isLoading
-                    ? "bg-gray-600 cursor-not-allowed text-gray-300"
-                    : "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    ? "bg-ink-3 cursor-not-allowed text-dim"
+                    : "bg-beacon hover:bg-beacon-soft text-ink"
                 }`}
               >
                 {isLoading ? (
@@ -249,8 +244,8 @@ const RideCard = ({
         {isCreator && (
           <motion.div
             initial={{ opacity: 0.8 }}
-            whileHover={{ opacity: 1, scale: 1.02 }}
-            className="mt-4 text-center text-white font-medium bg-gradient-to-r from-purple-600/30 to-blue-600/30 py-2 rounded-lg border border-purple-500/20"
+            whileHover={{ opacity: 1 }}
+            className="mt-4 text-center font-mono text-xs uppercase tracking-widest text-beacon py-2 rounded-sm border border-beacon/40"
           >
             Your Ride Offering
           </motion.div>

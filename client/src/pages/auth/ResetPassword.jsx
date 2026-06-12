@@ -48,7 +48,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-ink text-paper flex items-center justify-center p-4">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -68,23 +68,31 @@ const ResetPassword = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.9 }}
-          className="p-8 bg-white/10 backdrop-blur-10 rounded-2xl shadow-2xl w-full max-w-[400px]"
+          className="p-8 bg-ink-2 border border-ink-line rounded-sm w-full max-w-[400px]"
         >
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">
-            Reset Password
+          <div className="text-center mb-2">
+            <span className="font-display italic font-semibold text-paper text-2xl">
+              Campus<span className="text-beacon">Beacon</span>
+            </span>
+          </div>
+          <h2 className="font-display text-2xl font-semibold text-paper mb-6 text-center">
+            Reset password
           </h2>
           {authError && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-red-500 mb-4 bg-red-500/10 p-3 rounded-lg"
+              className="text-red-400 mb-4 bg-red-500/10 border border-red-500/30 p-3 rounded-sm"
             >
               {authError}
             </motion.div>
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="password" className="block text-white">
+              <label
+                htmlFor="password"
+                className="block font-mono text-xs uppercase tracking-widest text-dim"
+              >
                 New Password
               </label>
               <input
@@ -94,7 +102,7 @@ const ResetPassword = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full p-4 bg-white/5 rounded-lg text-white border border-white/10 focus:outline-none focus:border-purple-500 transition-all mt-2"
+                className="w-full p-4 bg-ink rounded-sm text-paper border border-ink-line focus:outline-none focus:border-beacon transition-colors mt-2"
               />
             </div>
             <ButtonColourfull

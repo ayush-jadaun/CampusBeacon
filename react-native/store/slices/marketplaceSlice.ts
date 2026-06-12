@@ -76,6 +76,24 @@ export const createMarketplaceItem = createAsyncThunk(
   }
 );
 
+export const updateMarketplaceItem = createAsyncThunk(
+  'marketplace/updateItem',
+  async (
+    { id, data }: { id: number; data: Partial<CreateMarketplaceData> },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await marketplaceService.update(id, data);
+      if (response.success) {
+        return response.data;
+      }
+      return rejectWithValue(response.message);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const deleteMarketplaceItem = createAsyncThunk(
   'marketplace/deleteItem',
   async (id: number, { rejectWithValue }) => {
@@ -160,6 +178,19 @@ const marketplaceSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
       });
+
+    // Update item
+    builder.addCase(updateMarketplaceItem.fulfilled, (state, action) => {
+      const index = state.items.findIndex((item) => item.id === action.payload.id);
+      if (index !== -1) {
+        state.items[index] = action.payload;
+      }
+      const myIndex = state.myListings.findIndex((item) => item.id === action.payload.id);
+      if (myIndex !== -1) {
+        state.myListings[myIndex] = action.payload;
+      }
+      state.filteredItems = filterItems(state);
+    });
 
     // Delete item
     builder.addCase(deleteMarketplaceItem.fulfilled, (state, action) => {

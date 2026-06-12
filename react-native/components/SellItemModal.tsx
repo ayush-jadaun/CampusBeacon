@@ -20,6 +20,7 @@ import { LocalImage } from '@/services/api';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 
 const ITEM_CONDITIONS: ItemCondition[] = ['New', 'Like New', 'Good', 'Fair', 'Poor'];
+const ITEM_CATEGORIES = ['Books', 'Electronics', 'Furniture', 'Cycle', 'Other'];
 
 interface SellItemModalProps {
   visible: boolean;
@@ -31,6 +32,7 @@ export default function SellItemModal({ visible, onClose, onCreated }: SellItemM
   const [itemName, setItemName] = useState('');
   const [price, setPrice] = useState('');
   const [condition, setCondition] = useState<ItemCondition>('Good');
+  const [category, setCategory] = useState<string | null>(null);
   const [description, setDescription] = useState('');
   const [ownerContact, setOwnerContact] = useState('');
   const [dateBought, setDateBought] = useState('');
@@ -42,6 +44,7 @@ export default function SellItemModal({ visible, onClose, onCreated }: SellItemM
     setItemName('');
     setPrice('');
     setCondition('Good');
+    setCategory(null);
     setDescription('');
     setOwnerContact('');
     setDateBought('');
@@ -96,6 +99,7 @@ export default function SellItemModal({ visible, onClose, onCreated }: SellItemM
           item_name: itemName.trim(),
           price: Math.round(Number(price)),
           item_condition: condition,
+          category: category ?? undefined,
           description: description.trim() || undefined,
           owner_contact: ownerContact.trim() || undefined,
           date_bought: dateBought.trim() || undefined,
@@ -171,6 +175,27 @@ export default function SellItemModal({ visible, onClose, onCreated }: SellItemM
                       style={[
                         styles.conditionChipText,
                         condition === c && styles.conditionChipTextActive,
+                      ]}
+                    >
+                      {c}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text style={styles.label}>Category</Text>
+              <View style={styles.conditionRow}>
+                {ITEM_CATEGORIES.map(c => (
+                  <TouchableOpacity
+                    key={c}
+                    style={[styles.conditionChip, category === c && styles.conditionChipActive]}
+                    onPress={() => setCategory(category === c ? null : c)}
+                    activeOpacity={0.7}
+                  >
+                    <Text
+                      style={[
+                        styles.conditionChipText,
+                        category === c && styles.conditionChipTextActive,
                       ]}
                     >
                       {c}

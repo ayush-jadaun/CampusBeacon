@@ -32,13 +32,13 @@ const SubjectStatCard = ({
             whileHover={
                 !isUnenrolling ? { scale: 1.03, transition: { duration: 0.15 } } : {}
             }
-            className={`p-4 rounded-lg border transition-all relative overflow-hidden group ${
+            className={`p-4 rounded-sm border transition-all relative overflow-hidden group ${
                 isSelected
-                    ? "bg-amber-900/30 border-amber-600 ring-2 ring-amber-500/50"
-                    : `${themeStyles.cardBg} ${themeStyles.borderColor} ${
+                    ? "bg-beacon/10 border-beacon"
+                    : `bg-ink border-ink-line ${
                             isUnenrolling
                                 ? "opacity-50 cursor-default"
-                                : `${themeStyles.listHoverBg} cursor-pointer`
+                                : "hover:border-beacon/60 cursor-pointer"
                         }`
             }`}
         >
@@ -46,12 +46,12 @@ const SubjectStatCard = ({
                 <div className="flex justify-between items-start mb-2">
                     <div className="flex-1 mr-2">
                         <h4
-                            className="font-semibold text-gray-100 truncate"
+                            className="font-semibold text-paper truncate"
                             title={enrollment.name}
                         >
                             {enrollment.name}
                         </h4>
-                        <p className="text-xs text-gray-400">{enrollment.code}</p>
+                        <p className="font-mono text-xs text-dim">{enrollment.code}</p>
                     </div>
                     <div className="flex-shrink-0">
                         <Suspense fallback={<LoadingSpinner size="text-xl" />}>
@@ -68,7 +68,7 @@ const SubjectStatCard = ({
                     </div>
                 </div>
                 {stats && !isLoadingThisStat && (
-                    <div className="text-xs space-y-0.5 text-gray-400 mt-1">
+                    <div className="text-xs space-y-0.5 text-dim mt-1">
                         <p>
                             Present:{" "}
                             <span className="text-green-400 font-medium">
@@ -84,14 +84,14 @@ const SubjectStatCard = ({
                     </div>
                 )}
                 {!stats && !isLoadingThisStat && (
-                    <p className="text-xs text-gray-500 italic mt-3">No stats yet</p>
+                    <p className="text-xs text-dim italic mt-3">No stats yet</p>
                 )}
             </div>
             <button
                 onClick={handleUnenroll}
                 disabled={isUnenrolling || unenrollLoading}
                 title={`Unenroll from ${enrollment.name}`}
-                className={`absolute top-2 right-2 p-1 rounded text-gray-500 hover:text-red-400 hover:bg-gray-700/50 transition-all duration-150 z-10
+                className={`absolute top-2 right-2 p-1 rounded-sm text-dim hover:text-red-400 hover:bg-ink-3 transition-all duration-150 z-10
                                      ${
                                          isUnenrolling
                                              ? "opacity-50 cursor-wait"

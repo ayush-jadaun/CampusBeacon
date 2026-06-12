@@ -12,6 +12,8 @@ export interface MarketplaceItem {
   image_url: string | null;
   userId: number;
   item_condition: ItemCondition;
+  category: string | null;
+  is_sold: boolean;
   createdAt: string;
   updatedAt: string;
   users?: {
@@ -28,13 +30,23 @@ export interface CreateMarketplaceData {
   owner_contact?: string;
   item_condition: ItemCondition;
   price: number;
+  category?: string;
+  is_sold?: boolean;
+}
+
+export interface MarketplaceFilters {
+  category?: string;
+  includeSold?: boolean;
 }
 
 const marketplaceService = {
   // Get all items
-  async getAll(): Promise<ApiResponse<MarketplaceItem[]>> {
+  async getAll(filters?: MarketplaceFilters): Promise<ApiResponse<MarketplaceItem[]>> {
     try {
-      const response = await api.get('/buy-and-sell/items');
+      const params: Record<string, string> = {};
+      if (filters?.category) params.category = filters.category;
+      if (filters?.includeSold) params.include_sold = 'true';
+      const response = await api.get('/buy-and-sell/items', { params });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');

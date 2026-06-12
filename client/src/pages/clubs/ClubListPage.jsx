@@ -26,27 +26,29 @@ const ClubCard = ({ club, onClick }) => (
     exit={{ opacity: 0, y: -10 }}
     transition={{ duration: 0.3 }}
     onClick={() => onClick(club.id)}
-    className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50 shadow-lg hover:shadow-amber-500/20 hover:border-amber-500/50 cursor-pointer transition-all duration-300 transform hover:-translate-y-1 flex flex-col h-full"
+    className="bg-ink-2 rounded-sm p-6 border border-ink-line hover:border-beacon/60 cursor-pointer transition-colors duration-300 flex flex-col h-full group"
   >
-    <div className="flex items-start justify-between mb-3">
-      <h3 className="text-xl font-bold text-amber-400">{club.name}</h3>
+    <div className="flex items-start justify-between mb-3 gap-3">
+      <h3 className="font-display text-xl font-medium text-paper">
+        {club.name}
+      </h3>
       {club.category && (
-        <span className="px-2 py-1 text-xs font-medium bg-amber-400/20 text-amber-300 rounded-full flex items-center">
+        <span className="px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-dim border border-ink-line rounded-full flex items-center shrink-0">
           <FiTag className="mr-1" size={12} />
           {club.category}
         </span>
       )}
     </div>
 
-    <p className="text-gray-300 text-sm flex-grow line-clamp-3 mb-4">
+    <p className="text-dim text-sm flex-grow line-clamp-3 mb-4">
       {club.description || "No description available."}
     </p>
 
-    <div className="mt-auto pt-3 border-t border-gray-700/50 flex justify-between items-center">
-      <span className="text-xs text-gray-400">
+    <div className="mt-auto pt-3 border-t border-ink-line flex justify-between items-center">
+      <span className="font-mono text-xs text-dim">
         {club.memberCount || 0} members
       </span>
-      <span className="text-xs font-medium text-amber-400 hover:underline">
+      <span className="font-mono text-xs text-beacon group-hover:underline">
         View Details →
       </span>
     </div>
@@ -56,8 +58,8 @@ const ClubCard = ({ club, onClick }) => (
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-full min-h-64">
     <div className="relative">
-      <FiLoader className="animate-spin text-amber-400 text-4xl" />
-      <div className="absolute inset-0 rounded-full animate-ping bg-amber-400/20"></div>
+      <FiLoader className="animate-spin text-beacon text-4xl" />
+      <div className="absolute inset-0 rounded-full animate-ping bg-beacon/20"></div>
     </div>
   </div>
 );
@@ -117,9 +119,9 @@ const ClubListPage = () => {
 
   if (clubsLoading && clubs.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-center p-4">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ink text-center p-4">
         <LoadingSpinner />
-        <p className="text-lg text-gray-300 mt-4 animate-pulse">
+        <p className="text-lg text-dim mt-4 animate-pulse">
           Loading Clubs...
         </p>
       </div>
@@ -128,24 +130,24 @@ const ClubListPage = () => {
 
   if (clubsError && !clubsLoading && clubs.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-center p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ink text-center p-6">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gray-800/60 p-8 rounded-xl shadow-2xl border border-red-700/50 max-w-lg backdrop-blur-sm"
+          className="bg-ink-2 p-8 rounded-sm border border-red-500/40 max-w-lg"
         >
           <FiAlertTriangle className="text-red-400 text-5xl mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-red-400 mb-3">
+          <h2 className="font-display text-2xl font-semibold text-red-400 mb-3">
             Failed to Load Clubs
           </h2>
-          <p className="text-gray-300 mb-6">{clubsError}</p>
+          <p className="text-dim mb-6">{clubsError}</p>
           <button
             onClick={() => {
               dispatch(clearClubError());
               dispatch(fetchClubs());
               toast.success("Retrying...");
             }}
-            className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:brightness-110 transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-gray-800"
+            className="px-6 py-2 bg-beacon hover:bg-beacon-soft text-ink rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-beacon focus:ring-offset-2 focus:ring-offset-ink"
           >
             Retry
           </button>
@@ -155,17 +157,20 @@ const ClubListPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white px-4 py-8 md:py-12">
+    <div className="min-h-screen bg-ink text-paper px-4 py-8 pt-24 md:py-12 md:pt-28">
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10 md:mb-16"
         >
-          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-600">
-            Discover MNNIT Clubs
+          <p className="font-mono text-[11px] md:text-xs tracking-[0.3em] text-beacon uppercase mb-4">
+            Societies · Communities · Culture
+          </p>
+          <h1 className="font-display text-4xl md:text-6xl font-semibold mb-4 text-paper">
+            Discover MNNIT <em className="italic text-beacon">Clubs</em>
           </h1>
-          <p className="text-blue-400 text-lg max-w-2xl mx-auto">
+          <p className="text-dim text-lg max-w-2xl mx-auto">
             Explore the vibrant communities on campus and find your perfect fit
           </p>
         </motion.div>
@@ -177,16 +182,16 @@ const ClubListPage = () => {
               placeholder="Search clubs..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-gray-800/50 text-white border border-gray-700 rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              className="w-full bg-ink-2 text-paper placeholder-dim border border-ink-line rounded-full py-2 pl-10 pr-4 focus:outline-none focus:border-beacon transition-colors"
             />
-            <FiSearch className="absolute left-3 top-3 text-gray-400" />
+            <FiSearch className="absolute left-3 top-3 text-dim" />
           </div>
 
           <div className="flex gap-4 w-full md:w-auto">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-gray-800/50 text-white border border-gray-700 rounded-lg py-2 px-4 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              className="bg-ink-2 text-paper border border-ink-line rounded-sm py-2 px-4 focus:outline-none focus:border-beacon transition-colors"
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
@@ -199,7 +204,7 @@ const ClubListPage = () => {
             {isAdmin && (
               <button
                 onClick={openCreateModal}
-                className="px-5 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:brightness-110 transform hover:-translate-y-0.5 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-gray-900 inline-flex items-center whitespace-nowrap"
+                className="px-5 py-2 bg-beacon hover:bg-beacon-soft text-ink rounded-full font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-beacon focus:ring-offset-2 focus:ring-offset-ink inline-flex items-center whitespace-nowrap"
               >
                 <FiPlus className="mr-2" /> Add New Club
               </button>
@@ -222,15 +227,15 @@ const ClubListPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center text-center p-10 bg-gray-800/30 rounded-xl border border-gray-700/50"
+              className="flex flex-col items-center justify-center text-center p-10 bg-ink-2 rounded-sm border border-ink-line"
             >
-              <FiInfo className="text-amber-400 text-5xl mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-3">
+              <FiInfo className="text-beacon text-5xl mx-auto mb-4" />
+              <h2 className="font-display text-2xl font-semibold text-paper mb-3">
                 {searchTerm || selectedCategory
                   ? "No Matching Clubs Found"
                   : "No Clubs Found"}
               </h2>
-              <p className="text-gray-400">
+              <p className="text-dim">
                 {searchTerm || selectedCategory
                   ? "Try adjusting your search or filters"
                   : !isAdmin
@@ -243,7 +248,7 @@ const ClubListPage = () => {
                     setSearchTerm("");
                     setSelectedCategory("");
                   }}
-                  className="mt-4 px-4 py-2 text-amber-400 border border-amber-400/30 rounded-lg hover:bg-amber-400/10 transition-colors"
+                  className="mt-4 px-4 py-2 text-beacon border border-ink-line rounded-full hover:border-beacon transition-colors"
                 >
                   Clear Filters
                 </button>

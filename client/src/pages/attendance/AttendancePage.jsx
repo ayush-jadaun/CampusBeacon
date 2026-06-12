@@ -91,14 +91,14 @@ const AttendancePage = () => {
 
   // Consistent theme styles (can be moved to a context or config if needed)
   const themeStyles = {
-    cardBg: "bg-gray-800/40",
-    borderColor: "border-gray-700/50",
-    headingColor: "text-amber-400",
-    buttonGradient: "from-amber-500 to-orange-600",
-    modalBg: "bg-gray-900",
-    listHoverBg: "hover:bg-gray-700/50",
-    tagBg: "bg-amber-500/20",
-    tagText: "text-amber-400",
+    cardBg: "bg-ink-2",
+    borderColor: "border-ink-line",
+    headingColor: "text-paper",
+    buttonGradient: "",
+    modalBg: "bg-ink-2",
+    listHoverBg: "hover:border-beacon/50",
+    tagBg: "bg-beacon/10",
+    tagText: "text-beacon",
   };
 
   // --- Data Fetching Effects ---
@@ -306,13 +306,13 @@ const AttendancePage = () => {
   if (!isAuthenticated) {
     // Render Login Prompt
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ink text-paper p-6">
         <FiAlertTriangle className="text-red-400 text-5xl mx-auto mb-4" />
         <p>
           Please{" "}
           <button
             onClick={() => navigate("/login")}
-            className="text-amber-400 underline font-semibold"
+            className="text-beacon link-sweep font-semibold"
           >
             log in
           </button>{" "}
@@ -325,9 +325,9 @@ const AttendancePage = () => {
   if (enrollLoading && !userEnrollments.length) {
     // Render Initial Loading State
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white p-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ink text-paper p-6">
         <LoadingSpinner />
-        <p className="text-lg text-gray-300 mt-4">Loading Your Subjects...</p>
+        <p className="text-lg text-dim mt-4">Loading Your Subjects...</p>
       </div>
     );
   }
@@ -335,20 +335,20 @@ const AttendancePage = () => {
   if (!enrollLoading && !enrollError && userEnrollments.length === 0) {
     // Render No Enrollments State
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-ink text-paper flex flex-col items-center justify-center p-6">
         <div className="text-center py-16">
           <h1
-            className={`text-3xl md:text-4xl font-bold ${themeStyles.headingColor} mb-6`}
+            className={`font-display text-3xl md:text-4xl font-semibold ${themeStyles.headingColor} mb-6`}
           >
             Attendance Tracker
           </h1>
-          <FiBookOpen className="text-6xl text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 mb-6">
+          <FiBookOpen className="text-6xl text-dim mx-auto mb-4" />
+          <p className="text-dim mb-6">
             You haven't enrolled in any subjects yet.
           </p>
           <button
             onClick={handleOpenEnrollModal}
-            /* Use handler */ className={`/* styles */`}
+            /* Use handler */ className="px-7 py-3 bg-beacon text-ink font-semibold rounded-full hover:bg-beacon-soft transition-colors"
           >
             Enroll Now
           </button>
@@ -368,7 +368,7 @@ const AttendancePage = () => {
 
   // --- Main View Render ---
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white pb-16 px-4 md:px-8">
+    <div className="min-h-screen bg-ink text-paper pb-16 px-4 md:px-8">
       {/* Header */}
       <AttendancePageHeader
         themeStyles={themeStyles}
@@ -419,7 +419,7 @@ const AttendancePage = () => {
             animate={{ opacity: 1, height: "auto", marginTop: "2.5rem" }}
             exit={{ opacity: 0, height: 0, marginTop: 0 }}
             transition={{ duration: 0.4 }}
-            className="pt-6 border-t border-gray-700"
+            className="pt-6 border-t border-ink-line"
           >
             {/* Controls */}
             <DetailedViewControls
@@ -471,7 +471,7 @@ const AttendancePage = () => {
       {/* --- Modals --- */}
       <Suspense
         fallback={
-          <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-[100]">
+          <div className="fixed inset-0 flex items-center justify-center bg-ink/80 z-[100]">
             <LoadingSpinner size="text-3xl" />
           </div>
         }

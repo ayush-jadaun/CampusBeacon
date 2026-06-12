@@ -123,24 +123,26 @@ function LostItemCard({ item, onEdit }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-ink/80 z-50 flex items-center justify-center p-4"
           onClick={() => setShowDeleteModal(false)}
         >
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-xl p-5 max-w-md w-full shadow-2xl border border-gray-700"
+            className="bg-ink-2 border border-ink-line rounded-sm p-6 max-w-md w-full shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex flex-col items-center text-center">
-              <div className="bg-red-500/20 p-3 rounded-full mb-4">
-                <FaExclamationTriangle className="text-red-500" size={24} />
+              <div className="border border-red-500/40 p-3 rounded-full mb-4">
+                <FaExclamationTriangle className="text-red-400" size={20} />
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-2">Delete Item</h3>
+              <h3 className="font-display text-2xl font-semibold text-paper mb-2">
+                Delete item
+              </h3>
 
-              <p className="text-gray-300 mb-6">
+              <p className="text-dim mb-6">
                 Are you sure you want to delete "{item.item_name}"? This action
                 cannot be undone.
               </p>
@@ -150,7 +152,7 @@ function LostItemCard({ item, onEdit }) {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 py-2 rounded-lg font-medium transition-colors"
+                  className="flex-1 border border-ink-line text-dim hover:text-paper hover:border-beacon py-2 rounded-full font-medium transition-colors"
                   disabled={isDeleting}
                 >
                   Cancel
@@ -160,7 +162,7 @@ function LostItemCard({ item, onEdit }) {
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={handleDeleteConfirm}
-                  className="flex-1 bg-gradient-to-r from-red-600 to-red-500 text-white py-2 rounded-lg font-medium shadow-lg hover:shadow-red-500/20 transition-all"
+                  className="flex-1 bg-red-600 hover:bg-red-500 text-paper py-2 rounded-full font-medium transition-colors"
                   disabled={isDeleting}
                 >
                   {isDeleting ? (
@@ -188,7 +190,7 @@ function LostItemCard({ item, onEdit }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-ink/90 z-50 flex items-center justify-center p-4"
           onClick={() => setShowFullImage(false)}
         >
           <motion.div
@@ -202,24 +204,26 @@ function LostItemCard({ item, onEdit }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setShowFullImage(false)}
-              className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full z-10"
+              className="absolute top-2 right-2 bg-ink-2 border border-ink-line hover:border-beacon text-paper p-2 rounded-full z-10 transition-colors"
             >
-              <FaTimes size={18} />
+              <FaTimes size={16} />
             </motion.button>
 
             <div className="flex items-center justify-center">
               <motion.img
                 src={item.image_url}
                 alt={item.item_name}
-                className="max-w-full max-h-screen object-contain rounded-lg shadow-2xl"
+                className="max-w-full max-h-screen object-contain rounded-sm border border-ink-line"
                 layoutId={`lost-image-${item.id}`}
               />
             </div>
 
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-lg">
-              <h3 className="text-center font-bold">{item.item_name}</h3>
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-ink-2/90 border border-ink-line text-paper px-4 py-2 rounded-sm">
+              <h3 className="text-center font-display font-semibold">
+                {item.item_name}
+              </h3>
               {item.location_found && (
-                <p className="text-center text-sm text-gray-300">
+                <p className="text-center font-mono text-xs text-dim">
                   <IoMdPin className="inline mr-1" size={14} />
                   {item.location_found}
                 </p>
@@ -257,16 +261,18 @@ function LostItemCard({ item, onEdit }) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-lg shadow-lg text-sm ${
-              notification.type === "error" ? "bg-red-500" : "bg-green-500"
-            } text-white`}
+            className={`absolute top-2 left-1/2 transform -translate-x-1/2 z-50 px-4 py-2 rounded-sm bg-ink-2 border text-sm text-paper ${
+              notification.type === "error"
+                ? "border-red-500/50"
+                : "border-beacon/50"
+            }`}
           >
             {notification.message}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 h-full flex flex-col">
+      <div className="bg-ink-2 border border-ink-line rounded-sm overflow-hidden hover:border-beacon transition-colors duration-300 h-full flex flex-col">
         {/* Image Container */}
         <div
           className="relative group cursor-pointer"
@@ -284,20 +290,20 @@ function LostItemCard({ item, onEdit }) {
                   loading="lazy"
                 />
                 {!imageLoaded && (
-                  <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+                  <div className="absolute inset-0 bg-ink-3 animate-pulse" />
                 )}
 
                 {/* View Image Overlay */}
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                  <span className="bg-black/50 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                <div className="absolute inset-0 bg-ink/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                  <span className="bg-ink/80 border border-ink-line text-paper px-3 py-1.5 rounded-full font-mono text-xs uppercase tracking-widest">
                     View Image
                   </span>
                 </div>
               </motion.div>
             </>
           ) : (
-            <div className="w-full h-40 sm:h-48 bg-gradient-to-r from-gray-800 to-gray-700 flex items-center justify-center">
-              <p className="text-gray-500 text-sm font-medium">
+            <div className="w-full h-40 sm:h-48 bg-ink-3 flex items-center justify-center">
+              <p className="font-mono text-xs uppercase tracking-widest text-dim">
                 No image available
               </p>
             </div>
@@ -314,7 +320,7 @@ function LostItemCard({ item, onEdit }) {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleEditClick}
-                  className="p-1.5 text-yellow-500 hover:text-yellow-400 transition-colors rounded-full bg-yellow-500/10 hover:bg-yellow-500/20"
+                  className="p-1.5 text-beacon hover:text-ink hover:bg-beacon transition-colors rounded-full bg-ink/80 border border-ink-line"
                   title="Edit Item"
                 >
                   <FaEdit size={14} />
@@ -323,7 +329,7 @@ function LostItemCard({ item, onEdit }) {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleShowDeleteModal}
-                  className="p-1.5 text-red-500 hover:text-red-400 transition-colors rounded-full bg-red-500/10 hover:bg-red-500/20"
+                  className="p-1.5 text-red-400 hover:text-red-300 transition-colors rounded-full bg-ink/80 border border-ink-line"
                   title="Delete Item"
                 >
                   <FaTrash size={14} />
@@ -334,7 +340,7 @@ function LostItemCard({ item, onEdit }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={handleShare}
-              className="p-1.5 text-yellow-500 hover:text-yellow-400 transition-colors rounded-full bg-yellow-500/10 hover:bg-yellow-500/20"
+              className="p-1.5 text-beacon hover:text-ink hover:bg-beacon transition-colors rounded-full bg-ink/80 border border-ink-line"
               title="Share Item"
             >
               <FaShareAlt size={14} />
@@ -343,10 +349,10 @@ function LostItemCard({ item, onEdit }) {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleLike}
-              className={`p-1.5 transition-colors rounded-full ${
+              className={`p-1.5 transition-colors rounded-full bg-ink/80 border border-ink-line ${
                 isLiked
-                  ? "text-yellow-500 hover:text-yellow-400 bg-yellow-500/10 hover:bg-yellow-500/20"
-                  : "text-gray-400 hover:text-gray-300 bg-gray-500/10 hover:bg-gray-500/20"
+                  ? "text-beacon hover:text-beacon-soft"
+                  : "text-dim hover:text-paper"
               }`}
               title={isLiked ? "Unlike" : "Like"}
             >
@@ -359,10 +365,10 @@ function LostItemCard({ item, onEdit }) {
             <motion.div
               initial={{ x: 100 }}
               animate={{ x: 0 }}
-              className="flex items-center bg-yellow-500/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg"
+              className="flex items-center bg-beacon px-2.5 py-1 rounded-full"
             >
-              <IoMdPin className="mr-0.5 text-black" size={12} />
-              <span className="font-bold text-black text-sm truncate max-w-32">
+              <IoMdPin className="mr-0.5 text-ink" size={12} />
+              <span className="font-mono font-semibold text-ink text-xs truncate max-w-32">
                 {item.location_found}
               </span>
             </motion.div>
@@ -372,30 +378,30 @@ function LostItemCard({ item, onEdit }) {
         {/* Content */}
         <div className="p-3 sm:p-4 space-y-2 sm:space-y-3 flex-grow flex flex-col">
           <div className="flex justify-between items-start">
-            <h2 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-yellow-200 to-yellow-500 bg-clip-text text-transparent line-clamp-1">
+            <h2 className="font-display text-lg sm:text-xl font-semibold text-paper line-clamp-1">
               {item.item_name}
             </h2>
           </div>
 
-          <p className="text-gray-300 text-sm sm:text-base font-medium leading-relaxed line-clamp-2 flex-grow">
+          <p className="text-dim text-sm leading-relaxed line-clamp-2 flex-grow">
             {sanitizeDescription(item.description)}
           </p>
 
           <div className="flex flex-wrap gap-1.5">
             {item.status && (
-              <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-medium">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-sm border border-ink-line text-dim">
                 {item.status}
               </span>
             )}
             {item.category && (
-              <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-medium">
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-sm border border-beacon/40 text-beacon">
                 {item.category}
               </span>
             )}
           </div>
 
           <div className="space-y-2 mt-auto">
-            <div className="flex items-center text-xs text-gray-400">
+            <div className="flex items-center font-mono text-xs text-dim">
               <IoMdTime className="mr-1.5 flex-shrink-0" size={14} />
               <span className="truncate">
                 Posted {formatDate(item.createdAt)}
@@ -410,10 +416,10 @@ function LostItemCard({ item, onEdit }) {
                 e.stopPropagation(); // Prevent image modal from opening
                 window.location.href = `tel:${item.owner_contact}`;
               }}
-              className="flex items-center justify-center w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2 rounded-lg text-sm font-medium shadow-lg hover:shadow-yellow-500/20 transition-all duration-300"
+              className="flex items-center justify-center w-full bg-beacon hover:bg-beacon-soft text-ink px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-300"
             >
               <IoMdCall size={16} className="mr-1.5 flex-shrink-0" />
-              <span className="truncate">{item.owner_contact}</span>
+              <span className="truncate font-mono">{item.owner_contact}</span>
             </motion.button>
           </div>
         </div>

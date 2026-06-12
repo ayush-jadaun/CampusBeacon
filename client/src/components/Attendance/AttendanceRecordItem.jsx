@@ -15,7 +15,7 @@ const AttendanceRecordItem = ({
     return (
         <div
             key={record.id}
-            className={`flex items-center justify-between p-3 rounded-lg transition-colors border ${themeStyles.borderColor} bg-gray-800/20 hover:bg-gray-700/40`}
+            className={`flex items-center justify-between p-3 rounded-sm transition-colors border ${themeStyles.borderColor} bg-ink hover:bg-ink-3`}
         >
             <div className="flex items-center">
                 {record.status === "Present" ? (
@@ -32,7 +32,7 @@ const AttendanceRecordItem = ({
                         {record.status}
                     </p>
                     {record.markedAt && isValid(parseISO(record.markedAt)) && (
-                        <p className="text-xs text-gray-500">
+                        <p className="font-mono text-xs text-dim">
                             Marked at {format(parseISO(record.markedAt), "HH:mm")}
                         </p>
                     )}
@@ -40,7 +40,7 @@ const AttendanceRecordItem = ({
             </div>
             <button
                 onClick={handleEdit}
-                className={`p-1.5 rounded-md text-gray-400 hover:text-amber-400 hover:bg-gray-700/60 transition-all ${
+                className={`p-1.5 rounded-sm text-dim hover:text-beacon hover:bg-ink-3 transition-all ${
                     isActionDisabled ? "cursor-not-allowed opacity-50" : ""
                 }`}
                 title="Edit Attendance Status"

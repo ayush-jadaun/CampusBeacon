@@ -27,43 +27,36 @@ const RideFilters = ({
   const quickFilters = [
     {
       label: "Today",
-      icon: "🕒",
       value: "today",
       type: "dateRange",
     },
     {
       label: "Tomorrow",
-      icon: "📅",
       value: "tomorrow",
       type: "dateRange",
     },
     {
       label: "This Week",
-      icon: "📆",
       value: "week",
       type: "dateRange",
     },
     {
       label: "2+ Seats",
-      icon: "👥",
       value: 2,
       type: "minSeats",
     },
     {
       label: "Under ₹100",
-      icon: "💰",
       value: 100,
       type: "maxPrice",
     },
     {
       label: "To College",
-      icon: "🎓",
       value: "toCollege",
       type: "direction",
     },
     {
       label: "From College",
-      icon: "🏫",
       value: "fromCollege",
       type: "direction",
     },
@@ -97,6 +90,11 @@ const RideFilters = ({
 
   const activeFilterCount = getActiveFilterCount();
 
+  const inputClasses =
+    "w-full bg-ink border border-ink-line rounded-sm px-4 py-2 text-sm text-paper placeholder:text-dim focus:border-beacon focus:outline-none transition-colors";
+  const labelClasses =
+    "font-mono text-[11px] uppercase tracking-widest text-dim flex items-center gap-2";
+
   return (
     <div className="space-y-4">
       {/* Search and Filter Toggle */}
@@ -107,12 +105,12 @@ const RideFilters = ({
             placeholder="Search pickup or drop location..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full bg-black/40 border border-purple-500/50 rounded-full px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 pl-10"
+            className={`${inputClasses} pl-10`}
           />
-          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dim w-4 h-4" />
           {searchTerm && (
             <X
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 cursor-pointer hover:text-white"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dim w-4 h-4 cursor-pointer hover:text-paper transition-colors"
               onClick={() => onSearchChange("")}
             />
           )}
@@ -122,16 +120,16 @@ const RideFilters = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-colors ${
+          className={`flex items-center gap-2 rounded-full border px-5 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
             activeFilterCount > 0
-              ? "bg-purple-500 hover:bg-purple-600"
-              : "bg-purple-500/20 border border-purple-500/50 hover:bg-purple-500/30"
+              ? "bg-beacon border-beacon text-ink font-semibold"
+              : "border-ink-line text-dim hover:border-beacon hover:text-beacon"
           }`}
         >
           {activeFilterCount > 0 ? (
             <div className="flex items-center">
               <Sliders className="w-4 h-4 mr-2" />
-              <span className="bg-white text-purple-800 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
+              <span className="bg-ink text-beacon rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">
                 {activeFilterCount}
               </span>
             </div>
@@ -157,13 +155,13 @@ const RideFilters = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="space-y-4 p-4 bg-black/20 rounded-lg border border-purple-500/20">
+            <div className="space-y-4 p-4 bg-ink-2 rounded-sm border border-ink-line">
               {/* Sort and Quick Filters Row */}
               <div className="flex flex-wrap gap-4 items-center">
                 <select
                   value={filters.sortBy}
                   onChange={(e) => onFilterChange("sortBy", e.target.value)}
-                  className="bg-black/40 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:outline-none"
+                  className="bg-ink border border-ink-line rounded-sm px-4 py-2 text-sm text-paper focus:border-beacon focus:outline-none transition-colors"
                 >
                   <option value="dateAsc">Earliest First</option>
                   <option value="dateDesc">Latest First</option>
@@ -179,12 +177,12 @@ const RideFilters = ({
                       key={`${filter.type}-${filter.value}`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm
+                      className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full border font-mono text-xs tracking-wide transition-colors
                         ${
                           filters[filter.type] === filter.value
-                            ? "bg-purple-500 text-white"
-                            : "bg-purple-500/20 border border-purple-500/50 text-white hover:bg-purple-500/30"
-                        } transition-colors`}
+                            ? "bg-beacon border-beacon text-ink font-semibold"
+                            : "border-ink-line text-dim hover:border-beacon hover:text-beacon"
+                        }`}
                       onClick={() => {
                         // Toggle off if already selected
                         if (filters[filter.type] === filter.value) {
@@ -194,7 +192,6 @@ const RideFilters = ({
                         }
                       }}
                     >
-                      <span>{filter.icon}</span>
                       {filter.label}
                       {filters[filter.type] === filter.value && (
                         <X
@@ -211,12 +208,12 @@ const RideFilters = ({
               </div>
 
               {/* Advanced Filters Toggle */}
-              <div className="border-t border-purple-500/20 pt-4">
+              <div className="border-t border-ink-line pt-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                  className="flex items-center gap-2 text-white text-sm"
+                  className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-dim hover:text-beacon transition-colors"
                 >
                   <ChevronDown
                     className={`w-4 h-4 transform transition-transform ${
@@ -239,7 +236,7 @@ const RideFilters = ({
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
                       {/* Enhanced Date Range Filter */}
                       <div className="space-y-2">
-                        <label className="text-white text-sm flex items-center gap-2">
+                        <label className={labelClasses}>
                           <Calendar className="w-4 h-4" /> Date Range
                         </label>
                         <select
@@ -252,7 +249,7 @@ const RideFilters = ({
                               onFilterChange("endDate", null);
                             }
                           }}
-                          className="w-full bg-black/40 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:outline-none mb-2"
+                          className={`${inputClasses} mb-2`}
                         >
                           <option value="">Any Date</option>
                           {dateOptions.map((option) => (
@@ -265,7 +262,7 @@ const RideFilters = ({
                         {filters.dateRange === "custom" && (
                           <div className="space-y-2">
                             <div className="flex flex-col space-y-2">
-                              <label className="text-white text-sm">
+                              <label className={labelClasses}>
                                 Start Date
                               </label>
                               <input
@@ -275,11 +272,11 @@ const RideFilters = ({
                                   onFilterChange("startDate", e.target.value)
                                 }
                                 min={new Date().toISOString().split("T")[0]}
-                                className="w-full bg-black/40 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:outline-none"
+                                className={`${inputClasses} font-mono`}
                               />
                             </div>
                             <div className="flex flex-col space-y-2">
-                              <label className="text-white text-sm">
+                              <label className={labelClasses}>
                                 End Date
                               </label>
                               <input
@@ -292,7 +289,7 @@ const RideFilters = ({
                                   filters.startDate ||
                                   new Date().toISOString().split("T")[0]
                                 }
-                                className="w-full bg-black/40 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:outline-none"
+                                className={`${inputClasses} font-mono`}
                               />
                             </div>
                           </div>
@@ -301,7 +298,7 @@ const RideFilters = ({
 
                       {/* Price Range Filter */}
                       <div className="space-y-2">
-                        <label className="text-white text-sm flex items-center gap-2">
+                        <label className={labelClasses}>
                           <CreditCard className="w-4 h-4" /> Max Price (₹)
                         </label>
                         <input
@@ -316,18 +313,20 @@ const RideFilters = ({
                               Number(e.target.value) || null
                             )
                           }
-                          className="w-full accent-purple-500"
+                          className="w-full accent-beacon"
                         />
-                        <div className="flex justify-between text-white text-sm">
+                        <div className="flex justify-between font-mono text-xs text-dim">
                           <span>₹0</span>
-                          <span>₹{filters.maxPrice || 1000}</span>
+                          <span className="text-beacon">
+                            ₹{filters.maxPrice || 1000}
+                          </span>
                           <span>₹1000</span>
                         </div>
                       </div>
 
                       {/* Seats Filter */}
                       <div className="space-y-2">
-                        <label className="text-white text-sm flex items-center gap-2">
+                        <label className={labelClasses}>
                           <Users className="w-4 h-4" /> Minimum Seats
                         </label>
                         <select
@@ -339,7 +338,7 @@ const RideFilters = ({
                                 : Number(e.target.value);
                             onFilterChange("minSeats", value);
                           }}
-                          className="w-full bg-black/40 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:outline-none"
+                          className={inputClasses}
                         >
                           <option value="">Any</option>
                           <option value="1">1+</option>
@@ -351,16 +350,16 @@ const RideFilters = ({
 
                       {/* Direction Filter */}
                       <div className="space-y-2">
-                        <label className="text-white text-sm">Direction</label>
+                        <label className={labelClasses}>Direction</label>
                         <div className="flex gap-2">
                           <button
                             onClick={() =>
                               onFilterChange("direction", "toCollege")
                             }
-                            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center gap-2 ${
+                            className={`flex-1 py-2 px-3 rounded-sm border text-sm flex items-center justify-center gap-2 transition-colors ${
                               filters.direction === "toCollege"
-                                ? "bg-purple-500 text-white"
-                                : "bg-black/40 border border-purple-500/50 text-white hover:bg-purple-500/20"
+                                ? "bg-beacon border-beacon text-ink font-semibold"
+                                : "bg-ink border-ink-line text-dim hover:border-beacon hover:text-beacon"
                             }`}
                           >
                             <ArrowRight className="w-4 h-4" /> To College
@@ -369,10 +368,10 @@ const RideFilters = ({
                             onClick={() =>
                               onFilterChange("direction", "fromCollege")
                             }
-                            className={`flex-1 py-2 px-3 rounded-lg flex items-center justify-center gap-2 ${
+                            className={`flex-1 py-2 px-3 rounded-sm border text-sm flex items-center justify-center gap-2 transition-colors ${
                               filters.direction === "fromCollege"
-                                ? "bg-purple-500 text-white"
-                                : "bg-black/40 border border-purple-500/50 text-white hover:bg-purple-500/20"
+                                ? "bg-beacon border-beacon text-ink font-semibold"
+                                : "bg-ink border-ink-line text-dim hover:border-beacon hover:text-beacon"
                             }`}
                           >
                             <ArrowLeft className="w-4 h-4" /> From College
@@ -386,16 +385,16 @@ const RideFilters = ({
 
               {/* Active Filters Summary and Clear Button */}
               {activeFilterCount > 0 && (
-                <div className="flex justify-between items-center text-sm text-gray-400 pt-4 border-t border-purple-500/20">
+                <div className="flex justify-between items-center text-sm text-dim pt-4 border-t border-ink-line">
                   <div>
-                    <span className="bg-purple-500/20 px-2 py-1 rounded-full text-xs">
+                    <span className="font-mono text-[11px] uppercase tracking-widest border border-ink-line rounded-full px-2.5 py-1">
                       {activeFilterCount}{" "}
                       {activeFilterCount === 1 ? "filter" : "filters"} active
                     </span>
                   </div>
                   <button
                     onClick={clearAllFilters}
-                    className="text-purple-400 hover:text-purple-300 underline"
+                    className="link-sweep text-beacon font-mono text-xs"
                   >
                     Clear All Filters
                   </button>

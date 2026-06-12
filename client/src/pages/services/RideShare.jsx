@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Car, AlertTriangle, Plus } from "lucide-react";
+import { Car, AlertTriangle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { formatDateTime, isRideActive } from "../../utils/dateUtils";
 import RideHeader from "../../components/rides/RideHeader";
 import RideFilters from "../../components/rides/RideFilters";
 import RideGrid from "../../components/rides/RideGrid";
@@ -17,8 +16,6 @@ import {
   deleteRide,
   setSearchTerm,
   setFilters,
-  setFilteredRides,
-  setActiveFilterCount,
 } from "../../slices/ridesSlice";
 
 const RideShare = () => {
@@ -106,16 +103,18 @@ const RideShare = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-black to-purple-900 flex items-center justify-center">
-        <div className="text-white text-2xl flex items-center">
+      <div className="min-h-screen bg-ink flex items-center justify-center">
+        <div className="text-paper flex flex-col items-center">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="mr-3"
+            className="mb-4"
           >
-            <Car className="w-8 h-8" />
+            <Car className="w-8 h-8 text-beacon" />
           </motion.div>
-          Loading rides...
+          <span className="font-mono text-xs uppercase tracking-widest text-dim">
+            Loading rides...
+          </span>
         </div>
       </div>
     );
@@ -123,16 +122,16 @@ const RideShare = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-black to-purple-900 flex items-center justify-center">
-        <div className="bg-red-900/50 backdrop-blur-md p-6 rounded-xl border border-red-500/50 max-w-lg mx-auto">
-          <div className="flex items-center text-red-400 text-xl mb-4">
+      <div className="min-h-screen bg-ink flex items-center justify-center px-4">
+        <div className="bg-ink-2 p-6 rounded-sm border border-red-500/40 max-w-lg mx-auto">
+          <div className="flex items-center text-red-400 font-display text-xl mb-4">
             <AlertTriangle className="w-6 h-6 mr-2" />
             Error Loading Rides
           </div>
-          <p className="text-white/80">{error}</p>
+          <p className="text-dim">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 bg-red-700 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors"
+            className="mt-5 bg-beacon hover:bg-beacon-soft text-ink font-semibold py-2 px-5 rounded-full transition-colors"
           >
             Try Again
           </button>
@@ -142,8 +141,8 @@ const RideShare = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-black to-purple-900 p-4 sm:p-8">
-      <div className="container mx-auto max-w-7xl">
+    <div className="min-h-screen bg-ink text-paper px-5 sm:px-8 lg:px-12 pt-24 pb-16">
+      <div className="mx-auto max-w-7xl">
         <RideHeader
           onOfferRide={() => {
             setEditingRide(null);
@@ -157,29 +156,27 @@ const RideShare = () => {
           onFilterChange={handleFilterChange}
           clearAllFilters={clearAllFilters}
         />
-        <div className="flex justify-between items-center mb-6">
-          <div className="text-gray-300">
+        <div className="flex justify-between items-center mb-6 mt-6">
+          <div className="font-mono text-xs uppercase tracking-widest text-dim">
             {filteredRides.length > 0 ? (
               <>
                 Showing{" "}
-                <span className="font-semibold text-white">
-                  {filteredRides.length}
-                </span>{" "}
+                <span className="text-beacon">{filteredRides.length}</span>{" "}
                 {filteredRides.length === 1 ? "ride" : "rides"}
               </>
             ) : (
-              <span className="text-gray-400">No rides found</span>
+              <span>No rides found</span>
             )}
           </div>
           {activeFilterCount > 0 && (
-            <div className="text-purple-400 text-sm flex items-center">
-              <span className="mr-2 bg-purple-500/20 px-2 py-1 rounded-full text-xs">
+            <div className="text-dim text-sm flex items-center">
+              <span className="mr-3 font-mono text-[11px] uppercase tracking-widest border border-ink-line rounded-full px-2.5 py-1">
                 {activeFilterCount}{" "}
                 {activeFilterCount === 1 ? "filter" : "filters"} active
               </span>
               <button
                 onClick={clearAllFilters}
-                className="text-purple-400 hover:text-purple-300 underline text-sm"
+                className="link-sweep text-beacon font-mono text-xs"
               >
                 Clear all
               </button>

@@ -2,6 +2,7 @@
 import express from "express";
 import { upload } from "../middlewares/multer.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import { requireRole } from "../middlewares/role.middleware.js";
 // import filterInputMiddleware from "../middlewares/filter.middleware.js"; 
 
 import {
@@ -19,8 +20,9 @@ const router = express.Router();
 router.post(
   "/coordinators",
   authMiddleware,
+  requireRole("admin", "coordinator"),
   upload.array("images", 5),
-  createCoordinator 
+  createCoordinator
 );
 router.get("/coordinators", getAllCoordinators);
 router.get("/coordinators/:id", getCoordinatorById);
@@ -28,9 +30,15 @@ router.get("/coordinators/:id", getCoordinatorById);
 router.put(
   "/coordinators/:id",
   authMiddleware,
+  requireRole("admin", "coordinator"),
   upload.array("images", 5),
   updateCoordinator
 );
-router.delete("/coordinators/:id", authMiddleware, deleteCoordinator);
+router.delete(
+  "/coordinators/:id",
+  authMiddleware,
+  requireRole("admin", "coordinator"),
+  deleteCoordinator
+);
 
 export default router;

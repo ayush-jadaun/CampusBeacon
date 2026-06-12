@@ -107,16 +107,16 @@ const ImageGallery = ({ images = [] }) => {
   const handleImageError = (e) => {
     e.target.onerror = null;
     e.target.src =
-      "https://via.placeholder.com/800x400/ef4444/ffffff?text=Image+Error";
+      "https://via.placeholder.com/800x400/1c232e/8b929c?text=Image+Error";
   };
 
   // --- Render Logic ---
 
   if (imageCount === 0) {
     return (
-      <div className="w-full h-64 md:h-80 lg:h-96 rounded-xl flex flex-col items-center justify-center bg-gray-800/70 border border-gray-700/50 text-gray-500 shadow-inner">
+      <div className="w-full h-64 md:h-80 lg:h-96 rounded-sm flex flex-col items-center justify-center bg-ink border border-ink-line text-dim">
         <FiImageIcon size={48} className="mb-3 opacity-50" />
-        <span className="text-sm font-medium">No Images Available</span>
+        <span className="font-mono text-xs uppercase tracking-widest">No Images Available</span>
       </div>
     );
   }
@@ -142,7 +142,7 @@ const ImageGallery = ({ images = [] }) => {
     <>
       {/* Main Gallery Container - Added Hover Handlers */}
       <div
-        className="relative w-full h-64 md:h-80 lg:h-96 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 group bg-gray-900"
+        className="relative w-full h-64 md:h-80 lg:h-96 rounded-sm overflow-hidden border border-ink-line group bg-ink"
         onMouseEnter={() => setIsHovering(true)} 
         onMouseLeave={() => setIsHovering(false)} 
       >
@@ -181,14 +181,14 @@ const ImageGallery = ({ images = [] }) => {
           <>
             <button
               onClick={handlePrev}
-              className="absolute top-1/2 left-2 md:left-3 transform -translate-y-1/2 z-10 p-2 bg-black/40 hover:bg-black/70 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="absolute top-1/2 left-2 md:left-3 transform -translate-y-1/2 z-10 p-2 bg-ink/60 hover:bg-ink/90 rounded-full text-paper opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-beacon/60"
               aria-label="Previous image"
             >
               <FiChevronLeft size={24} />
             </button>
             <button
               onClick={handleNext}
-              className="absolute top-1/2 right-2 md:right-3 transform -translate-y-1/2 z-10 p-2 bg-black/40 hover:bg-black/70 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+              className="absolute top-1/2 right-2 md:right-3 transform -translate-y-1/2 z-10 p-2 bg-ink/60 hover:bg-ink/90 rounded-full text-paper opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-beacon/60"
               aria-label="Next image"
             >
               <FiChevronRight size={24} />
@@ -205,8 +205,8 @@ const ImageGallery = ({ images = [] }) => {
                 onClick={() => goToIndex(index)}
                 className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   currentIndex === index
-                    ? "bg-white scale-125 ring-1 ring-offset-1 ring-offset-black/30 ring-white/70" // Improved active dot
-                    : "bg-white/50 hover:bg-white/80"
+                    ? "bg-beacon scale-125" // Improved active dot
+                    : "bg-paper/40 hover:bg-paper/70"
                 }`}
                 aria-label={`Go to image ${index + 1}`}
               />
@@ -228,7 +228,7 @@ const ImageGallery = ({ images = [] }) => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+            <div className="fixed inset-0 bg-ink/90" />
           </Transition.Child>
 
           {/* Modal Content */}
@@ -243,10 +243,10 @@ const ImageGallery = ({ images = [] }) => {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-lg bg-gray-900/50 text-left align-middle shadow-xl transition-all relative border border-gray-700/50">
+                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-sm bg-ink-2 text-left align-middle transition-all relative border border-ink-line">
                   <button
                     onClick={closeLightbox}
-                    className="absolute top-2 right-2 z-50 p-2 bg-black/50 hover:bg-black/80 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-white/70"
+                    className="absolute top-2 right-2 z-50 p-2 bg-ink/70 hover:bg-ink rounded-full text-paper focus:outline-none focus:ring-2 focus:ring-beacon/70"
                     aria-label="Close lightbox"
                   >
                     {" "}
@@ -256,7 +256,7 @@ const ImageGallery = ({ images = [] }) => {
                     <>
                       <button
                         onClick={() => navigateLightbox("prev")}
-                        className="absolute top-1/2 left-2 md:left-4 transform -translate-y-1/2 z-40 p-3 bg-black/40 hover:bg-black/70 rounded-full text-white transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        className="absolute top-1/2 left-2 md:left-4 transform -translate-y-1/2 z-40 p-3 bg-ink/60 hover:bg-ink/90 rounded-full text-paper transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-beacon/60"
                         aria-label="Previous image"
                       >
                         {" "}
@@ -264,7 +264,7 @@ const ImageGallery = ({ images = [] }) => {
                       </button>
                       <button
                         onClick={() => navigateLightbox("next")}
-                        className="absolute top-1/2 right-2 md:right-4 transform -translate-y-1/2 z-40 p-3 bg-black/40 hover:bg-black/70 rounded-full text-white transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        className="absolute top-1/2 right-2 md:right-4 transform -translate-y-1/2 z-40 p-3 bg-ink/60 hover:bg-ink/90 rounded-full text-paper transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-beacon/60"
                         aria-label="Next image"
                       >
                         {" "}
@@ -288,7 +288,7 @@ const ImageGallery = ({ images = [] }) => {
                     </AnimatePresence>
                   </div>
                   {imageCount > 1 && (
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-ink/80 text-paper font-mono text-xs px-2 py-1 rounded-full">
                       {" "}
                       {lightboxIndex + 1} / {imageCount}{" "}
                     </div>

@@ -8,6 +8,12 @@ const formatTimeToHHMM = (timeString) => {
   return match ? match[1] : "";
 };
 
+const inputClasses =
+  "w-full bg-ink border border-ink-line rounded-sm px-3 py-2 text-paper placeholder-dim focus:outline-none focus:border-beacon transition-colors disabled:opacity-70";
+
+const labelClasses =
+  "block font-mono text-xs uppercase tracking-widest text-dim mb-1.5";
+
 const EateryForm = ({ initialData, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
@@ -99,11 +105,8 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
       <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-300 mb-1"
-        >
-          Name <span className="text-red-500">*</span>
+        <label htmlFor="name" className={labelClasses}>
+          Name <span className="text-beacon">*</span>
         </label>
         <input
           type="text"
@@ -111,7 +114,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+          className={inputClasses}
           placeholder="e.g., Main Canteen"
           required
           disabled={isSubmitting}
@@ -119,11 +122,8 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
       </div>
 
       <div>
-        <label
-          htmlFor="location"
-          className="block text-sm font-medium text-gray-300 mb-1"
-        >
-          Location <span className="text-red-500">*</span>
+        <label htmlFor="location" className={labelClasses}>
+          Location <span className="text-beacon">*</span>
         </label>
         <input
           type="text"
@@ -131,7 +131,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
           name="location"
           value={formData.location}
           onChange={handleChange}
-          className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+          className={inputClasses}
           placeholder="e.g., Near Admin Building"
           required
           disabled={isSubmitting}
@@ -140,10 +140,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label
-            htmlFor="openingTime"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
+          <label htmlFor="openingTime" className={labelClasses}>
             Opening Time
           </label>
           <input
@@ -152,16 +149,13 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
             name="openingTime"
             value={formData.openingTime}
             onChange={handleChange}
-            className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+            className={inputClasses}
             disabled={isSubmitting}
           />
         </div>
 
         <div>
-          <label
-            htmlFor="closingTime"
-            className="block text-sm font-medium text-gray-300 mb-1"
-          >
+          <label htmlFor="closingTime" className={labelClasses}>
             Closing Time
           </label>
           <input
@@ -170,17 +164,14 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
             name="closingTime"
             value={formData.closingTime}
             onChange={handleChange}
-            className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+            className={inputClasses}
             disabled={isSubmitting}
           />
         </div>
       </div>
 
       <div>
-        <label
-          htmlFor="phoneNumber"
-          className="block text-sm font-medium text-gray-300 mb-1"
-        >
+        <label htmlFor="phoneNumber" className={labelClasses}>
           Phone Number
         </label>
         <input
@@ -190,16 +181,13 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
           value={formData.phoneNumber}
           onChange={handleChange}
           placeholder="Optional contact number"
-          className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+          className={inputClasses}
           disabled={isSubmitting}
         />
       </div>
 
       <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-300 mb-1"
-        >
+        <label htmlFor="description" className={labelClasses}>
           Description
         </label>
         <textarea
@@ -209,22 +197,20 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
           value={formData.description}
           onChange={handleChange}
           placeholder="Optional: Short description about the eatery"
-          className="w-full bg-gray-800 border border-gray-600 rounded-md px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-70"
+          className={inputClasses}
           disabled={isSubmitting}
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-1">
-          Menu Image
-        </label>
+        <label className={labelClasses}>Menu Image</label>
         <div className="flex items-center space-x-4">
           <label
-            className={`relative cursor-pointer bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2 px-4 rounded-md transition duration-150 ease-in-out shadow-sm hover:shadow-md ${
+            className={`relative cursor-pointer bg-ink border border-ink-line text-paper py-2 px-4 rounded-full transition-colors duration-300 hover:bg-beacon hover:border-beacon hover:text-ink ${
               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            <span className="flex items-center text-sm">
+            <span className="flex items-center text-sm font-medium">
               <Camera size={16} className="mr-1.5" />
               {previewUrl ? "Change" : "Choose"} Image
             </span>
@@ -243,13 +229,13 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
               <img
                 src={previewUrl}
                 alt="Menu Preview"
-                className="h-full w-full object-cover rounded-md shadow-md border border-gray-600"
+                className="h-full w-full object-cover rounded-sm border border-ink-line"
               />
               {!isSubmitting && (
                 <button
                   type="button"
                   aria-label="Remove image"
-                  className="absolute -top-1.5 -right-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full p-0.5 shadow-md transition"
+                  className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full p-0.5 shadow-md transition"
                   onClick={handleRemoveImage}
                 >
                   <X size={14} />
@@ -258,7 +244,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-400 mt-1.5">
+        <p className="text-xs text-dim mt-1.5">
           Optional. Max 5MB. JPG, PNG, WEBP accepted.
         </p>
       </div>
@@ -267,7 +253,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full sm:w-auto flex-1 order-1 sm:order-2 bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white py-2.5 px-5 rounded-md transition duration-150 ease-in-out shadow-md hover:shadow-lg text-sm font-medium flex items-center justify-center ${
+          className={`w-full sm:w-auto flex-1 order-1 sm:order-2 bg-beacon hover:bg-beacon-soft text-ink font-semibold py-2.5 px-5 rounded-full transition-colors duration-300 text-sm flex items-center justify-center ${
             isSubmitting ? "opacity-70 cursor-not-allowed" : ""
           }`}
         >
@@ -282,7 +268,7 @@ const EateryForm = ({ initialData, onSubmit, onCancel }) => {
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="w-full sm:w-auto flex-1 order-2 sm:order-1 bg-gray-600 hover:bg-gray-500 text-gray-200 py-2.5 px-5 rounded-md transition duration-150 ease-in-out text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto flex-1 order-2 sm:order-1 border border-ink-line text-dim hover:text-paper hover:border-dim py-2.5 px-5 rounded-full transition-colors duration-300 text-sm font-medium disabled:opacity-70 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

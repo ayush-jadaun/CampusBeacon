@@ -86,15 +86,15 @@ const Notifications = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-purple-500/50"
+        className="bg-ink-2 rounded-sm p-4 md:p-6 border border-ink-line"
       >
         <div className="animate-pulse">
-          <div className="h-8 bg-purple-500/20 rounded w-1/3 mb-6"></div>
+          <div className="h-8 bg-ink-3 rounded-sm w-1/3 mb-6"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-3 md:p-4 rounded-lg border bg-black/30">
-                <div className="h-4 bg-purple-500/20 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-purple-500/20 rounded w-1/2"></div>
+              <div key={i} className="p-3 md:p-4 rounded-sm border border-ink-line bg-ink">
+                <div className="h-4 bg-ink-3 rounded-sm w-3/4 mb-2"></div>
+                <div className="h-3 bg-ink-3 rounded-sm w-1/2"></div>
               </div>
             ))}
           </div>
@@ -108,7 +108,7 @@ const Notifications = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-red-500/50"
+        className="bg-ink-2 rounded-sm p-4 md:p-6 border border-red-500/40"
       >
         <p className="text-red-400">Error: {error}</p>
       </motion.div>
@@ -119,16 +119,16 @@ const Notifications = ({ hostelId }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-black/40 backdrop-blur-lg rounded-xl p-4 md:p-6 border border-purple-500/50"
+      className="bg-ink-2 rounded-sm p-4 md:p-6 border border-ink-line"
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-white flex items-center">
-          <Bell className="mr-2 w-5 h-5" /> Notifications
+        <h2 className="font-display text-xl md:text-2xl font-semibold text-paper flex items-center">
+          <Bell className="mr-2 w-5 h-5 text-beacon" /> Notifications
         </h2>
         {(isAdmin || isHostelPresident) && (
           <button
             onClick={() => setIsCreating(true)}
-            className="flex items-center justify-center space-x-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-400 rounded-lg transition-colors text-sm sm:text-base w-full sm:w-auto"
+            className="flex items-center justify-center space-x-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-beacon hover:bg-beacon-soft text-ink font-semibold rounded-full transition-colors text-sm w-full sm:w-auto"
           >
             <Plus className="w-4 h-4" />
             <span>Add Notification</span>
@@ -140,7 +140,7 @@ const Notifications = ({ hostelId }) => {
       {(isAdmin || isHostelPresident) && isCreating && (
         <form onSubmit={handleSubmit} className="mb-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
               Message
             </label>
             <textarea
@@ -148,7 +148,7 @@ const Notifications = ({ hostelId }) => {
               onChange={(e) =>
                 setFormData({ ...formData, message: e.target.value })
               }
-              className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 h-24 sm:h-32 resize-none text-sm sm:text-base"
+              className="w-full px-3 py-2 bg-ink border border-ink-line rounded-sm text-paper focus:outline-none focus:border-beacon transition-colors h-24 sm:h-32 resize-none text-sm sm:text-base"
               required
             />
             {formError && (
@@ -156,7 +156,7 @@ const Notifications = ({ hostelId }) => {
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
               Type
             </label>
             <select
@@ -164,7 +164,7 @@ const Notifications = ({ hostelId }) => {
               onChange={(e) =>
                 setFormData({ ...formData, type: e.target.value })
               }
-              className="w-full px-3 py-2 bg-black/50 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm sm:text-base"
+              className="w-full px-3 py-2 bg-ink border border-ink-line rounded-sm text-paper focus:outline-none focus:border-beacon transition-colors text-sm sm:text-base"
             >
               <option value="info">Info</option>
               <option value="warning">Warning</option>
@@ -172,26 +172,26 @@ const Notifications = ({ hostelId }) => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
+            <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
               Attachment (Optional)
             </label>
             <input
               type="file"
               onChange={(e) => setFileAttachment(e.target.files[0])}
-              className="text-white text-sm w-full"
+              className="text-paper text-sm w-full file:mr-3 file:px-3 file:py-1 file:rounded-full file:border file:border-ink-line file:bg-ink file:text-dim file:text-xs"
             />
           </div>
           <div className="flex justify-end space-x-3">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-3 py-1.5 text-gray-300 hover:text-white transition-colors text-sm"
+              className="px-4 py-1.5 text-dim hover:text-paper transition-colors text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-3 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors text-sm"
+              className="px-5 py-1.5 bg-beacon text-ink font-semibold rounded-full hover:bg-beacon-soft transition-colors text-sm"
             >
               Create
             </button>
@@ -206,18 +206,18 @@ const Notifications = ({ hostelId }) => {
             key={notif.notification_id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className={`p-3 sm:p-4 rounded-lg border ${
+            className={`p-3 sm:p-4 rounded-sm bg-ink border ${
               notif.type === "warning"
-                ? "bg-yellow-500/20 border-yellow-500"
+                ? "border-beacon/40"
                 : notif.type === "error"
-                ? "bg-red-500/20 border-red-500"
-                : "bg-blue-500/20 border-blue-500"
+                ? "border-red-500/40"
+                : "border-ink-line"
             } flex justify-between items-start gap-2`}
           >
             <div className="flex-1 break-words">
-              <p className="text-white text-sm sm:text-base">{notif.message}</p>
+              <p className="text-paper text-sm sm:text-base">{notif.message}</p>
               {notif.timestamp && (
-                <p className="text-xs sm:text-sm text-gray-400 mt-1 sm:mt-2">
+                <p className="font-mono text-xs text-dim mt-1 sm:mt-2">
                   {new Date(notif.timestamp).toLocaleTimeString()}
                 </p>
               )}
@@ -226,7 +226,7 @@ const Notifications = ({ hostelId }) => {
                   href={notif.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs sm:text-sm text-gray-300 underline mt-1 block"
+                  className="font-mono text-xs text-beacon link-sweep mt-1 inline-block"
                 >
                   View Attachment
                 </a>
@@ -235,7 +235,7 @@ const Notifications = ({ hostelId }) => {
             {(isAdmin || isHostelPresident) && (
               <button
                 onClick={() => handleDeleteNotification(notif.notification_id)}
-                className="text-red-500 hover:text-red-600 flex-shrink-0"
+                className="text-dim hover:text-red-400 transition-colors flex-shrink-0"
                 aria-label="Delete notification"
               >
                 <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -244,7 +244,7 @@ const Notifications = ({ hostelId }) => {
           </motion.div>
         ))}
         {hostelNotifications.length === 0 && (
-          <p className="text-gray-400 text-center text-sm sm:text-base">
+          <p className="text-dim text-center text-sm sm:text-base">
             No notifications yet
           </p>
         )}

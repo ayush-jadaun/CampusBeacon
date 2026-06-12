@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import scheduleUnverifiedUserCleanup from "./src/utils/killUnverifiedUser.js";
 import { initializeAssociations } from "./src/models/association.js";
@@ -53,6 +55,36 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
+// Security headers (API-only server, so CSP/CORP for embedded docs not needed)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
+// Rate limiting: generous global cap, strict cap on credential endpoints
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 600,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many attempts. Please try again in 15 minutes.",
+  },
+});
+app.use(globalLimiter);
+app.use(
+  ["/api/users/login", "/api/users/signup", "/api/users/forgot-password", "/api/users/reset-password"],
+  authLimiter
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -96,6 +128,15 @@ const startServer = async () => {
     await EventRegistration.sync();
     await sequelize.query(
       "ALTER TABLE events ADD COLUMN IF NOT EXISTS max_participants INTEGER;"
+    );
+    await sequelize.query(
+      `ALTER TABLE "LostAndFounds" ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'lost';`
+    );
+    await sequelize.query(
+      `ALTER TABLE "BuyAndSells" ADD COLUMN IF NOT EXISTS category VARCHAR(100);`
+    );
+    await sequelize.query(
+      `ALTER TABLE "BuyAndSells" ADD COLUMN IF NOT EXISTS is_sold BOOLEAN NOT NULL DEFAULT false;`
     );
 
     const httpServer = createServer(app);

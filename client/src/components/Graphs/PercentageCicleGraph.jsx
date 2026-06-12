@@ -5,17 +5,16 @@ const PercentageCircleGraph = ({
   percentage = 0,
   size = 60,
   strokeWidth = 5,
-  themeStyles,
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (percentage / 100) * circumference;
 
-  let color = "text-red-500"; // Default color
+  let color = "text-red-500"; // Default color (bad attendance)
   if (percentage >= 75) {
     color = "text-green-500";
   } else if (percentage >= 50) {
-    color = "text-yellow-500";
+    color = "text-beacon";
   }
 
   return (
@@ -26,7 +25,7 @@ const PercentageCircleGraph = ({
       <svg className="absolute top-0 left-0" width={size} height={size}>
         {/* Background Circle */}
         <circle
-          className="text-gray-700/50" // Background color
+          className="text-ink-3" // Track color
           strokeWidth={strokeWidth}
           stroke="currentColor"
           fill="transparent"
@@ -51,7 +50,7 @@ const PercentageCircleGraph = ({
         />
       </svg>
       {/* Percentage Text */}
-      <span className={`absolute text-xs font-medium ${color}`}>
+      <span className={`absolute font-mono text-xs font-medium ${color}`}>
         {`${Math.round(percentage)}%`}
       </span>
     </div>

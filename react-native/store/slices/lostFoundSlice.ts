@@ -11,6 +11,7 @@ interface LostFoundState {
   isLoading: boolean;
   error: string | null;
   searchQuery: string;
+  statusFilter: string;
 }
 
 const initialState: LostFoundState = {
@@ -19,6 +20,7 @@ const initialState: LostFoundState = {
   isLoading: false,
   error: null,
   searchQuery: '',
+  statusFilter: 'All',
 };
 
 // Async thunks
@@ -96,8 +98,13 @@ const lostFoundSlice = createSlice({
       state.searchQuery = action.payload;
       state.filteredItems = filterItems(state);
     },
+    setStatusFilter: (state, action: PayloadAction<string>) => {
+      state.statusFilter = action.payload;
+      state.filteredItems = filterItems(state);
+    },
     clearFilters: (state) => {
       state.searchQuery = '';
+      state.statusFilter = 'All';
       state.filteredItems = state.items;
     },
   },
@@ -148,6 +155,11 @@ const lostFoundSlice = createSlice({
 function filterItems(state: LostFoundState): LostAndFoundItem[] {
   let filtered = [...state.items];
 
+  // Filter by status
+  if (state.statusFilter !== 'All') {
+    filtered = filtered.filter((item) => item.status === state.statusFilter.toLowerCase());
+  }
+
   // Filter by search query
   if (state.searchQuery) {
     const query = state.searchQuery.toLowerCase();
@@ -162,5 +174,5 @@ function filterItems(state: LostFoundState): LostAndFoundItem[] {
   return filtered;
 }
 
-export const { setSearchQuery, clearFilters } = lostFoundSlice.actions;
+export const { setSearchQuery, setStatusFilter, clearFilters } = lostFoundSlice.actions;
 export default lostFoundSlice.reducer;

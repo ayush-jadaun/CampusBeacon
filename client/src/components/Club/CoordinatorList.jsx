@@ -26,37 +26,25 @@ import toast from "react-hot-toast";
 
 const getSocialDetails = (link = "") => {
   if (typeof link !== "string" || !link)
-    return { Icon: FaGlobe, colorClass: "text-gray-400 hover:text-gray-300" };
+    return { Icon: FaGlobe, colorClass: "text-dim hover:text-beacon" };
   if (link.includes("instagram.com"))
-    return {
-      Icon: FaInstagram,
-      colorClass: "text-[#E1306C] hover:text-[#c72a5f]",
-    };
+    return { Icon: FaInstagram, colorClass: "text-dim hover:text-beacon" };
   if (link.includes("linkedin.com"))
-    return {
-      Icon: FaLinkedin,
-      colorClass: "text-[#0077B5] hover:text-[#005e90]",
-    };
+    return { Icon: FaLinkedin, colorClass: "text-dim hover:text-beacon" };
   if (link.includes("facebook.com"))
-    return {
-      Icon: FaFacebookF,
-      colorClass: "text-[#1877F2] hover:text-[#125fb3]",
-    };
+    return { Icon: FaFacebookF, colorClass: "text-dim hover:text-beacon" };
   if (link.includes("twitter.com"))
-    return {
-      Icon: FaTwitter,
-      colorClass: "text-[#1DA1F2] hover:text-[#17a8de]",
-    };
+    return { Icon: FaTwitter, colorClass: "text-dim hover:text-beacon" };
   if (link.includes("mailto:"))
-    return { Icon: FiMail, colorClass: "text-amber-400 hover:text-amber-300" };
-  return { Icon: FaGlobe, colorClass: "text-gray-400 hover:text-gray-300" };
+    return { Icon: FiMail, colorClass: "text-dim hover:text-beacon" };
+  return { Icon: FaGlobe, colorClass: "text-dim hover:text-beacon" };
 };
 
 const ListLoadingSkeleton = () => (
   <div className="flex justify-center items-center py-16">
     <div className="flex flex-col items-center space-y-3">
-      <FiLoader className="animate-spin text-cyan-400 text-5xl" />
-      <span className="text-gray-400 animate-pulse text-lg">
+      <FiLoader className="animate-spin text-beacon text-5xl" />
+      <span className="text-dim animate-pulse text-lg">
         Loading Team Members...
       </span>
     </div>
@@ -67,9 +55,9 @@ const ListErrorState = ({ error, onRetry, clubId }) => (
   <motion.div
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="text-center py-10 text-red-400 bg-red-900/10 backdrop-blur-sm rounded-xl border border-red-700/30 p-6 shadow-lg flex flex-col items-center space-y-4"
+    className="text-center py-10 text-red-400 bg-ink-2 rounded-sm border border-red-500/40 p-6 flex flex-col items-center space-y-4"
   >
-    <FiUsers size={40} className="text-red-500/70" />
+    <FiUsers size={40} className="text-red-400/70" />
     <p className="font-semibold text-lg">Oops! Could not load the team.</p>
     <p className="text-red-400/80 text-sm max-w-md">
       {typeof error === "string" ? error : "An unknown error occurred."}
@@ -78,7 +66,7 @@ const ListErrorState = ({ error, onRetry, clubId }) => (
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => onRetry(clubId)}
-      className="mt-3 px-5 py-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg text-sm transition-colors shadow-lg"
+      className="mt-3 px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full text-sm transition-colors"
     >
       Try Again
     </motion.button>
@@ -93,22 +81,22 @@ const NoCoordinatorsMessage = ({ isAdmin, isPassedData }) => (
     className={`${
       isPassedData
         ? "py-4 text-center"
-        : "bg-gradient-to-br from-gray-800/50 to-gray-900/70 border border-gray-700/40 rounded-xl p-8 md:p-12 text-center shadow-lg"
+        : "bg-ink-2 border border-ink-line rounded-sm p-8 md:p-12 text-center"
     } flex flex-col items-center space-y-4`}
   >
     <FiUsers
-      className={`text-4xl ${isPassedData ? "text-gray-500" : "text-gray-500/80 mb-3"}`}
+      className={`text-4xl ${isPassedData ? "text-dim" : "text-dim mb-3"}`}
     />
-    <h3 className="text-lg font-semibold text-gray-300">
+    <h3 className="font-display text-lg font-semibold text-paper">
       {isPassedData ? "No Coordinators Assigned" : "No Team Members Yet"}
     </h3>
-    <p className="text-gray-400/90 text-sm max-w-xs">
+    <p className="text-dim text-sm max-w-xs">
       {isPassedData
         ? "This event doesn't have any coordinators listed."
         : "Looks like the team roster is currently empty for this club."}
     </p>
     {!isPassedData && isAdmin && (
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-dim mt-1">
         Use the "+ Add Coordinator" button above to build the team!
       </p>
     )}
@@ -204,13 +192,13 @@ const CoordinatorList = ({
   const renderCoordinatorCard = (coord) => {
     const isSimpleLayout = cardLayout === "simple";
     const cardClasses = isSimpleLayout
-      ? "bg-gradient-to-br from-gray-800/60 to-gray-900/50 rounded-xl p-4 border border-gray-700/50 shadow-lg group relative flex items-center gap-4"
-      : "bg-gradient-to-br from-gray-800/70 via-gray-800/40 to-gray-900/70 rounded-2xl p-6 border border-gray-700/60 shadow-xl hover:shadow-cyan-500/15 backdrop-blur-lg group relative overflow-hidden hover:border-cyan-600/70 transition-all duration-300 ease-out flex flex-col";
+      ? "bg-ink-2 rounded-sm p-4 border border-ink-line group relative flex items-center gap-4"
+      : "bg-ink-2 rounded-sm p-6 border border-ink-line group relative overflow-hidden hover:border-beacon/60 transition-colors duration-300 ease-out flex flex-col";
     const imageSizeClass = isSimpleLayout ? "w-16 h-16" : "w-24 h-24";
     const imageWrapperSizeClass = isSimpleLayout ? "w-16 h-16" : "w-28 h-28";
     const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
       coord.name || "N A"
-    )}&background=${isSimpleLayout ? "2563eb" : "1d4ed8"}&color=fff&size=${
+    )}&background=1c232e&color=efe9dd&size=${
       isSimpleLayout ? "96" : "128"
     }&font-size=0.4&bold=true`;
     const imageUrl =
@@ -241,7 +229,7 @@ const CoordinatorList = ({
                     whileHover={{ scale: 1.15, rotate: 5 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => openModal("coordinator", "edit", coord)}
-                    className="p-1.5 bg-blue-600/80 hover:bg-blue-500/90 rounded-full text-white shadow-md hover:shadow-blue-500/40 transition backdrop-blur-sm"
+                    className="p-1.5 bg-ink border border-ink-line hover:bg-beacon hover:border-beacon hover:text-ink rounded-full text-paper transition-colors"
                     aria-label="Edit Coordinator"
                   >
                     <FiEdit size={13} />
@@ -257,12 +245,11 @@ const CoordinatorList = ({
                     onClick={() =>
                       handleDeleteCoordinator(coord.id, coord.name)
                     }
-                    className={`p-1.5 bg-red-600/80 hover:bg-red-500/90 rounded-full text-white shadow-md hover:shadow-red-500/40 transition ${
+                    className={`p-1.5 bg-ink border border-ink-line hover:bg-red-500 hover:border-red-500 hover:text-white rounded-full text-red-400 transition-colors ${
                       isDeleting === coord.id ? "cursor-not-allowed" : ""
                     }`}
                     aria-label="Delete Coordinator"
                     disabled={isDeleting === coord.id}
-                    style={{ backdropFilter: "blur(4px)" }}
                   >
                     {isDeleting === coord.id ? (
                       <FiLoader className="animate-spin" size={13} />
@@ -278,7 +265,7 @@ const CoordinatorList = ({
                 key={`deleting-${coord.id}`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="p-1.5 rounded-full bg-black/50 backdrop-blur-sm"
+                className="p-1.5 rounded-full bg-ink border border-ink-line"
               >
                 <FiLoader className="animate-spin text-red-400" size={14} />
               </motion.div>
@@ -291,7 +278,7 @@ const CoordinatorList = ({
             <img
               src={imageUrl}
               alt={coord.name || "Coordinator"}
-              className={`${imageSizeClass} rounded-full object-cover border-2 border-gray-600 flex-shrink-0`}
+              className={`${imageSizeClass} rounded-full object-cover border-2 border-ink-line flex-shrink-0`}
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = avatarUrl;
@@ -299,16 +286,16 @@ const CoordinatorList = ({
               loading="lazy"
             />
             <div className="flex-grow overflow-hidden">
-              <h3 className="text-base sm:text-lg font-semibold text-white mb-0.5 leading-tight truncate">
+              <h3 className="text-base sm:text-lg font-semibold text-paper mb-0.5 leading-tight truncate">
                 {coord.name || "Unnamed Coordinator"}
               </h3>
-              <span className="text-cyan-300 text-xs font-medium block truncate">
+              <span className="text-dim font-mono text-xs uppercase tracking-widest block truncate">
                 {coord.designation || "Team Member"}
               </span>
               {showContact && coord.contact && (
                 <a
                   href={`tel:${coord.contact}`}
-                  className="text-xs text-gray-400 hover:text-cyan-300 mt-1 flex items-center gap-1 truncate"
+                  className="text-xs text-dim hover:text-beacon mt-1 flex items-center gap-1 truncate"
                 >
                   <FiPhone size={11} /> {coord.contact}
                 </a>
@@ -320,11 +307,10 @@ const CoordinatorList = ({
             <div
               className={`relative mb-4 ${imageWrapperSizeClass} group-hover:scale-105 transition-transform duration-300 ease-out`}
             >
-              <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-cyan-400/60 via-blue-500/60 to-indigo-600/60 blur opacity-50 group-hover:opacity-70 group-hover:blur-md transition-all duration-400 animate-pulse-slow"></div>
               <img
                 src={imageUrl}
                 alt={coord.name || "Coordinator"}
-                className={`${imageSizeClass} rounded-full object-cover shadow-lg border-3 border-gray-600/50 group-hover:border-cyan-500/70 transition-colors duration-300 relative z-10`}
+                className={`${imageSizeClass} rounded-full object-cover border-2 border-ink-line group-hover:border-beacon/70 transition-colors duration-300 relative z-10`}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = avatarUrl;
@@ -332,16 +318,16 @@ const CoordinatorList = ({
                 loading="lazy"
               />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-1 tracking-tight leading-tight">
+            <h3 className="font-display text-lg font-semibold text-paper mb-1 tracking-tight leading-tight">
               {coord.name || "Unnamed Coordinator"}
             </h3>
-            <span className="inline-block px-3 py-0.5 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-indigo-500/10 rounded-full text-cyan-300 text-xs font-medium mb-3 border border-cyan-600/30">
+            <span className="inline-block px-3 py-0.5 rounded-full text-dim font-mono text-[10px] uppercase tracking-widest mb-3 border border-ink-line">
               {coord.designation || "Team Member"}
             </span>
             <div className="flex-grow"></div>
             {showContact && coord.contact && (
-              <p className="text-xs text-gray-300/80 mt-2 flex items-center justify-center group-hover:text-gray-200 transition-colors">
-                <FiPhone size={12} className="mr-1.5 text-cyan-400/80" />
+              <p className="text-xs text-dim mt-2 flex items-center justify-center group-hover:text-paper transition-colors">
+                <FiPhone size={12} className="mr-1.5 text-dim" />
                 <a href={`tel:${coord.contact}`} className="hover:underline">
                   {coord.contact}
                 </a>
@@ -350,7 +336,7 @@ const CoordinatorList = ({
             {showSocial &&
               Array.isArray(coord.social_media_links) &&
               coord.social_media_links.length > 0 && (
-                <div className="flex justify-center gap-3 mt-3 pt-3 border-t border-gray-700/40 w-full">
+                <div className="flex justify-center gap-3 mt-3 pt-3 border-t border-ink-line w-full">
                   {coord.social_media_links
                     .filter((link) => link?.trim())
                     .slice(0, 4)
@@ -388,10 +374,10 @@ const CoordinatorList = ({
       {showTitleSection && (
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 md:mb-12 gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-500 pb-1">
-              Meet the Team
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-paper pb-1">
+              Meet the <em className="italic text-beacon">team</em>
             </h2>
-            <p className="text-gray-400 mt-1 text-base">
+            <p className="text-dim mt-1 text-base">
               The driving force behind the club's success.
             </p>
           </div>
@@ -402,7 +388,7 @@ const CoordinatorList = ({
               onClick={() =>
                 openModal("coordinator", "create", { club_id: clubId })
               }
-              className="flex items-center px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-lg text-sm transition-all shadow-lg hover:shadow-cyan-500/30 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex items-center px-5 py-2.5 bg-beacon hover:bg-beacon-soft text-ink rounded-full text-sm transition-colors font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
               <FiPlus className="mr-2" size={18} /> Add Coordinator
@@ -440,7 +426,7 @@ const CoordinatorList = ({
                 <div className="flex justify-center mt-8">
                   <button
                     onClick={() => setShowAll((prev) => !prev)}
-                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-medium transition-all text-sm shadow-md hover:shadow-gray-500/20 focus:outline-none focus:ring-2 focus:ring-gray-500/50 focus:ring-offset-2 focus:ring-offset-gray-900"
+                    className="px-5 py-2 rounded-full border border-ink-line text-paper hover:border-beacon hover:text-beacon font-medium transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-beacon/50 focus:ring-offset-2 focus:ring-offset-ink"
                   >
                     {showAll ? "Show Less" : "Show More"}
                   </button>
@@ -457,17 +443,17 @@ const CoordinatorList = ({
       )}
 
       {isAdmin && confirmDeleteData && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 px-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", damping: 15, stiffness: 200 }}
-            className="bg-gray-800 rounded-xl p-6 w-full max-w-sm text-center shadow-xl border border-gray-700"
+            className="bg-ink-2 rounded-sm p-6 w-full max-w-sm text-center border border-ink-line"
           >
-            <p className="text-white text-lg mb-3">
-              Remove <span className="font-semibold text-cyan-300">{confirmDeleteData.name}</span>?
+            <p className="text-paper text-lg mb-3">
+              Remove <span className="font-semibold text-beacon">{confirmDeleteData.name}</span>?
             </p>
-            <p className="text-gray-400 text-sm mb-6">
+            <p className="text-dim text-sm mb-6">
               Are you sure? This action cannot be undone.
             </p>
             <div className="flex justify-center gap-4">
@@ -475,13 +461,13 @@ const CoordinatorList = ({
                 onClick={() =>
                   performDelete(confirmDeleteData.id, confirmDeleteData.name)
                 }
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-red-500/50"
+                className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full font-medium transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50"
               >
                 Confirm Delete
               </button>
               <button
                 onClick={() => setConfirmDeleteData(null)}
-                className="px-5 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-sm shadow-md focus:outline-none focus:ring-2 focus:ring-gray-500/50"
+                className="px-5 py-2 border border-ink-line text-dim hover:text-paper hover:border-dim rounded-full font-medium transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-beacon/40"
               >
                 Cancel
               </button>

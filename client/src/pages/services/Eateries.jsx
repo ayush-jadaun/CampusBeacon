@@ -159,10 +159,10 @@ const CollegeEateries = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-950 text-gray-200 p-4 sm:p-8">
+    <div className="min-h-screen bg-ink text-paper p-4 pt-24 sm:p-8 sm:pt-28">
       <div className="container mx-auto max-w-7xl">
-        {/* --- Header Section (Modified) --- */}
-        <div className="mb-8">
+        {/* --- Header Section --- */}
+        <div className="mb-10">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             {/* Title Area */}
             <motion.div
@@ -171,10 +171,13 @@ const CollegeEateries = () => {
               transition={{ delay: 0.1 }}
               className="text-center sm:text-left"
             >
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 flex items-center justify-center sm:justify-start">
-                <IoFastFoodOutline className="mr-3 h-8 w-8" /> Campus Eateries
+              <p className="font-mono text-[11px] tracking-[0.3em] text-beacon uppercase mb-2">
+                Chai stalls · Canteens · Late-night bites
+              </p>
+              <h1 className="font-display text-4xl sm:text-5xl font-semibold text-paper">
+                Campus <em className="italic text-beacon">Eateries</em>
               </h1>
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-dim mt-2">
                 Discover dining options at MNNIT
               </p>
             </motion.div>
@@ -187,16 +190,16 @@ const CollegeEateries = () => {
                   placeholder="Search name or location..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-gray-800/30 border border-purple-600/30 rounded-full py-2 px-4 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition w-full sm:w-64 text-sm backdrop-blur-sm"
+                  className="bg-ink-2 border border-ink-line rounded-full py-2 px-4 pl-10 text-paper placeholder-dim focus:outline-none focus:border-beacon transition-colors w-full sm:w-64 text-sm"
                 />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5 pointer-events-none" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dim h-5 w-5 pointer-events-none" />
               </div>
               {isAdmin && (
                 <motion.button
                   whileHover={{ scale: 1.05, y: -1 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={openAddForm}
-                  className="bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white py-2 px-5 rounded-full transition shadow-md hover:shadow-lg text-sm font-medium flex items-center"
+                  className="bg-beacon hover:bg-beacon-soft text-ink py-2 px-5 rounded-full transition-colors text-sm font-semibold flex items-center"
                 >
                   <Plus size={18} className="mr-1.5" /> Add New
                 </motion.button>
@@ -208,8 +211,8 @@ const CollegeEateries = () => {
         {/* --- Content Area --- */}
         {loading && (
           <div className="flex justify-center items-center py-20">
-            <Loader2 className="w-12 h-12 text-purple-400 animate-spin" />
-            <span className="ml-4 text-xl text-gray-400">
+            <Loader2 className="w-12 h-12 text-beacon animate-spin" />
+            <span className="ml-4 text-xl text-dim">
               Loading Eateries...
             </span>
           </div>
@@ -217,12 +220,12 @@ const CollegeEateries = () => {
 
         {error && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <AlertTriangle className="w-16 h-16 text-red-500 mb-4" />
+            <AlertTriangle className="w-16 h-16 text-red-400 mb-4" />
             <p className="text-xl text-red-400 mb-2">Failed to load eateries</p>
-            <p className="text-gray-500">{error}</p>
+            <p className="text-dim">{error}</p>
             <button
               onClick={() => dispatch(fetchEateries())}
-              className="mt-6 bg-purple-600 hover:bg-purple-700 text-white py-2 px-5 rounded-full transition text-sm font-medium"
+              className="mt-6 bg-beacon hover:bg-beacon-soft text-ink py-2 px-5 rounded-full transition-colors text-sm font-semibold"
             >
               Retry
             </button>
@@ -243,32 +246,26 @@ const CollegeEateries = () => {
                 key={eatery.id}
                 variants={item}
                 layoutId={`card-${eatery.id}`} // For potential future animated modal opening
-                className="bg-gradient-to-br from-gray-900/70 to-black/70 backdrop-blur-md rounded-xl overflow-hidden border border-purple-800/50 relative shadow-lg transition-all duration-300 hover:border-purple-600/80 hover:shadow-purple-500/10 group"
+                className="bg-ink-2 rounded-sm overflow-hidden border border-ink-line relative transition-colors duration-300 hover:border-beacon/60 group"
               >
                 {/* Admin Controls */}
                 {isAdmin && (
                   <div className="absolute top-2.5 right-2.5 z-20 flex space-x-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <motion.button
-                      whileHover={{
-                        scale: 1.1,
-                        backgroundColor: "rgba(99, 102, 241, 0.9)",
-                      }} // Indigo color
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleEdit(eatery)}
                       aria-label="Edit Eatery"
-                      className="bg-indigo-600/70 p-1.5 rounded-full text-white transition-colors"
+                      className="bg-ink/90 border border-ink-line p-1.5 rounded-full text-paper hover:bg-beacon hover:border-beacon hover:text-ink transition-colors"
                     >
                       <Edit size={14} />
                     </motion.button>
                     <motion.button
-                      whileHover={{
-                        scale: 1.1,
-                        backgroundColor: "rgba(239, 68, 68, 0.9)",
-                      }} // Red color
+                      whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={() => openDeleteModal(eatery)}
                       aria-label="Delete Eatery"
-                      className="bg-red-600/70 p-1.5 rounded-full text-white transition-colors"
+                      className="bg-ink/90 border border-ink-line p-1.5 rounded-full text-red-400 hover:bg-red-500 hover:border-red-500 hover:text-white transition-colors"
                     >
                       <Trash2 size={14} />
                     </motion.button>
@@ -288,23 +285,23 @@ const CollegeEateries = () => {
                       className="w-full h-full object-cover transition-transform duration-300 ease-in-out group-hover/image:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                      <IoFastFoodOutline className="text-gray-600 w-16 h-16 opacity-50" />
+                    <div className="w-full h-full bg-ink-3 flex items-center justify-center">
+                      <IoFastFoodOutline className="text-dim w-16 h-16 opacity-50" />
                     </div>
                   )}
                   {/* Rating Badge */}
-                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center border border-white/10">
-                    <Star className="w-4 h-4 text-yellow-400 mr-1.5" />
-                    <span className="text-white text-sm font-semibold">
+                  <div className="absolute top-3 left-3 bg-ink/85 px-2.5 py-1 rounded-full flex items-center border border-ink-line">
+                    <Star className="w-4 h-4 text-beacon fill-beacon mr-1.5" />
+                    <span className="text-paper font-mono text-sm">
                       {eatery.averageRating?.toFixed(1) ?? "N/A"}
                     </span>
                   </div>
                   {/* Open/Closed Badge */}
                   <div
-                    className={`absolute bottom-3 left-3 px-2.5 py-0.5 rounded-full text-xs font-medium border border-black/20 ${
+                    className={`absolute bottom-3 left-3 px-2.5 py-1 rounded-full font-mono text-[10px] uppercase tracking-widest ${
                       eatery.isOpen
-                        ? "bg-green-500/80 text-white"
-                        : "bg-red-600/80 text-white"
+                        ? "bg-paper text-ink"
+                        : "bg-ink/85 text-dim border border-ink-line"
                     }`}
                   >
                     {eatery.isOpen ? "Open Now" : "Closed"}
@@ -314,33 +311,33 @@ const CollegeEateries = () => {
                 {/* Content */}
                 <div className="p-4 sm:p-5 flex flex-col flex-grow">
                   <h2
-                    className="text-xl font-semibold text-white mb-2 line-clamp-1"
+                    className="font-display text-xl font-medium text-paper mb-2 line-clamp-1"
                     title={eatery.name}
                   >
                     {eatery.name}
                   </h2>
                   <div className="space-y-2 mb-4 text-sm flex-grow">
-                    <p className="text-gray-400 flex items-start">
+                    <p className="text-dim flex items-start">
                       <MapPin
                         size={15}
-                        className="mr-2 mt-0.5 text-purple-400 flex-shrink-0"
+                        className="mr-2 mt-0.5 text-dim flex-shrink-0"
                       />
                       <span className="line-clamp-1" title={eatery.location}>
                         {eatery.location}
                       </span>
                     </p>
-                    <p className="text-gray-400 flex items-center">
+                    <p className="text-dim flex items-center">
                       <Clock
                         size={15}
-                        className="mr-2 text-purple-400 flex-shrink-0"
+                        className="mr-2 text-dim flex-shrink-0"
                       />
                       {eatery.openingTime ?? "N/A"} -{" "}
                       {eatery.closingTime ?? "N/A"}
                     </p>
-                    <p className="text-gray-400 flex items-center">
+                    <p className="text-dim flex items-center">
                       <Phone
                         size={15}
-                        className="mr-2 text-purple-400 flex-shrink-0"
+                        className="mr-2 text-dim flex-shrink-0"
                       />
                       {eatery.phoneNumber ?? "N/A"}
                     </p>
@@ -350,7 +347,7 @@ const CollegeEateries = () => {
                       whileHover={{ scale: 1.03, y: -1 }}
                       whileTap={{ scale: 0.97 }}
                       onClick={() => openRatingModal(eatery.id)}
-                      className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-2 px-3 rounded-md transition shadow-sm text-sm font-medium"
+                      className="flex-1 bg-beacon hover:bg-beacon-soft text-ink py-2 px-3 rounded-full transition-colors text-sm font-semibold"
                     >
                       Rate
                     </motion.button>
@@ -359,7 +356,7 @@ const CollegeEateries = () => {
                         whileHover={{ scale: 1.03, y: -1 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => openMenuModal(eatery.menuImageUrl)}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white py-2 px-3 rounded-md transition shadow-sm text-sm font-medium"
+                        className="flex-1 border border-ink-line text-paper hover:bg-paper hover:border-paper hover:text-ink py-2 px-3 rounded-full transition-colors text-sm font-medium"
                       >
                         Menu
                       </motion.button>
@@ -376,10 +373,10 @@ const CollegeEateries = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-16 text-gray-500"
+            className="text-center py-16 text-dim"
           >
             <IoFastFoodOutline className="mx-auto h-16 w-16 opacity-50 mb-4" />
-            <p className="text-xl mb-2">
+            <p className="font-display text-xl text-paper mb-2">
               {eateries?.length > 0
                 ? "No eateries match your search."
                 : "No eateries found."}
@@ -387,7 +384,7 @@ const CollegeEateries = () => {
             {eateries?.length > 0 && searchTerm && (
               <button
                 onClick={() => setSearchTerm("")}
-                className="mt-2 text-purple-400 hover:text-purple-300 hover:underline text-sm"
+                className="link-sweep mt-2 font-mono text-sm tracking-wide text-beacon px-1 py-1"
               >
                 Clear search
               </button>
@@ -402,7 +399,7 @@ const CollegeEateries = () => {
                 whileHover={{ scale: 1.05, y: -1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={openAddForm}
-                className="mt-4 bg-gradient-to-r from-green-500 to-cyan-500 hover:from-green-600 hover:to-cyan-600 text-white py-2 px-5 rounded-full transition shadow-md hover:shadow-lg text-sm font-medium flex items-center mx-auto"
+                className="mt-4 bg-beacon hover:bg-beacon-soft text-ink py-2 px-5 rounded-full transition-colors text-sm font-semibold flex items-center mx-auto"
               >
                 <Plus size={18} className="mr-1.5" /> Add the First Eatery
               </motion.button>
@@ -419,16 +416,16 @@ const CollegeEateries = () => {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 p-4"
               onClick={() => setSelectedImage(null)}
             >
               <motion.div
                 variants={modalContent}
-                className="relative max-w-4xl w-full bg-gray-900/50 p-4 rounded-lg border border-purple-700/50"
+                className="relative max-w-4xl w-full bg-ink-2 p-4 rounded-sm border border-ink-line"
                 onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
               >
                 <motion.button
-                  className="absolute -top-3 -right-3 text-white bg-red-600/80 hover:bg-red-700 p-1.5 rounded-full transition-colors z-10"
+                  className="absolute -top-3 -right-3 text-paper bg-ink-3 border border-ink-line hover:bg-beacon hover:border-beacon hover:text-ink p-1.5 rounded-full transition-colors z-10"
                   onClick={() => setSelectedImage(null)}
                   aria-label="Close image viewer"
                   whileHover={{ scale: 1.1 }}
@@ -443,12 +440,12 @@ const CollegeEateries = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="overflow-hidden rounded-md"
+                      className="overflow-hidden rounded-sm"
                     >
                       <img
                         src={img}
                         alt={`Eatery view ${index + 1}`}
-                        className="w-full h-64 object-cover rounded-md shadow-lg hover:scale-105 transition-transform duration-200"
+                        className="w-full h-64 object-cover rounded-sm hover:scale-105 transition-transform duration-200"
                       />
                     </motion.div>
                   ))}
@@ -464,16 +461,16 @@ const CollegeEateries = () => {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 p-4"
               onClick={() => setSelectedMenu(null)}
             >
               <motion.div
                 variants={modalContent}
-                className="relative max-w-2xl w-full max-h-[90vh] overflow-hidden bg-gray-900/50 rounded-lg border border-purple-700/50"
+                className="relative max-w-2xl w-full max-h-[90vh] overflow-hidden bg-ink-2 rounded-sm border border-ink-line"
                 onClick={(e) => e.stopPropagation()}
               >
                 <motion.button
-                  className="absolute -top-3 -right-3 text-white bg-red-600/80 hover:bg-red-700 p-1.5 rounded-full transition-colors z-10"
+                  className="absolute -top-3 -right-3 text-paper bg-ink-3 border border-ink-line hover:bg-beacon hover:border-beacon hover:text-ink p-1.5 rounded-full transition-colors z-10"
                   onClick={() => setSelectedMenu(null)}
                   aria-label="Close menu viewer"
                   whileHover={{ scale: 1.1 }}
@@ -484,7 +481,7 @@ const CollegeEateries = () => {
                 <img
                   src={selectedMenu}
                   alt="Menu"
-                  className="w-full h-auto object-contain max-h-[85vh] rounded-lg"
+                  className="w-full h-auto object-contain max-h-[85vh] rounded-sm"
                 />
               </motion.div>
             </motion.div>
@@ -497,15 +494,15 @@ const CollegeEateries = () => {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 p-4"
               onClick={() => setRatingModal(null)} // Allow closing by clicking overlay
             >
               <motion.div
                 variants={modalContent}
-                className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl max-w-md w-full border border-amber-500/40 shadow-xl"
+                className="bg-ink-2 p-6 rounded-sm max-w-md w-full border border-ink-line"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-semibold text-white mb-4 text-center">
+                <h3 className="font-display text-xl font-semibold text-paper mb-4 text-center">
                   Rate {eateries?.find((e) => e.id === ratingModal)?.name ?? ""}
                 </h3>
                 <div className="flex justify-center mb-6">
@@ -520,7 +517,7 @@ const CollegeEateries = () => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleSubmitRating}
-                    className="flex-1 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white py-2.5 px-4 rounded-lg transition font-medium text-sm shadow-sm"
+                    className="flex-1 bg-beacon hover:bg-beacon-soft text-ink py-2.5 px-4 rounded-full transition-colors font-semibold text-sm"
                   >
                     Submit Rating
                   </motion.button>
@@ -531,7 +528,7 @@ const CollegeEateries = () => {
                       setRatingModal(null);
                       setCurrentRating(0);
                     }}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 py-2.5 px-4 rounded-lg transition font-medium text-sm shadow-sm"
+                    className="flex-1 border border-ink-line text-dim hover:text-paper hover:border-dim py-2.5 px-4 rounded-full transition-colors font-medium text-sm"
                   >
                     Cancel
                   </motion.button>
@@ -547,31 +544,31 @@ const CollegeEateries = () => {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 p-4"
               onClick={closeForm}
             >
               <motion.div
                 variants={modalContent}
-                className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl max-w-lg w-full border border-purple-600/40 shadow-xl max-h-[90vh] overflow-y-auto"
+                className="bg-ink-2 p-6 rounded-sm max-w-lg w-full border border-ink-line max-h-[90vh] overflow-y-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-semibold text-white mb-6 flex items-center">
+                <h3 className="font-display text-xl font-semibold text-paper mb-6 flex items-center">
                   {editingEatery ? (
                     <>
                       {" "}
-                      <Edit size={20} className="mr-2.5 text-indigo-400" /> Edit
+                      <Edit size={20} className="mr-2.5 text-beacon" /> Edit
                       Eatery{" "}
                     </>
                   ) : (
                     <>
                       {" "}
-                      <Plus size={20} className="mr-2.5 text-green-400" /> Add
+                      <Plus size={20} className="mr-2.5 text-beacon" /> Add
                       New Eatery{" "}
                     </>
                   )}
                   <button
                     onClick={closeForm}
-                    className="ml-auto text-gray-400 hover:text-white"
+                    className="ml-auto text-dim hover:text-paper"
                   >
                     <X size={20} />
                   </button>
@@ -592,21 +589,21 @@ const CollegeEateries = () => {
               initial="hidden"
               animate="show"
               exit="exit"
-              className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-ink/85 flex items-center justify-center z-50 p-4"
               onClick={() => setConfirmDelete(null)}
             >
               <motion.div
                 variants={modalContent}
-                className="bg-gradient-to-br from-gray-900 to-black p-6 rounded-xl max-w-md w-full border border-red-500/40 shadow-xl"
+                className="bg-ink-2 p-6 rounded-sm max-w-md w-full border border-red-500/40"
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+                <h3 className="font-display text-xl font-semibold text-paper mb-4 flex items-center">
                   <AlertTriangle size={20} className="mr-2.5 text-red-400" />{" "}
                   Confirm Deletion
                 </h3>
-                <p className="text-gray-300 mb-6 text-sm">
+                <p className="text-dim mb-6 text-sm">
                   Are you sure you want to delete{" "}
-                  <span className="font-medium text-white">
+                  <span className="font-medium text-paper">
                     {confirmDelete.name}
                   </span>
                   ?
@@ -618,7 +615,7 @@ const CollegeEateries = () => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={handleDeleteConfirm}
-                    className="flex-1 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white py-2.5 px-4 rounded-lg transition font-medium text-sm shadow-sm"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2.5 px-4 rounded-full transition-colors font-medium text-sm"
                   >
                     Delete Permanently
                   </motion.button>
@@ -626,7 +623,7 @@ const CollegeEateries = () => {
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => setConfirmDelete(null)}
-                    className="flex-1 bg-gray-700 hover:bg-gray-600 text-gray-200 py-2.5 px-4 rounded-lg transition font-medium text-sm shadow-sm"
+                    className="flex-1 border border-ink-line text-dim hover:text-paper hover:border-dim py-2.5 px-4 rounded-full transition-colors font-medium text-sm"
                   >
                     Cancel
                   </motion.button>

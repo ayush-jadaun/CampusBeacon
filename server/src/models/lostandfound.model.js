@@ -37,6 +37,11 @@ const LostAndFound = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    status: {
+      type: DataTypes.STRING(20),
+      allowNull: false,
+      defaultValue: "lost", // 'lost' (owner searching) or 'found' (finder reporting)
+    },
   },
   {
     timestamps: true,

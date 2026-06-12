@@ -208,16 +208,24 @@ const LoginSignup = () => {
         <>
           <div className="relative flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-600"></div>
+              <div className="w-full border-t border-ink-line"></div>
             </div>
             <div className="relative px-4 bg-transparent">
             </div>
           </div>
 
-          
+
         </>
       )}
     </div>
+  );
+
+  const Wordmark = ({ className = "" }) => (
+    <span
+      className={`font-display italic font-semibold text-paper ${className}`}
+    >
+      Campus<span className="text-beacon">Beacon</span>
+    </span>
   );
 
   const switchView = (newIsSignUp, newAuthMode = "default") => {
@@ -228,20 +236,16 @@ const LoginSignup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-purple-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-ink text-paper flex items-center justify-center p-4">
       <AnimatePresence mode="wait">
         {authMode === "default" ? (
           <motion.div
             key="default-auth"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.3 }}
-            className="relative w-full max-w-[900px] md:h-[620px] h-auto rounded-2xl overflow-hidden md:flex shadow-2xl my-8 md:my-0"
-            style={{
-              background: "rgba(0, 0, 0, 0.7)",
-              backdropFilter: "blur(10px)",
-            }}
+            className="relative w-full max-w-[900px] md:h-[620px] h-auto rounded-sm overflow-hidden md:flex bg-ink-2 border border-ink-line my-8 md:my-0"
           >
             {/* Sliding overlay panel for desktop */}
             <motion.div
@@ -249,29 +253,26 @@ const LoginSignup = () => {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute top-0 left-0 w-1/2 h-full z-10 hidden md:block"
               style={{
-                background: "rgba(139, 92, 246, 0.2)", // More transparent
-                backdropFilter: "blur(8px)",
-                boxShadow: "0 0 50px rgba(139, 92, 246, 0.3)",
-                borderRight: isSignUp
-                  ? "none"
-                  : "1px solid rgba(139, 92, 246, 0.3)",
-                borderLeft: isSignUp
-                  ? "1px solid rgba(139, 92, 246, 0.3)"
-                  : "none",
+                borderRight: isSignUp ? "none" : "1px solid #232b37",
+                borderLeft: isSignUp ? "1px solid #232b37" : "none",
               }}
             >
-              <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-purple-900/100 ">
-                <h2 className="text-4xl font-bold text-white mb-6">
-                  {isSignUp ? "Welcome Back!" : "New Here?"}
+              <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-ink-3">
+                <Wordmark className="text-3xl mb-2" />
+                <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-dim mb-8">
+                  MNNIT · campus network
+                </p>
+                <h2 className="font-display text-4xl font-semibold text-paper mb-6">
+                  {isSignUp ? "Welcome back" : "New here?"}
                 </h2>
-                <p className="text-white/80 mb-8 max-w-xs">
+                <p className="text-dim mb-8 max-w-xs">
                   {isSignUp
                     ? "Already have an account? Sign in to continue your journey."
                     : "Sign up and join our community today! It only takes a minute."}
                 </p>
                 <button
                   onClick={() => switchView(!isSignUp)}
-                  className="px-10 py-3 border-2 border-white text-white rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300"
+                  className="px-10 py-3 border border-ink-line text-paper rounded-full hover:bg-beacon hover:border-beacon hover:text-ink font-semibold transition-colors duration-300"
                   disabled={loading}
                 >
                   {isSignUp ? "Sign In" : "Sign Up"}
@@ -281,6 +282,9 @@ const LoginSignup = () => {
 
             {/* Mobile view with flipping animation */}
             <div className="md:hidden w-full p-6">
+              <div className="text-center mb-6">
+                <Wordmark className="text-2xl" />
+              </div>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={isSignUp ? "signUpMobile" : "signInMobile"}
@@ -301,14 +305,14 @@ const LoginSignup = () => {
                 >
                   {isSignUp ? (
                     <div className="w-full">
-                      <h2 className="text-3xl font-bold text-white mb-6 text-center">
-                        Create Account
+                      <h2 className="font-display text-3xl font-semibold text-paper mb-6 text-center">
+                        Create account
                       </h2>
                       <AuthForm type="signup" />
                       <div className="mt-6 text-center">
                         <button
                           onClick={() => switchView(false)}
-                          className="text-purple-400 hover:text-purple-300 transition-colors"
+                          className="text-dim hover:text-beacon transition-colors"
                           disabled={loading}
                         >
                           Already have an account? Sign In
@@ -317,21 +321,21 @@ const LoginSignup = () => {
                     </div>
                   ) : (
                     <div className="w-full">
-                      <h2 className="text-3xl font-bold text-white mb-6 text-center">
-                        Welcome Back!
+                      <h2 className="font-display text-3xl font-semibold text-paper mb-6 text-center">
+                        Welcome back
                       </h2>
                       <AuthForm type="login" />
                       <div className="mt-6 flex flex-col items-center space-y-3">
                         <button
                           onClick={() => switchView(false, "forgot")}
-                          className="text-purple-400 hover:text-purple-300 transition-colors"
+                          className="text-dim hover:text-beacon transition-colors"
                           disabled={loading}
                         >
                           Forgot Password?
                         </button>
                         <button
                           onClick={() => switchView(true)}
-                          className="text-purple-400 hover:text-purple-300 transition-colors"
+                          className="text-dim hover:text-beacon transition-colors"
                           disabled={loading}
                         >
                           New here? Create Account
@@ -353,8 +357,8 @@ const LoginSignup = () => {
                       : "opacity-0 z-0 pointer-events-none"
                   }`}
                 >
-                  <h2 className="text-3xl font-bold text-white mb-8 text-center">
-                    Create Account
+                  <h2 className="font-display text-3xl font-semibold text-paper mb-8 text-center">
+                    Create account
                   </h2>
                   <AuthForm type="signup" />
                 </div>
@@ -367,12 +371,12 @@ const LoginSignup = () => {
                       : "opacity-0 z-0 pointer-events-none"
                   }`}
                 >
-                  <h2 className="text-3xl font-bold text-white mb-2 text-center">
-                    Welcome Back!
+                  <h2 className="font-display text-3xl font-semibold text-paper mb-2 text-center">
+                    Welcome back
                   </h2>
                   <AuthForm type="login" />
                   <button
-                    className="mt-4 text-purple-400 hover:text-purple-300 w-full text-center transition-colors"
+                    className="mt-4 text-dim hover:text-beacon w-full text-center transition-colors"
                     onClick={() => switchView(false, "forgot")}
                     disabled={loading}
                   >
@@ -386,18 +390,21 @@ const LoginSignup = () => {
           // Forgot password view
           <motion.div
             key="forgot-password"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.3 }}
-            className="p-8 bg-black/70 backdrop-blur-md rounded-2xl shadow-2xl w-full max-w-md mx-auto border border-purple-500/30"
+            className="p-8 bg-ink-2 rounded-sm w-full max-w-md mx-auto border border-ink-line"
           >
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">
-              Reset Password
+            <div className="text-center mb-2">
+              <Wordmark className="text-2xl" />
+            </div>
+            <h2 className="font-display text-2xl font-semibold text-paper mb-6 text-center">
+              Reset password
             </h2>
             <AuthForm type="forgot" />
             <button
-              className="mt-6 text-purple-400 hover:text-purple-300 w-full text-center transition-colors"
+              className="mt-6 text-dim hover:text-beacon w-full text-center transition-colors"
               onClick={() => switchView(false, "default")}
               disabled={loading}
             >

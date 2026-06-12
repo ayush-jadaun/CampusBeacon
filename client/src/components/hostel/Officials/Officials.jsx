@@ -201,7 +201,7 @@ const Officials = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-red-500/50"
+        className="bg-ink-2 rounded-sm p-6 border border-red-500/40"
       >
         <p className="text-red-400">Error: {error}</p>
       </motion.div>
@@ -213,16 +213,16 @@ const Officials = ({ hostelId }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-purple-500/50"
+        className="bg-ink-2 rounded-sm p-6 border border-ink-line"
       >
         <div className="animate-pulse">
-          <div className="h-8 bg-purple-500/20 rounded w-1/3 mb-6"></div>
+          <div className="h-8 bg-ink-3 rounded-sm w-1/3 mb-6"></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 rounded-lg border bg-black/30">
-                <div className="h-6 bg-purple-500/20 rounded w-1/3 mb-2"></div>
-                <div className="h-4 bg-purple-500/20 rounded w-1/2"></div>
-                <div className="h-4 bg-purple-500/20 rounded w-1/3 mt-2"></div>
+              <div key={i} className="p-4 rounded-sm border border-ink-line bg-ink">
+                <div className="h-6 bg-ink-3 rounded-sm w-1/3 mb-2"></div>
+                <div className="h-4 bg-ink-3 rounded-sm w-1/2"></div>
+                <div className="h-4 bg-ink-3 rounded-sm w-1/3 mt-2"></div>
               </div>
             ))}
           </div>
@@ -235,16 +235,16 @@ const Officials = ({ hostelId }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-black/40 backdrop-blur-lg rounded-xl p-6 border border-purple-500/50"
+      className="bg-ink-2 rounded-sm p-6 border border-ink-line"
     >
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold text-white flex items-center">
-          <FaUsersGear className="mr-2" /> Hostel Officials
+        <h2 className="font-display text-2xl font-semibold text-paper flex items-center">
+          <FaUsersGear className="mr-2 text-beacon" /> Hostel Officials
         </h2>
         {hasPermission && (
           <button
             onClick={openCreateModal}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg flex items-center text-sm md:text-base"
+            className="bg-beacon hover:bg-beacon-soft text-ink font-semibold px-4 py-2 rounded-full flex items-center text-sm transition-colors"
           >
             <Plus className="w-4 h-4 mr-1" /> Add Official
           </button>
@@ -252,7 +252,7 @@ const Officials = ({ hostelId }) => {
       </div>
 
       {deleteError && (
-        <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/40 rounded-sm">
           <p className="text-red-400">{deleteError}</p>
         </div>
       )}
@@ -276,7 +276,7 @@ const Officials = ({ hostelId }) => {
           `}</style>
 
           {hostelOfficials.length === 0 ? (
-            <p className="text-center text-gray-400 py-4">No officials found</p>
+            <p className="text-center text-dim py-4">No officials found</p>
           ) : (
             hostelOfficials.map((official) => (
               <motion.div
@@ -284,28 +284,30 @@ const Officials = ({ hostelId }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2 }}
-                className="p-4 rounded-lg border bg-black/30 flex flex-col md:flex-row justify-between"
+                className="p-4 rounded-sm border border-ink-line bg-ink flex flex-col md:flex-row justify-between hover:border-beacon/50 transition-colors"
                 layout
               >
                 <div className="w-full md:w-3/4">
-                  <h3 className="text-xl font-semibold text-white">
+                  <h3 className="font-display text-xl font-semibold text-paper">
                     {official.name}
                   </h3>
-                  <p className="text-gray-300">{official.designation}</p>
+                  <p className="font-mono text-xs uppercase tracking-widest text-dim mt-0.5">
+                    {official.designation}
+                  </p>
                   <div className="flex flex-col sm:flex-row sm:items-center mt-2 sm:space-x-4 space-y-2 sm:space-y-0">
                     <a
                       href={`tel:${official.phone}`}
-                      className="flex items-center text-gray-400 hover:text-white truncate max-w-xs"
+                      className="flex items-center text-dim hover:text-beacon transition-colors truncate max-w-xs"
                     >
                       <Phone className="w-4 h-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">{official.phone}</span>
+                      <span className="truncate font-mono text-sm">{official.phone}</span>
                     </a>
                     <a
                       href={`mailto:${official.email}`}
-                      className="flex items-center text-gray-400 hover:text-white truncate max-w-xs"
+                      className="flex items-center text-dim hover:text-beacon transition-colors truncate max-w-xs"
                     >
                       <Mail className="w-4 h-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">{official.email}</span>
+                      <span className="truncate font-mono text-sm">{official.email}</span>
                     </a>
                   </div>
                 </div>
@@ -313,13 +315,13 @@ const Officials = ({ hostelId }) => {
                   <div className="flex items-center space-x-2 mt-3 md:mt-0 justify-end">
                     <button
                       onClick={() => openEditModal(official)}
-                      className="text-blue-500 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-500/10"
+                      className="text-dim hover:text-beacon transition-colors px-3 py-1.5 rounded-full hover:bg-ink-3"
                     >
                       <Edit className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => handleDeleteOfficial(official.official_id)}
-                      className="text-red-500 hover:text-red-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-red-500/10"
+                      className="text-dim hover:text-red-400 transition-colors px-3 py-1.5 rounded-full hover:bg-ink-3"
                     >
                       Delete
                     </button>
@@ -347,11 +349,11 @@ const Officials = ({ hostelId }) => {
               <motion.div
                 animate={{ y: [0, 5, 0] }}
                 transition={{ repeat: Infinity, duration: 1.5 }}
-                className="bg-purple-600/80 text-white p-2 rounded-full"
+                className="bg-beacon text-ink p-2 rounded-full"
               >
                 <ChevronDown className="w-5 h-5" />
               </motion.div>
-              <span className="text-xs text-gray-300 mt-1">
+              <span className="font-mono text-xs text-dim mt-1">
                 Scroll for more
               </span>
             </motion.div>
@@ -361,33 +363,33 @@ const Officials = ({ hostelId }) => {
 
       {/* Modal for Create/Edit Official */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-ink/80 flex items-center justify-center z-50 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-gray-900 border border-purple-500/50 rounded-lg p-6 w-full max-w-md relative"
+            className="bg-ink-2 border border-ink-line rounded-sm p-6 w-full max-w-md relative shadow-[0_10px_30px_rgba(0,0,0,0.45)]"
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              className="absolute top-4 right-4 text-dim hover:text-beacon transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-xl font-bold text-white mb-4">
+            <h3 className="font-display text-xl font-semibold text-paper mb-4">
               {modalMode === "create" ? "Add New Official" : "Edit Official"}
             </h3>
 
             <form onSubmit={handleSubmit}>
               {formErrors.form && (
-                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/40 rounded-sm">
                   <p className="text-red-400 text-sm">{formErrors.form}</p>
                 </div>
               )}
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-gray-300 mb-1 text-sm">
+                  <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
                     Name
                   </label>
                   <input
@@ -395,19 +397,19 @@ const Officials = ({ hostelId }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
-                    className={`w-full bg-black/40 text-white border ${
-                      formErrors.name ? "border-red-500" : "border-gray-700"
-                    } rounded-lg p-2.5 focus:outline-none focus:border-purple-500`}
+                    className={`w-full bg-ink text-paper border ${
+                      formErrors.name ? "border-red-500" : "border-ink-line"
+                    } rounded-sm p-2.5 focus:outline-none focus:border-beacon transition-colors`}
                   />
                   {formErrors.name && (
-                    <p className="text-red-500 text-xs mt-1">
+                    <p className="text-red-400 text-xs mt-1">
                       {formErrors.name}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-1 text-sm">
+                  <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
                     Designation
                   </label>
                   <input
@@ -415,21 +417,21 @@ const Officials = ({ hostelId }) => {
                     name="designation"
                     value={formData.designation}
                     onChange={handleInputChange}
-                    className={`w-full bg-black/40 text-white border ${
+                    className={`w-full bg-ink text-paper border ${
                       formErrors.designation
                         ? "border-red-500"
-                        : "border-gray-700"
-                    } rounded-lg p-2.5 focus:outline-none focus:border-purple-500`}
+                        : "border-ink-line"
+                    } rounded-sm p-2.5 focus:outline-none focus:border-beacon transition-colors`}
                   />
                   {formErrors.designation && (
-                    <p className="text-red-500 text-xs mt-1">
+                    <p className="text-red-400 text-xs mt-1">
                       {formErrors.designation}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-1 text-sm">
+                  <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
                     Phone
                   </label>
                   <input
@@ -437,19 +439,19 @@ const Officials = ({ hostelId }) => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    className={`w-full bg-black/40 text-white border ${
-                      formErrors.phone ? "border-red-500" : "border-gray-700"
-                    } rounded-lg p-2.5 focus:outline-none focus:border-purple-500`}
+                    className={`w-full bg-ink text-paper border ${
+                      formErrors.phone ? "border-red-500" : "border-ink-line"
+                    } rounded-sm p-2.5 focus:outline-none focus:border-beacon transition-colors`}
                   />
                   {formErrors.phone && (
-                    <p className="text-red-500 text-xs mt-1">
+                    <p className="text-red-400 text-xs mt-1">
                       {formErrors.phone}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-gray-300 mb-1 text-sm">
+                  <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-1.5">
                     Email
                   </label>
                   <input
@@ -457,12 +459,12 @@ const Officials = ({ hostelId }) => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className={`w-full bg-black/40 text-white border ${
-                      formErrors.email ? "border-red-500" : "border-gray-700"
-                    } rounded-lg p-2.5 focus:outline-none focus:border-purple-500`}
+                    className={`w-full bg-ink text-paper border ${
+                      formErrors.email ? "border-red-500" : "border-ink-line"
+                    } rounded-sm p-2.5 focus:outline-none focus:border-beacon transition-colors`}
                   />
                   {formErrors.email && (
-                    <p className="text-red-500 text-xs mt-1">
+                    <p className="text-red-400 text-xs mt-1">
                       {formErrors.email}
                     </p>
                   )}
@@ -472,13 +474,13 @@ const Officials = ({ hostelId }) => {
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800"
+                    className="px-4 py-2 border border-ink-line rounded-full text-dim hover:border-beacon hover:text-beacon transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white"
+                    className="px-5 py-2 bg-beacon hover:bg-beacon-soft rounded-full text-ink font-semibold transition-colors"
                   >
                     {modalMode === "create" ? "Add Official" : "Save Changes"}
                   </button>

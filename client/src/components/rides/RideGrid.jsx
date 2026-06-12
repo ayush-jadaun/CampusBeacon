@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { isRideActive } from "../../utils/dateUtils";
 import RideCard from "./RideCard";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { joinRide, unjoinRide } from "../../slices/ridesSlice";
 import { toast } from "react-hot-toast";
 
@@ -47,10 +47,10 @@ const RideGrid = ({ rides, currentUser, onEdit, onDelete }) => {
           key={ride.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`bg-black/40 backdrop-blur-lg rounded-xl overflow-hidden border-2 shadow-lg transform transition-all hover:scale-[1.02] hover:shadow-xl ${
+          className={`bg-ink-2 rounded-sm overflow-hidden border transition-colors duration-300 hover:border-beacon ${
             isRideActive(ride.departureDateTime)
-              ? "border-purple-500/50 shadow-purple-900/20"
-              : "border-gray-700/50"
+              ? "border-ink-line"
+              : "border-ink-line opacity-70"
           }`}
         >
           <RideCard

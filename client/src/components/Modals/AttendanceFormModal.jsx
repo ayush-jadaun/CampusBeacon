@@ -26,7 +26,7 @@ const customStyles = {
     width: "500px",
   },
   overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    backgroundColor: "rgba(14, 17, 22, 0.85)",
     zIndex: 50,
   },
 };
@@ -38,7 +38,6 @@ const AttendanceFormModal = ({
   onClose,
   mode = "create",
   initialData,
-  themeStyles = {},
 }) => {
   const dispatch = useDispatch();
   const { loading: attendanceLoading, error: attendanceError } = useSelector(
@@ -111,59 +110,57 @@ const AttendanceFormModal = ({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.2 }}
-        className={`${
-          themeStyles.modalBg || "bg-gray-900"
-        } rounded-lg shadow-xl border ${
-          themeStyles.borderColor || "border-gray-700"
-        } text-white p-6 relative overflow-hidden`}
+        className="bg-ink-2 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.45)] border border-ink-line text-paper p-6 relative overflow-hidden"
       >
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-amber-400 transition-colors"
+          className="absolute top-3 right-3 text-dim hover:text-beacon transition-colors"
           aria-label="Close modal"
         >
           <FiX size={24} />
         </button>
-        <h2
-          className={`text-2xl font-bold mb-4 ${
-            themeStyles.headingColor || "text-amber-400"
-          }`}
-        >
+        <h2 className="font-display text-2xl font-semibold mb-4 text-paper">
           {mode === "create" ? "Mark Attendance" : "Edit Attendance"}
         </h2>
-        <div className="mb-5 text-gray-300 bg-gray-800/50 p-3 rounded-md border border-gray-700/50">
-          <p>
-            <strong className="font-medium text-gray-100">Subject:</strong>{" "}
-            {initialData?.subjectName || "N/A"}
+        <div className="mb-5 bg-ink p-3 rounded-sm border border-ink-line">
+          <p className="text-dim text-sm">
+            <strong className="font-mono text-xs uppercase tracking-widest text-dim">
+              Subject:
+            </strong>{" "}
+            <span className="text-paper">
+              {initialData?.subjectName || "N/A"}
+            </span>
           </p>
-          <p>
-            <strong className="font-medium text-gray-100">Date:</strong>{" "}
-            {initialData?.date || "N/A"}
+          <p className="text-dim text-sm mt-1">
+            <strong className="font-mono text-xs uppercase tracking-widest text-dim">
+              Date:
+            </strong>{" "}
+            <span className="text-paper font-mono">
+              {initialData?.date || "N/A"}
+            </span>
           </p>
         </div>
         {attendanceError && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-red-900/30 border border-red-700 text-red-300 p-3 rounded-md mb-4 text-sm flex items-center"
+            className="bg-red-500/10 border border-red-500/40 text-red-400 p-3 rounded-sm mb-4 text-sm flex items-center"
           >
             <FiAlertCircle className="mr-2 flex-shrink-0" /> {attendanceError}
           </motion.div>
         )}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-2">
               Status <span className="text-red-400">*</span>
             </label>
             <div className="flex items-center space-x-4">
               <label
                 htmlFor="present"
-                className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all duration-200 flex-1 ${
+                className={`flex items-center p-3 rounded-sm border cursor-pointer transition-all duration-200 flex-1 ${
                   status === "Present"
-                    ? "bg-green-800/50 border-green-500 text-white"
-                    : `${
-                        themeStyles.cardBg || "bg-gray-800/30"
-                      } border-gray-700 text-gray-400 hover:border-green-700`
+                    ? "bg-green-500/10 border-green-500 text-green-400"
+                    : "bg-ink border-ink-line text-dim hover:border-green-500/50"
                 }`}
               >
                 <input
@@ -179,12 +176,10 @@ const AttendanceFormModal = ({
               </label>
               <label
                 htmlFor="absent"
-                className={`flex items-center p-3 rounded-lg border cursor-pointer transition-all duration-200 flex-1 ${
+                className={`flex items-center p-3 rounded-sm border cursor-pointer transition-all duration-200 flex-1 ${
                   status === "Absent"
-                    ? "bg-red-800/50 border-red-500 text-white"
-                    : `${
-                        themeStyles.cardBg || "bg-gray-800/30"
-                      } border-gray-700 text-gray-400 hover:border-red-700`
+                    ? "bg-red-500/10 border-red-500 text-red-400"
+                    : "bg-ink border-ink-line text-dim hover:border-red-500/50"
                 }`}
               >
                 <input
@@ -204,13 +199,10 @@ const AttendanceFormModal = ({
             <button
               type="submit"
               disabled={attendanceLoading}
-              className={`px-6 py-2 rounded-lg font-semibold shadow-lg text-white flex items-center justify-center transition-all duration-300 ${
+              className={`px-7 py-2.5 rounded-full font-semibold flex items-center justify-center transition-colors duration-300 ${
                 attendanceLoading
-                  ? "bg-gray-500 cursor-not-allowed"
-                  : `bg-gradient-to-r ${
-                      themeStyles.buttonGradient ||
-                      "from-amber-500 to-orange-600"
-                    } hover:brightness-110`
+                  ? "bg-ink-3 text-dim cursor-not-allowed"
+                  : "bg-beacon text-ink hover:bg-beacon-soft"
               }`}
             >
               {attendanceLoading ? (

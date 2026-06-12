@@ -34,14 +34,14 @@ const customStyles = {
     flexDirection: 'column',
   },
   overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.75)",
+    backgroundColor: "rgba(14, 17, 22, 0.85)",
     zIndex: 50,
   },
 };
 
 Modal.setAppElement("#root");
 
-const EnrollmentModal = ({ isOpen, onClose, themeStyles = {} }) => {
+const EnrollmentModal = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const {
@@ -148,44 +148,44 @@ const EnrollmentModal = ({ isOpen, onClose, themeStyles = {} }) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.2 }}
-        className={`${themeStyles.modalBg || "bg-gray-900"} rounded-lg shadow-xl border ${themeStyles.borderColor || "border-gray-700"} text-white p-6 relative overflow-hidden flex flex-col flex-grow`}
+        className="bg-ink-2 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.45)] border border-ink-line text-paper p-6 relative overflow-hidden flex flex-col flex-grow"
       >
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-amber-400 transition-colors z-10"
+          className="absolute top-3 right-3 text-dim hover:text-beacon transition-colors z-10"
           aria-label="Close modal"
         >
           <FiX size={24} />
         </button>
 
-        <h2 className={`text-2xl font-bold mb-4 ${themeStyles.headingColor || "text-amber-400"}`}>
+        <h2 className="font-display text-2xl font-semibold mb-4 text-paper">
           Enroll in Subjects
         </h2>
 
          <div className="relative mb-4">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dim"/>
             <input
               type="text"
               placeholder="Search subjects by name or code..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 rounded-lg bg-gray-700/50 border ${themeStyles.borderColor || 'border-gray-700/50'} focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors text-white placeholder-gray-400`}
+              className="w-full pl-10 pr-4 py-2 rounded-sm bg-ink border border-ink-line focus:border-beacon focus:outline-none transition-colors text-paper placeholder:text-dim"
             />
          </div>
 
         {subjectsError && (
           <motion.div
              initial={{ opacity: 0 }} animate={{ opacity: 1}}
-             className="bg-red-900/30 border border-red-700 text-red-300 p-3 rounded-md mb-4 text-sm flex items-center"
+             className="bg-red-500/10 border border-red-500/40 text-red-400 p-3 rounded-sm mb-4 text-sm flex items-center"
            >
               <FiAlertCircle className="mr-2 flex-shrink-0"/> Error fetching subjects: {subjectsError}
-              <button onClick={() => dispatch(fetchSubjects())} className="ml-auto text-xs underline hover:text-white">Retry</button>
+              <button onClick={() => dispatch(fetchSubjects())} className="ml-auto text-xs underline hover:text-paper">Retry</button>
           </motion.div>
         )}
          {enrollError && (
           <motion.div
              initial={{ opacity: 0 }} animate={{ opacity: 1}}
-             className="bg-red-900/30 border border-red-700 text-red-300 p-3 rounded-md mb-4 text-sm flex items-center"
+             className="bg-red-500/10 border border-red-500/40 text-red-400 p-3 rounded-sm mb-4 text-sm flex items-center"
            >
               <FiAlertCircle className="mr-2 flex-shrink-0"/> Enrollment Error: {enrollError}
           </motion.div>
@@ -194,11 +194,11 @@ const EnrollmentModal = ({ isOpen, onClose, themeStyles = {} }) => {
         <div className="flex-grow overflow-y-auto mb-4 pr-2 space-y-2 min-h-[200px]">
            {subjectsLoading && !filteredSubjects.length && (
                  <div className="flex justify-center items-center h-full">
-                    <FiLoader className="animate-spin text-amber-400 text-3xl" />
+                    <FiLoader className="animate-spin text-beacon text-3xl" />
                  </div>
            )}
            {!subjectsLoading && !filteredSubjects.length && !subjectsError && (
-                 <p className="text-center text-gray-500 italic pt-10">No subjects found{searchTerm ? ' matching your search' : ''}.</p>
+                 <p className="text-center text-dim italic pt-10">No subjects found{searchTerm ? ' matching your search' : ''}.</p>
            )}
 
            {filteredSubjects.map((subject) => {
@@ -208,25 +208,25 @@ const EnrollmentModal = ({ isOpen, onClose, themeStyles = {} }) => {
                  <div
                     key={subject.id}
                     onClick={() => !isAlreadyEnrolled && handleSubjectToggle(subject.id)}
-                    className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
+                    className={`flex items-center justify-between p-3 rounded-sm border transition-all duration-200 ${
                         isAlreadyEnrolled
-                        ? 'bg-gray-700/30 border-gray-600 opacity-60 cursor-not-allowed'
+                        ? 'bg-ink border-ink-line opacity-60 cursor-not-allowed'
                         : isSelected
-                        ? 'bg-amber-800/30 border-amber-600'
-                        : `${themeStyles.cardBg || 'bg-gray-800/40'} ${themeStyles.borderColor || 'border-gray-700/50'} ${themeStyles.listHoverBg || 'hover:bg-gray-700/50'} cursor-pointer`
+                        ? 'bg-beacon/10 border-beacon'
+                        : 'bg-ink border-ink-line hover:border-beacon/60 cursor-pointer'
                     }`}
                  >
                     <div className="flex items-center">
                         {isAlreadyEnrolled ? (
                              <FiCheckSquare className="mr-3 text-green-500 text-xl flex-shrink-0" title="Already Enrolled"/>
                         ) : isSelected ? (
-                            <FiCheckSquare className="mr-3 text-amber-400 text-xl flex-shrink-0"/>
+                            <FiCheckSquare className="mr-3 text-beacon text-xl flex-shrink-0"/>
                         ) : (
-                             <FiSquare className="mr-3 text-gray-500 text-xl flex-shrink-0"/>
+                             <FiSquare className="mr-3 text-dim text-xl flex-shrink-0"/>
                         )}
                         <div>
-                            <p className={`font-medium ${isAlreadyEnrolled ? 'text-gray-400' : 'text-gray-100'}`}>{subject.name}</p>
-                            <p className="text-xs text-gray-400">{subject.code} {isAlreadyEnrolled ? '(Already Enrolled)' : ''}</p>
+                            <p className={`font-medium ${isAlreadyEnrolled ? 'text-dim' : 'text-paper'}`}>{subject.name}</p>
+                            <p className="font-mono text-xs text-dim">{subject.code} {isAlreadyEnrolled ? '(Already Enrolled)' : ''}</p>
                         </div>
                     </div>
                  </div>
@@ -235,17 +235,15 @@ const EnrollmentModal = ({ isOpen, onClose, themeStyles = {} }) => {
 
         </div>
 
-        <div className="flex justify-end pt-2 border-t border-gray-700/50 mt-auto">
+        <div className="flex justify-end pt-2 border-t border-ink-line mt-auto">
           <button
             type="button"
             onClick={handleEnroll}
             disabled={enrollLoading || subjectsLoading || selectedSubjectIds.size === 0}
-            className={`px-6 py-2 rounded-lg font-semibold shadow-lg text-white flex items-center justify-center transition-all duration-300 ${
+            className={`px-7 py-2.5 rounded-full font-semibold flex items-center justify-center transition-colors duration-300 ${
               enrollLoading || subjectsLoading || selectedSubjectIds.size === 0
-                ? "bg-gray-500 cursor-not-allowed opacity-70"
-                : `bg-gradient-to-r ${
-                    themeStyles.buttonGradient || "from-amber-500 to-orange-600"
-                  } hover:brightness-110`
+                ? "bg-ink-3 text-dim cursor-not-allowed"
+                : "bg-beacon text-ink hover:bg-beacon-soft"
             }`}
           >
             {enrollLoading ? (

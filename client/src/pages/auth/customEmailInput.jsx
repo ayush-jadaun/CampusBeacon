@@ -78,22 +78,19 @@ const CustomEmailInput = ({
       <input type="hidden" name={name} value={fullEmailValue} />
       <label
         htmlFor={inputId}
-        className="block text-sm font-medium text-purple-700 mb-2"
+        className="block font-mono text-xs uppercase tracking-widest text-dim mb-2"
       >
-        {label} {required && <span className="text-red-500">*</span>}
+        {label} {required && <span className="text-beacon">*</span>}
       </label>
       <div
         onClick={handleContainerClick}
-        className={`flex items-center w-full overflow-hidden bg-white/5 rounded-lg text-white shadow-sm transition-all duration-150 ease-in-out ${
+        className={`flex items-center w-full overflow-hidden bg-ink rounded-sm text-paper border transition-colors duration-150 ease-in-out ${
           isFocused
-            ? "ring-2 ring-purple-500 border-purple-500"
+            ? "border-beacon"
             : error
-            ? "border-red-500 ring-1 ring-red-500"
-            : "border border-white/20 hover:border-white/30"
+            ? "border-red-400"
+            : "border-ink-line hover:border-dim/50"
         }`}
-        style={{
-          borderColor: isFocused ? "#a855f7" : error ? "#ef4444" : undefined,
-        }}
       >
         <div className="relative flex-grow">
           <input
@@ -105,9 +102,7 @@ const CustomEmailInput = ({
             onFocus={() => setIsFocused(true)}
             onBlur={handleBlur}
             placeholder="name.registration_number"
-            className={`w-full p-3 md:p-4 bg-transparent focus:outline-none text-white placeholder-gray-400 ${
-              username ? "text-white" : "text-gray-400"
-            }`}
+            className="w-full p-3 md:p-4 bg-transparent focus:outline-none text-paper placeholder-dim"
             required={required}
             autoComplete={autoComplete}
             aria-label={`${label} Username`}
@@ -117,7 +112,7 @@ const CustomEmailInput = ({
           {username && (
             <button
               type="button"
-              className="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-white focus:outline-none focus:ring-1 focus:ring-purple-400 rounded-full p-0.5"
+              className="absolute inset-y-0 right-2 flex items-center text-dim hover:text-paper focus:outline-none focus:ring-1 focus:ring-beacon rounded-full p-0.5"
               onClick={handleClearClick}
               aria-label="Clear username input"
             >
@@ -137,13 +132,13 @@ const CustomEmailInput = ({
             </button>
           )}
         </div>
-        <div className="py-3 px-3 md:px-4 bg-white/10 text-gray-300 whitespace-nowrap font-mono text-sm md:text-base flex-shrink-0">
+        <div className="py-3 px-3 md:px-4 bg-ink-3 text-dim whitespace-nowrap font-mono text-sm md:text-base flex-shrink-0 border-l border-ink-line">
           {domain}
         </div>
       </div>
       <div className="min-h-[1.25rem] mt-1">
         {error && (
-          <p id={errorId} className="text-sm text-red-500" role="alert">
+          <p id={errorId} className="text-sm text-red-400" role="alert">
             {error}
           </p>
         )}
@@ -152,7 +147,7 @@ const CustomEmailInput = ({
         <div className="flex-shrink-0 mt-0.5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4 text-purple-400"
+            className="h-4 w-4 text-beacon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -166,22 +161,22 @@ const CustomEmailInput = ({
             />
           </svg>
         </div>
-        <p id={hintId} className="ml-2 text-xs md:text-sm text-gray-400">
+        <p id={hintId} className="ml-2 text-xs md:text-sm text-dim">
           Enter only your username (e.g.,{" "}
-          <span className="font-medium text-purple-400">john.2022ca045</span>).
-          The domain <span className="font-mono text-purple-400">{domain}</span>{" "}
+          <span className="font-medium text-paper">john.2022ca045</span>).
+          The domain <span className="font-mono text-paper">{domain}</span>{" "}
           will be appended automatically.
         </p>
       </div>
 
       {/* Email preview with fixed height to prevent layout shifts */}
       <div className="mt-3 h-[42px] transition-opacity duration-200">
-          <div className="p-2 bg-purple-900/20 border border-purple-500/30 rounded text-sm text-purple-300 font-mono break-all">
-            <span className="font-normal text-gray-400">Email preview: </span>
+          <div className="p-2 bg-ink border border-ink-line rounded-sm text-sm text-paper font-mono break-all">
+            <span className="font-normal text-dim">Email preview: </span>
             {username}
-            <span className="text-purple-400">{domain}</span>
+            <span className="text-beacon">{domain}</span>
           </div>
-        
+
       </div>
     </div>
   );

@@ -23,12 +23,12 @@ const DailyRecordsList = ({
 
   return (
     <div
-      className={`${themeStyles.cardBg} rounded-xl p-5 md:p-6 border ${themeStyles.borderColor} min-h-[300px] flex flex-col`}
+      className={`${themeStyles.cardBg} rounded-sm p-5 md:p-6 border ${themeStyles.borderColor} min-h-[300px] flex flex-col`}
     >
       <h3
-        className={`text-lg font-semibold mb-4 ${themeStyles.headingColor} flex items-center`}
+        className={`font-display text-lg font-semibold mb-4 ${themeStyles.headingColor} flex items-center`}
       >
-        <FiList className="mr-2" /> Records for{" "}
+        <FiList className="mr-2 text-beacon" /> Records for{" "}
         {selectedDate
           ? format(selectedDate, "eee, dd MMM yyyy")
           : "Selected Date"}

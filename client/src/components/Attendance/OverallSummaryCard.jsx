@@ -17,12 +17,12 @@ const OverallSummaryCard = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className={`${themeStyles.cardBg} rounded-xl p-5 md:p-6 mb-8 border ${themeStyles.borderColor}`}
+            className={`${themeStyles.cardBg} rounded-sm p-5 md:p-6 mb-8 border ${themeStyles.borderColor}`}
         >
             <h2
-                className={`text-xl font-semibold mb-4 ${themeStyles.headingColor} flex items-center`}
+                className={`font-display text-xl font-semibold mb-4 ${themeStyles.headingColor} flex items-center`}
             >
-                <FiPieChart className="mr-2" /> Overall Summary
+                <FiPieChart className="mr-2 text-beacon" /> Overall Summary
             </h2>
             {errorOverall && (
                 <ErrorDisplay
@@ -44,23 +44,23 @@ const OverallSummaryCard = ({
                             />
                         </Suspense>
                         <div className="text-sm mt-4 sm:mt-0 space-y-1 text-center sm:text-left">
-                            <p className="text-gray-300">
+                            <p className="text-dim">
                                 Across currently enrolled subjects:{" "}
                             </p>
-                            <p>
+                            <p className="text-dim">
                                 <strong className="text-green-400 font-semibold">
                                     {overallPercentageData.presentDays}
                                 </strong>{" "}
                                 Present
                             </p>
-                            <p>
+                            <p className="text-dim">
                                 <strong className="text-red-400 font-semibold">
                                     {overallPercentageData.absentDays}
                                 </strong>{" "}
                                 Absent
                             </p>
-                            <p>
-                                <strong className="text-gray-200 font-semibold">
+                            <p className="text-dim">
+                                <strong className="text-paper font-semibold">
                                     {overallPercentageData.totalDays}
                                 </strong>{" "}
                                 Total Marked
@@ -69,7 +69,7 @@ const OverallSummaryCard = ({
                     </div>
                 ) : (
                     !errorOverall && (
-                        <p className="text-sm text-gray-500 italic text-center py-4">
+                        <p className="text-sm text-dim italic text-center py-4">
                             No overall attendance data available yet.
                         </p>
                     )

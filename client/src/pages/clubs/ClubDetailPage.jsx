@@ -39,7 +39,7 @@ const EventFormModal = lazy(() =>
 // --- LoadingSpinner Component ---
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-64">
-    <FiLoader className="animate-spin text-amber-400 text-4xl" />
+    <FiLoader className="animate-spin text-beacon text-4xl" />
   </div>
 );
 
@@ -158,14 +158,14 @@ const ClubDetailPage = () => {
 
   // --- Theme Styles (Passed down) ---
   const themeStyles = {
-    cardBg: "bg-gray-800/30",
-    borderColor: "border-gray-700",
-    headingColor: "text-amber-400",
-    buttonGradient: "from-amber-500 to-orange-600",
-    modalBg: "bg-gray-900",
-    eventCardBg: "bg-gray-900/50",
-    eventTagBg: "bg-amber-500/20",
-    eventTagText: "text-amber-400",
+    cardBg: "bg-ink-2",
+    borderColor: "border-ink-line",
+    headingColor: "text-paper",
+    buttonGradient: "from-beacon to-beacon",
+    modalBg: "bg-ink-2",
+    eventCardBg: "bg-ink",
+    eventTagBg: "bg-beacon/15",
+    eventTagText: "text-beacon",
   };
 
   // --- RENDER LOGIC --- (Corrected Order and Conditions)
@@ -176,7 +176,7 @@ const ClubDetailPage = () => {
     return (
       // Apply slight opacity during background updates
       <div
-        className={`min-h-screen bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-white pb-12 ${
+        className={`min-h-screen bg-ink text-paper pb-12 pt-16 ${
           clubLoading
             ? "opacity-80 transition-opacity duration-300"
             : "opacity-100"
@@ -184,16 +184,16 @@ const ClubDetailPage = () => {
       >
         {/* Optional: Small loading indicator for background updates */}
         {clubLoading && (
-          <div className="fixed top-5 right-5 z-[60] p-2 bg-gray-900/80 rounded-full shadow-lg animate-pulse">
-            <FiLoader className="text-amber-400 text-lg animate-spin" />
+          <div className="fixed top-5 right-5 z-[60] p-2 bg-ink-2 border border-ink-line rounded-full animate-pulse">
+            <FiLoader className="text-beacon text-lg animate-spin" />
           </div>
         )}
 
         {/* --- Header: Back Navigation & Admin Delete Action --- */}
-        <div className="container mx-auto px-4 pt-6 pb-4 flex justify-between items-center sticky top-0 z-20 bg-gradient-to-b from-[#0B1026] via-[#0c112a] to-transparent backdrop-blur-sm mb-6">
+        <div className="container mx-auto px-4 pt-6 pb-4 flex justify-between items-center sticky top-16 z-20 bg-ink/95 border-b border-ink-line mb-6">
           <button
             onClick={() => navigate("/clubs")}
-            className="flex items-center text-blue-400 hover:text-amber-400 transition-colors duration-300 group"
+            className="flex items-center font-mono text-sm tracking-wide text-dim hover:text-beacon transition-colors duration-300 group"
           >
             <FiArrowLeft className="mr-2 transition-transform duration-300 group-hover:-translate-x-1" />{" "}
             Back to Clubs
@@ -204,7 +204,7 @@ const ClubDetailPage = () => {
               {showDeleteConfirm ? (
                 <button
                   onClick={handleDeleteClub}
-                  className="px-3 py-2 bg-gradient-to-r from-red-500 to-red-700 text-white rounded-lg font-medium text-sm shadow-md hover:brightness-110 transition-all duration-300 flex items-center animate-pulse"
+                  className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full font-medium text-sm transition-colors duration-300 flex items-center animate-pulse"
                 >
                   {" "}
                   <FiTrash2 className="mr-1" /> Confirm Delete{" "}
@@ -212,7 +212,7 @@ const ClubDetailPage = () => {
               ) : (
                 <button
                   onClick={handleDeleteClub}
-                  className="px-3 py-2 bg-gray-800/30 hover:bg-red-900/50 text-red-400 hover:text-white rounded-lg font-medium text-sm shadow-md transition-all duration-300 flex items-center border border-gray-700 hover:border-red-700"
+                  className="px-3 py-2 bg-ink-2 text-red-400 hover:text-white hover:bg-red-500 rounded-full font-medium text-sm transition-colors duration-300 flex items-center border border-ink-line hover:border-red-500"
                   title={`Delete ${currentClub.name}`}
                 >
                   {" "}
@@ -247,7 +247,7 @@ const ClubDetailPage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className={`${themeStyles.cardBg} rounded-xl p-6 border ${themeStyles.borderColor}`}
+              className={`${themeStyles.cardBg} rounded-sm p-6 border ${themeStyles.borderColor}`}
             >
               <Suspense fallback={<LoadingSpinner />}>
                 <CoordinatorList
@@ -260,13 +260,13 @@ const ClubDetailPage = () => {
               </Suspense>
             </motion.div>
             {/* Separator */}
-            <hr className="border-t border-gray-700/50 my-8 md:my-12" />
+            <hr className="border-t border-ink-line my-8 md:my-12" />
             {/* Event List Section */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className={`${themeStyles.cardBg} rounded-xl p-6 border ${themeStyles.borderColor}`}
+              className={`${themeStyles.cardBg} rounded-sm p-6 border ${themeStyles.borderColor}`}
             >
               <Suspense fallback={<LoadingSpinner />}>
                 <EventList
@@ -321,9 +321,9 @@ const ClubDetailPage = () => {
   // Condition 2: If data isn't available yet AND we ARE loading (Initial Load)
   if (clubLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35]">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-ink">
         <LoadingSpinner />
-        <p className="text-lg text-gray-300 mt-4">Loading Club Details...</p>
+        <p className="text-lg text-dim mt-4">Loading Club Details...</p>
       </div>
     );
   }
@@ -331,23 +331,23 @@ const ClubDetailPage = () => {
   // Condition 3: If data isn't available AND we are NOT loading (Error or Not Found)
   // This will be the final return if the above conditions are false.
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0B1026] to-[#1A1B35] text-center p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-ink text-center p-6">
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800/60 p-8 rounded-xl shadow-2xl border border-red-700/50 max-w-lg"
+        className="bg-ink-2 p-8 rounded-sm border border-red-500/40 max-w-lg"
       >
         <FiAlertTriangle className="text-red-400 text-5xl mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-red-400 mb-3">
+        <h2 className="font-display text-2xl font-semibold text-red-400 mb-3">
           {clubError ? "Error Loading Club" : "Club Not Found"}
         </h2>
-        <p className="text-gray-300 mb-6">
+        <p className="text-dim mb-6">
           {clubError ||
             `Could not find details for the requested club (ID: ${clubId}). It might have been deleted or the link is incorrect.`}
         </p>
         <button
           onClick={() => navigate("/clubs")}
-          className="px-6 py-2 mr-2 bg-gray-600 text-white rounded-lg font-semibold shadow-lg hover:bg-gray-500 transition-all duration-300"
+          className="px-6 py-2 mr-2 border border-ink-line text-paper rounded-full font-semibold hover:border-dim transition-colors duration-300"
         >
           {" "}
           Back to Clubs List{" "}
@@ -358,7 +358,7 @@ const ClubDetailPage = () => {
               dispatch(clearClubError());
               dispatch(fetchClubById(clubId));
             }}
-            className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl hover:brightness-110 transition-all duration-300"
+            className="px-6 py-2 bg-beacon hover:bg-beacon-soft text-ink rounded-full font-semibold transition-colors duration-300"
           >
             {" "}
             Retry{" "}

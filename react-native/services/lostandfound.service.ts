@@ -1,5 +1,7 @@
 import api, { ApiResponse, LocalImage, toFormData } from '@/services/api';
 
+export type LostAndFoundStatus = 'lost' | 'found';
+
 export interface LostAndFoundItem {
   id: number;
   item_name: string;
@@ -9,6 +11,7 @@ export interface LostAndFoundItem {
   owner_contact: string | null;
   image_url: string | null;
   userId: number;
+  status: LostAndFoundStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,13 +22,20 @@ export interface CreateLostAndFoundData {
   location_found?: string;
   date_found?: string;
   owner_contact?: string;
+  status?: LostAndFoundStatus;
+}
+
+export interface LostAndFoundFilters {
+  status?: LostAndFoundStatus;
 }
 
 const lostAndFoundService = {
   // Get all items
-  async getAll(): Promise<ApiResponse<LostAndFoundItem[]>> {
+  async getAll(filters?: LostAndFoundFilters): Promise<ApiResponse<LostAndFoundItem[]>> {
     try {
-      const response = await api.get('/lost-and-found/lost-items');
+      const params: Record<string, string> = {};
+      if (filters?.status) params.status = filters.status;
+      const response = await api.get('/lost-and-found/lost-items', { params });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch items');

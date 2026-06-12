@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
 import { LocalImage } from '@/services/api';
-import { CreateLostAndFoundData } from '@/services/lostandfound.service';
+import { CreateLostAndFoundData, LostAndFoundStatus } from '@/services/lostandfound.service';
 import { useAppDispatch } from '@/store/hooks';
 import { createLostFoundItem } from '@/store/slices/lostFoundSlice';
 
@@ -29,6 +29,7 @@ interface ReportItemModalProps {
 export default function ReportItemModal({ visible, onClose }: ReportItemModalProps) {
   const dispatch = useAppDispatch();
   const [itemName, setItemName] = useState('');
+  const [status, setStatus] = useState<LostAndFoundStatus>('lost');
   const [description, setDescription] = useState('');
   const [locationFound, setLocationFound] = useState('');
   const [dateFound, setDateFound] = useState('');
@@ -38,6 +39,7 @@ export default function ReportItemModal({ visible, onClose }: ReportItemModalPro
 
   const resetForm = () => {
     setItemName('');
+    setStatus('lost');
     setDescription('');
     setLocationFound('');
     setDateFound('');
@@ -83,7 +85,7 @@ export default function ReportItemModal({ visible, onClose }: ReportItemModalPro
       return;
     }
 
-    const data: CreateLostAndFoundData = { item_name: name };
+    const data: CreateLostAndFoundData = { item_name: name, status };
     if (description.trim()) data.description = description.trim();
     if (locationFound.trim()) data.location_found = locationFound.trim();
     if (date) data.date_found = date;
@@ -132,6 +134,30 @@ export default function ReportItemModal({ visible, onClose }: ReportItemModalPro
               keyboardShouldPersistTaps="handled"
               contentContainerStyle={styles.formContent}
             >
+              <Text style={styles.label}>
+                Status <Text style={styles.required}>*</Text>
+              </Text>
+              <View style={styles.statusRow}>
+                {(['lost', 'found'] as LostAndFoundStatus[]).map(s => (
+                  <TouchableOpacity
+                    key={s}
+                    style={[styles.statusChip, status === s && styles.statusChipActive]}
+                    onPress={() => setStatus(s)}
+                    activeOpacity={0.7}
+                    disabled={isSubmitting}
+                  >
+                    <Text
+                      style={[
+                        styles.statusChipText,
+                        status === s && styles.statusChipTextActive,
+                      ]}
+                    >
+                      {s === 'lost' ? 'Lost' : 'Found'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               <Text style={styles.label}>
                 Item Name <Text style={styles.required}>*</Text>
               </Text>
@@ -299,6 +325,28 @@ const styles = StyleSheet.create({
   },
   required: {
     color: COLORS.error,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    gap: SIZES.sm,
+    marginBottom: SIZES.lg,
+  },
+  statusChip: {
+    paddingVertical: SIZES.sm,
+    paddingHorizontal: SIZES.lg,
+    borderRadius: 20,
+    backgroundColor: COLORS.backgroundDark,
+  },
+  statusChipActive: {
+    backgroundColor: COLORS.primary,
+  },
+  statusChipText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  statusChipTextActive: {
+    color: COLORS.white,
   },
   inputContainer: {
     backgroundColor: COLORS.backgroundDark,

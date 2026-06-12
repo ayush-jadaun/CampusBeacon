@@ -21,16 +21,23 @@ import ErrorState from '@/components/ErrorState';
 import SellItemModal from '@/components/SellItemModal';
 import marketplaceService, { MarketplaceItem } from '@/services/marketplace.service';
 import { COLORS, SIZES, SHADOWS } from '@/constants/theme';
+import { useAppDispatch } from '@/store/hooks';
+import { updateMarketplaceItem } from '@/store/slices/marketplaceSlice';
+import { useAuth } from '@/contexts/AuthContext';
 
 const CONDITIONS = ['All', 'New', 'Like New', 'Good', 'Fair', 'Poor'];
+const CATEGORIES = ['All', 'Books', 'Electronics', 'Furniture', 'Cycle', 'Other'];
 
 export default function MarketplaceScreen() {
+  const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const [items, setItems] = useState<MarketplaceItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCondition, setSelectedCondition] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [isSellModalVisible, setIsSellModalVisible] = useState(false);
 
   const fetchItems = useCallback(async () => {
@@ -59,6 +66,10 @@ export default function MarketplaceScreen() {
       filtered = filtered.filter(item => item.item_condition === selectedCondition);
     }
 
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(item => item.category === selectedCategory);
+    }
+
     if (searchQuery) {
       filtered = filtered.filter(item =>
         item.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -67,7 +78,7 @@ export default function MarketplaceScreen() {
     }
 
     return filtered;
-  }, [items, searchQuery, selectedCondition]);
+  }, [items, searchQuery, selectedCondition, selectedCategory]);
 
   const onRefresh = () => {
     setIsRefreshing(true);
@@ -78,6 +89,7 @@ export default function MarketplaceScreen() {
     const details = [
       `Price: ₹${item.price.toLocaleString()}`,
       `Condition: ${item.item_condition}`,
+      item.category ? `Category: ${item.category}` : null,
       item.description ? `\n${item.description}` : null,
       item.owner_contact ? `\nContact: ${item.owner_contact}` : null,
       `Posted: ${new Date(item.createdAt).toLocaleDateString()}`,
@@ -90,6 +102,25 @@ export default function MarketplaceScreen() {
   const handleItemCreated = () => {
     setIsSellModalVisible(false);
     fetchItems();
+  };
+
+  const handleMarkSold = (item: MarketplaceItem) => {
+    if (!user || item.userId !== user.id || item.is_sold) return;
+    Alert.alert('Mark as Sold', `Mark "${item.item_name}" as sold? It will be removed from the marketplace.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Mark Sold',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await dispatch(updateMarketplaceItem({ id: item.id, data: { is_sold: true } })).unwrap();
+            setItems(prev => prev.filter(i => i.id !== item.id));
+          } catch (err: any) {
+            Alert.alert('Error', typeof err === 'string' ? err : 'Failed to mark item as sold');
+          }
+        },
+      },
+    ]);
   };
 
   if (isLoading) {
@@ -130,6 +161,34 @@ export default function MarketplaceScreen() {
             </TouchableOpacity>
           )}
         </View>
+
+        {/* Categories */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={[styles.categoriesContainer, styles.categoriesRowSpacing]}
+        >
+          {CATEGORIES.map(category => (
+            <TouchableOpacity
+              key={category}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category && styles.categoryChipActive,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  selectedCategory === category && styles.categoryChipTextActive,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* Conditions */}
         <ScrollView
@@ -183,7 +242,12 @@ export default function MarketplaceScreen() {
         ) : (
           <View style={styles.itemsGrid}>
             {filteredItems.map(item => (
-              <ProductCard key={item.id} item={item} onPress={() => handleItemPress(item)} />
+              <ProductCard
+                key={item.id}
+                item={item}
+                onPress={() => handleItemPress(item)}
+                onLongPress={() => handleMarkSold(item)}
+              />
             ))}
           </View>
         )}
@@ -215,7 +279,15 @@ export default function MarketplaceScreen() {
 }
 
 // Product Card Component
-function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => void }) {
+function ProductCard({
+  item,
+  onPress,
+  onLongPress,
+}: {
+  item: MarketplaceItem;
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
   const getConditionColor = () => {
     switch (item.item_condition) {
       case 'New': return '#10B981';
@@ -227,7 +299,12 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
   };
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      onLongPress={onLongPress}
+      activeOpacity={0.7}
+    >
       {/* Image */}
       {item.image_url ? (
         <Image source={{ uri: item.image_url }} style={styles.cardImage} />
@@ -243,6 +320,13 @@ function ProductCard({ item, onPress }: { item: MarketplaceItem; onPress: () => 
           <Text style={styles.conditionBadgeText}>
             {item.item_condition.toUpperCase()}
           </Text>
+        </View>
+      )}
+
+      {/* Sold Badge */}
+      {item.is_sold && (
+        <View style={styles.soldBadge}>
+          <Text style={styles.conditionBadgeText}>SOLD</Text>
         </View>
       )}
 
@@ -319,6 +403,9 @@ const styles = StyleSheet.create({
   categoriesContainer: {
     flexGrow: 0,
   },
+  categoriesRowSpacing: {
+    marginBottom: SIZES.sm,
+  },
   categoryChip: {
     paddingVertical: SIZES.sm,
     paddingHorizontal: SIZES.lg,
@@ -381,6 +468,15 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  soldBadge: {
+    position: 'absolute',
+    top: SIZES.sm,
+    left: SIZES.sm,
+    paddingVertical: 4,
+    paddingHorizontal: SIZES.sm,
+    borderRadius: 8,
+    backgroundColor: '#6B7280',
   },
   cardContent: {
     padding: SIZES.md,

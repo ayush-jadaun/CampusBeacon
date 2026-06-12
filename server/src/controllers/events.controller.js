@@ -98,7 +98,7 @@ export const createEvent = asyncHandler(async (req, res) => {
 });
 
 export const getAllEvents = asyncHandler(async (req, res) => {
-  const { club_id } = req.query;
+  const { club_id, limit, offset } = req.query;
 
   let whereClause = {};
   if (club_id) {
@@ -107,6 +107,9 @@ export const getAllEvents = asyncHandler(async (req, res) => {
 
   const events = await Event.findAll({
     where: whereClause,
+    ...(limit ? { limit: Math.min(parseInt(limit, 10) || 50, 100) } : {}),
+    ...(offset ? { offset: parseInt(offset, 10) || 0 } : {}),
+    order: [["date", "DESC"]],
     include: [
       {
         model: Club,

@@ -11,19 +11,19 @@ const PasswordInput = ({ name, placeholder, required, autoComplete }) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <label className="block text-sm font-medium text-purple-700 mb-1">
+      <label className="block font-mono text-xs uppercase tracking-widest text-dim mb-2">
         Password
       </label>
       <div
-        className={`flex items-center w-full p-4 bg-white/5 rounded-lg text-white border ${
-          isFocused ? "border-purple-500" : "border-white/10"
-        } transition-all`}
+        className={`flex items-center w-full p-4 bg-ink rounded-sm text-paper border ${
+          isFocused ? "border-beacon" : "border-ink-line"
+        } transition-colors`}
       >
         <input
           type={showPassword ? "text" : "password"}
           name={name}
           placeholder={placeholder}
-          className="bg-transparent focus:outline-none w-full"
+          className="bg-transparent focus:outline-none w-full text-paper placeholder-dim"
           required={required}
           autoComplete={autoComplete}
           onFocus={() => setIsFocused(true)}
@@ -32,8 +32,8 @@ const PasswordInput = ({ name, placeholder, required, autoComplete }) => {
         <button
           type="button"
           onClick={togglePasswordVisibility}
-          className="text-gray-400 hover:text-white focus:outline-none transition-colors"
-          tabIndex="-1" 
+          className="text-dim hover:text-paper focus:outline-none transition-colors"
+          tabIndex="-1"
         >
           {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
         </button>
