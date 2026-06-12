@@ -1,34 +1,158 @@
 @import "tailwindcss";
 
-html, body {
-  overflow-x: hidden;
+/* ============================================================
+   CampusBeacon design tokens — "the campus at night"
+   Ink surfaces, one amber beacon accent, paper notices.
+   Display: Fraunces · Body: Familjen Grotesk · Labels: Spline Sans Mono
+   ============================================================ */
+@theme {
+  --color-ink: #0e1116;
+  --color-ink-2: #141921;
+  --color-ink-3: #1c232e;
+  --color-ink-line: #232b37;
+
+  --color-paper: #efe9dd;
+  --color-paper-2: #e4dccb;
+  --color-dim: #8b929c;
+
+  --color-beacon: #ffb224;
+  --color-beacon-deep: #d98e00;
+  --color-beacon-soft: #ffd47e;
+
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-sans: "Familjen Grotesk", "Segoe UI", sans-serif;
+  --font-mono: "Spline Sans Mono", "Consolas", monospace;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  background-color: var(--color-ink);
+  color: var(--color-paper);
+  font-family: var(--font-sans);
+}
 
+::selection {
+  background: var(--color-beacon);
+  color: var(--color-ink);
+}
 
+/* Thin, dark scrollbar to match the board */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-3) var(--color-ink);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--color-ink);
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-ink-3);
+  border-radius: 5px;
+}
 
+/* ---------- Atmosphere ---------- */
+
+/* Film grain over everything; sits above bg, below content via z-index use */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Rotating beacon light sweep (use inside a relative container) */
+@keyframes beacon-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.beacon-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255, 178, 36, 0.5) 18deg,
+    rgba(255, 178, 36, 0.12) 42deg,
+    transparent 70deg,
+    transparent 360deg
+  );
+  animation: beacon-rotate 16s linear infinite;
+  border-radius: 9999px;
+  filter: blur(28px);
+}
+
+@keyframes beacon-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+.beacon-core {
+  animation: beacon-pulse 3.2s ease-in-out infinite;
+}
+
+/* Marquee ticker */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 36s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* Underline sweep for links */
+.link-sweep {
+  background-image: linear-gradient(var(--color-beacon), var(--color-beacon));
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: left bottom;
+  transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-sweep:hover {
+  background-size: 100% 2px;
+}
+
+/* Legacy utility kept for existing components */
 @keyframes shine {
   100% {
     left: 125%;
   }
 }
 .animate-shine {
-  animation: shine 0.85s forwards; 
+  animation: shine 0.85s forwards;
 }
-
 
 @layer utilities {
   .hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for Chrome, Safari, and Opera */
+    display: none;
   }
   .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
+
 input:-webkit-autofill,
 textarea:-webkit-autofill,
 select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px #261333 inset !important;
-  -webkit-text-fill-color: #fff !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--color-ink-2) inset !important;
+  -webkit-text-fill-color: var(--color-paper) !important;
 }

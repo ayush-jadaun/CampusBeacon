@@ -1,9 +1,8 @@
-import React, {
+﻿import {
   useState,
   useRef,
   useEffect,
   useMemo,
-  lazy,
   Suspense,
 } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
@@ -21,11 +20,19 @@ import {
   HiAcademicCap,
   HiClipboardList,
 } from "react-icons/hi";
-import { HiChatBubbleLeftRight, HiTruck } from "react-icons/hi2";
 import { X, Building } from "lucide-react";
 import { handleLogout } from "../../../slices/authSlice";
 import { getAllHostels } from "../../../slices/hostelSlice";
 import "react-toastify/dist/ReactToastify.css";
+
+const Wordmark = ({ className = "" }) => (
+  <span className={`font-display italic font-semibold text-paper ${className}`}>
+    Campus<span className="text-beacon">Beacon</span>
+  </span>
+);
+
+const mobileLinkClasses =
+  "flex items-center gap-4 px-4 py-3 font-mono text-xs uppercase tracking-widest text-paper hover:text-beacon transition-colors";
 
 const DefaultMobileMenu = ({
   isAuthenticated,
@@ -43,14 +50,14 @@ const DefaultMobileMenu = ({
     className="fixed inset-0 z-40 sm:hidden"
   >
     <div
-      className="absolute inset-0 bg-black/80 backdrop-blur-lg"
+      className="absolute inset-0 bg-ink/80 backdrop-blur-sm"
       onClick={onClose}
     />
-    <div className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-gray-900/95 shadow-2xl">
+    <div className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-ink-2 border-l border-ink-line">
       <div className="flex flex-col h-full py-16 px-4 overflow-y-auto">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white"
+          className="absolute top-4 right-4 p-2 text-dim hover:text-beacon transition-colors"
           aria-label="Close menu"
         >
           <X className="w-6 h-6" />
@@ -60,9 +67,9 @@ const DefaultMobileMenu = ({
           <Link
             to="/profile"
             onClick={onClose}
-            className="flex items-center space-x-4 px-4 py-4 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors mb-4"
+            className={`${mobileLinkClasses} border-b border-ink-line pb-4 mb-4`}
           >
-            <HiUser className="w-6 h-6" />
+            <HiUser className="w-5 h-5 text-dim" />
             <span>Profile</span>
           </Link>
         )}
@@ -72,16 +79,16 @@ const DefaultMobileMenu = ({
             key={link.name}
             to={link.path}
             onClick={onClose}
-            className="flex items-center space-x-4 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+            className={mobileLinkClasses}
           >
-            <link.icon className="w-5 h-5" />
+            <link.icon className="w-5 h-5 text-dim" />
             <span>{link.name}</span>
           </Link>
         ))}
 
         {isAuthenticated && (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <div className="mt-4 border-t border-ink-line pt-4">
+            <div className="px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-dim">
               Academics
             </div>
             {academicsOptions.map((option) => (
@@ -89,9 +96,9 @@ const DefaultMobileMenu = ({
                 key={option.name}
                 to={option.path}
                 onClick={onClose}
-                className="flex items-center space-x-4 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                className={mobileLinkClasses}
               >
-                <option.icon className="w-5 h-5" />
+                <option.icon className="w-5 h-5 text-dim" />
                 <span>{option.name}</span>
               </Link>
             ))}
@@ -99,8 +106,8 @@ const DefaultMobileMenu = ({
         )}
 
         {isAuthenticated && hostels.length > 0 && (
-          <div className="mt-4 border-t border-white/10 pt-4">
-            <div className="px-4 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <div className="mt-4 border-t border-ink-line pt-4">
+            <div className="px-4 py-2 font-mono text-[10px] uppercase tracking-[0.25em] text-dim">
               Hostels
             </div>
             {hostels.map((hostel) => (
@@ -108,23 +115,23 @@ const DefaultMobileMenu = ({
                 key={hostel.hostel_id}
                 to={`/hostels/${hostel.hostel_id}`}
                 onClick={onClose}
-                className="flex items-center space-x-4 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                className={mobileLinkClasses}
               >
-                <HiOfficeBuilding className="w-5 h-5" />
+                <HiOfficeBuilding className="w-5 h-5 text-dim" />
                 <span>{hostel.hostel_name}</span>
               </Link>
             ))}
           </div>
         )}
 
-        <div className="mt-auto pt-6 border-t border-white/10">
+        <div className="mt-auto pt-6 border-t border-ink-line">
           {isAuthenticated ? (
             <button
               onClick={() => {
                 onLogout();
                 onClose();
               }}
-              className="flex items-center space-x-4 w-full px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors"
+              className={`${mobileLinkClasses} w-full text-dim hover:text-beacon`}
             >
               <HiLogout className="w-5 h-5" />
               <span>Logout</span>
@@ -133,7 +140,7 @@ const DefaultMobileMenu = ({
             <Link
               to="/login"
               onClick={onClose}
-              className="flex items-center space-x-4 w-full px-4 py-3 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-xl transition-colors"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 bg-beacon text-ink rounded-full font-semibold hover:bg-beacon-soft transition-colors"
             >
               <HiLogin className="w-5 h-5" />
               <span>Login</span>
@@ -194,6 +201,12 @@ function NavBar() {
     ],
     []
   );
+
+  // Mono micro-label treatment shared by every desktop nav item
+  const desktopLinkClasses = (active) =>
+    `link-sweep font-mono text-xs uppercase tracking-widest py-2 transition-colors ${
+      active ? "text-beacon" : "text-paper"
+    }`;
 
   // --- Event handlers
   const handleLogoutClick = async () => {
@@ -277,11 +290,9 @@ function NavBar() {
   // Initial loading state
   if (isInitialRender && loading) {
     return (
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl mx-auto z-50">
-        <div className="rounded-2xl bg-black/30 backdrop-blur-xl border border-white/10 shadow-2xl shadow-purple-500/10 h-16 flex items-center px-4">
-          <div className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-300 bg-clip-text text-transparent">
-            CampusBeacon
-          </div>
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <div className="bg-ink/85 backdrop-blur-md border-b border-ink-line h-16 flex items-center px-5 sm:px-8">
+          <Wordmark className="text-xl sm:text-2xl" />
         </div>
       </div>
     );
@@ -298,20 +309,19 @@ function NavBar() {
       {/* Mobile Menu Button */}
       <div className="fixed top-4 right-4 z-[70] sm:hidden">
         <motion.button
-          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-full bg-purple-500/20 backdrop-blur-sm border border-purple-500/30 shadow-lg"
+          className="p-2 rounded-full bg-ink-2/90 backdrop-blur-sm border border-ink-line text-paper hover:text-beacon transition-colors"
           aria-label="Menu"
         >
-          <HiMenu className="w-6 h-6 text-white" />
+          <HiMenu className="w-6 h-6" />
         </motion.button>
       </div>
       {/* Mobile Navigation */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <Suspense
-            fallback={<div className="fixed inset-0 z-40 bg-black/50" />}
+            fallback={<div className="fixed inset-0 z-40 bg-ink/80" />}
           >
             <DefaultMobileMenu
               isAuthenticated={isAuthenticated}
@@ -329,11 +339,11 @@ function NavBar() {
       <AnimatePresence>
         {isVisible && (
           <motion.nav
-            initial={{ y: -100, opacity: 0 }}
+            initial={{ y: -64, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
+            exit={{ y: -64, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-7xl mx-auto z-50 hidden sm:block"
+            className="fixed top-0 left-0 right-0 z-50 hidden sm:block"
             onMouseLeave={() => {
               if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
               showTimeoutRef.current = setTimeout(() => {
@@ -346,29 +356,26 @@ function NavBar() {
               if (showTimeoutRef.current) clearTimeout(showTimeoutRef.current);
             }}
           >
-            <div className="relative rounded-2xl overflow-visible bg-black/30 backdrop-blur-xl border border-white/10 shadow-2xl shadow-purple-500/10">
+            <div className="bg-ink/85 backdrop-blur-md border-b border-ink-line">
               <div className="max-w-7xl mx-auto px-4 lg:px-6">
                 <div className="flex items-center justify-between h-16">
                   {/* Logo */}
-                  <Link
-                    to="/"
-                    className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-300 bg-clip-text text-transparent"
-                  >
-                    CampusBeacon
+                  <Link to="/" aria-label="CampusBeacon home">
+                    <Wordmark className="text-xl sm:text-2xl" />
                   </Link>
 
                   {/* Desktop Links */}
-                  <div className="flex items-center space-x-4 md:space-x-6 text-sm md:text-base">
+                  <div className="flex items-center gap-5 md:gap-7">
                     {/* Main Links */}
                     {mainLinks.map((link) => (
                       <Link
                         key={link.name}
                         to={link.path}
-                        className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group"
+                        className={desktopLinkClasses(
+                          location.pathname === link.path
+                        )}
                       >
-                        <link.icon className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                        <span>{link.name}</span>
-                        <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                        {link.name}
                       </Link>
                     ))}
 
@@ -379,36 +386,37 @@ function NavBar() {
                         onMouseEnter={() => handleMenuEnter("academics")}
                         onMouseLeave={() => handleMenuLeave("academics")}
                       >
-                        <button className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group">
-                          <HiAcademicCap className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                          <span>Academics</span>
-                          <span
-                            className={`absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-transform duration-300 ${
-                              showAcademicsMenu
-                                ? "scale-x-100"
-                                : "scale-x-0 group-hover:scale-x-100"
-                            }`}
+                        <button
+                          className={`flex items-center gap-1.5 ${desktopLinkClasses(
+                            showAcademicsMenu
+                          )}`}
+                        >
+                          <HiAcademicCap
+                            className="w-4 h-4 flex-shrink-0"
+                            aria-hidden="true"
                           />
+                          <span>Academics</span>
                         </button>
                         <AnimatePresence>
                           {showAcademicsMenu && (
                             <motion.div
-                              initial={{ opacity: 0, y: 10 }}
+                              initial={{ opacity: 0, y: 8 }}
                               animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
+                              exit={{ opacity: 0, y: 8 }}
                               transition={{ duration: 0.2 }}
-                              className="absolute left-0 top-full mt-2 w-60 bg-black/70 backdrop-blur-xl rounded-xl overflow-hidden border border-white/10 shadow-lg z-10"
+                              className="absolute left-0 top-full mt-2 w-60 bg-ink-2 rounded-sm overflow-hidden border border-ink-line shadow-[0_10px_30px_rgba(0,0,0,0.45)] z-10"
                             >
                               {academicsOptions.map((option) => (
                                 <Link
                                   key={option.name}
                                   to={option.path}
-                                  className="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:bg-white/10 hover:text-white transition-colors"
+                                  className="flex items-center gap-3 px-4 py-3 font-mono text-xs uppercase tracking-widest text-paper hover:bg-ink-3 hover:text-beacon transition-colors"
                                 >
-                                  <option.icon className="w-5 h-5 flex-shrink-0 opacity-80" />
-                                  <span className="font-medium">
-                                    {option.name}
-                                  </span>
+                                  <option.icon
+                                    className="w-4 h-4 flex-shrink-0 text-dim"
+                                    aria-hidden="true"
+                                  />
+                                  <span>{option.name}</span>
                                 </Link>
                               ))}
                             </motion.div>
@@ -424,31 +432,31 @@ function NavBar() {
                         onMouseEnter={() => handleMenuEnter("hostels")}
                         onMouseLeave={() => handleMenuLeave("hostels")}
                       >
-                        <button className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group">
-                          <Building className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                          <span>Hostels</span>
-                          <span
-                            className={`absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-transform duration-300 ${
-                              showHostelMenu
-                                ? "scale-x-100"
-                                : "scale-x-0 group-hover:scale-x-100"
-                            }`}
+                        <button
+                          className={`flex items-center gap-1.5 ${desktopLinkClasses(
+                            showHostelMenu
+                          )}`}
+                        >
+                          <Building
+                            className="w-4 h-4 flex-shrink-0"
+                            aria-hidden="true"
                           />
+                          <span>Hostels</span>
                         </button>
                         <AnimatePresence>
                           {showHostelMenu && (
                             <motion.div
-                              initial={{ opacity: 0, y: 10 }}
+                              initial={{ opacity: 0, y: 8 }}
                               animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: 10 }}
+                              exit={{ opacity: 0, y: 8 }}
                               transition={{ duration: 0.2 }}
-                              className="absolute left-0 top-full mt-2 w-56 bg-black/70 backdrop-blur-xl rounded-xl overflow-hidden border border-white/10 shadow-lg z-10 max-h-80 overflow-y-auto"
+                              className="absolute left-0 top-full mt-2 w-56 bg-ink-2 rounded-sm overflow-hidden border border-ink-line shadow-[0_10px_30px_rgba(0,0,0,0.45)] z-10 max-h-80 overflow-y-auto"
                             >
                               {hostels.map((hostel) => (
                                 <Link
                                   key={hostel.hostel_id}
                                   to={`/hostels/${hostel.hostel_id}`}
-                                  className="block px-4 py-3 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition-colors font-medium"
+                                  className="block px-4 py-3 font-mono text-xs uppercase tracking-widest text-paper hover:bg-ink-3 hover:text-beacon transition-colors"
                                 >
                                   {hostel.hostel_name}
                                 </Link>
@@ -464,29 +472,26 @@ function NavBar() {
                       <>
                         <Link
                           to="/profile"
-                          className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group"
+                          className={desktopLinkClasses(
+                            location.pathname === "/profile"
+                          )}
                         >
-                          <HiUser className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                          <span>Profile</span>
-                          <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                          Profile
                         </Link>
                         <button
                           onClick={handleLogoutClick}
-                          className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group"
+                          className="link-sweep font-mono text-xs uppercase tracking-widest py-2 text-dim hover:text-paper transition-colors"
                         >
-                          <HiLogout className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
-                          <span>Logout</span>
-                          <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
+                          Logout
                         </button>
                       </>
                     ) : (
                       <Link
                         to="/login"
-                        className="flex items-center space-x-1 md:space-x-2 text-gray-300 hover:text-white transition-colors relative group"
+                        className="inline-flex items-center gap-2 bg-beacon text-ink rounded-full font-semibold px-5 py-2 hover:bg-beacon-soft transition-colors"
                       >
-                        <HiLogin className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
+                        <HiLogin className="w-4 h-4" aria-hidden="true" />
                         <span>Login</span>
-                        <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
                       </Link>
                     )}
                   </div>

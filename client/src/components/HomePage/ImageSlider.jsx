@@ -18,20 +18,12 @@ import { useNavigate } from "react-router-dom";
 import { fetchClubs } from "../../slices/clubSlice";
 
 // --- Constants ---
-const gradients = [
-  "from-blue-500 via-indigo-500 to-purple-500",
-  "from-cyan-500 via-teal-500 to-emerald-500",
-  "from-rose-500 via-pink-500 to-purple-500",
-  "from-green-500 via-emerald-500 to-teal-500",
-  "from-amber-500 via-orange-500 to-red-500",
-  "from-violet-500 via-purple-500 to-fuchsia-500",
-];
 const DEFAULT_IMAGE_URL = "https://via.placeholder.com/800x600?text=Club+Image";
 const AUTOPLAY_INTERVAL = 5000; // ms
 
 // --- Child Components (Memoized) ---
 // ClubContent Component (displays text info)
-const ClubContent = React.memo(({ club, gradient }) => {
+const ClubContent = React.memo(({ club }) => {
   const defaultIcon = useMemo(
     () => club.name?.charAt(0).toUpperCase() || "?",
     [club.name]
@@ -46,17 +38,15 @@ const ClubContent = React.memo(({ club, gradient }) => {
         className="max-w-xs sm:max-w-md lg:max-w-3xl"
       >
         <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-4 lg:mb-6">
-          <div className="text-4xl sm:text-5xl lg:text-6xl bg-white/10 rounded-full w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center text-white font-bold flex-shrink-0">
+          <div className="font-display text-2xl sm:text-3xl lg:text-4xl bg-beacon text-ink rounded-sm w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center font-semibold flex-shrink-0">
             {defaultIcon}
           </div>
-          <h3
-            className={`text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}
-          >
+          <h3 className="font-display text-2xl sm:text-3xl lg:text-5xl font-semibold text-paper">
             {club.name || "Unnamed Club"}
           </h3>
         </div>
         {club.description && (
-          <p className="text-sm sm:text-base lg:text-lg text-gray-200 mb-4 sm:mb-6 font-light leading-relaxed line-clamp-3">
+          <p className="text-sm sm:text-base lg:text-lg text-paper/75 mb-4 sm:mb-6 leading-relaxed line-clamp-3">
             {club.description}
           </p>
         )}
@@ -130,10 +120,6 @@ const ImageSlider = () => {
   const currentClubData = useMemo(
     () => clubs?.[currentClubIndex],
     [clubs, currentClubIndex]
-  );
-  const currentGradient = useMemo(
-    () => gradients[currentClubIndex % gradients.length],
-    [currentClubIndex]
   );
   const currentImageDisplayIndex = useMemo(
     () => clubImageIndices[currentClubData?.id] ?? 0,
@@ -212,16 +198,16 @@ const ImageSlider = () => {
   // --- Render Logic ---
   if (loading) {
     return (
-      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-2xl sm:rounded-3xl bg-gray-900 flex items-center justify-center text-gray-400">
-        <Loader2 className="animate-spin mr-2" size={24} />
-        Loading Clubs...
+      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-sm bg-ink-2 border border-ink-line flex items-center justify-center text-dim">
+        <Loader2 className="animate-spin mr-2 text-beacon" size={24} />
+        Loading clubs…
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-2xl sm:rounded-3xl bg-red-900/50 border border-red-700 flex flex-col items-center justify-center text-red-300 p-4 text-center">
+      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-sm bg-ink-2 border border-red-900 flex flex-col items-center justify-center text-red-400 p-4 text-center">
         <AlertTriangle className="mb-2" size={32} />
         <p className="font-semibold mb-1">Failed to load clubs</p>
         <p className="text-sm">
@@ -233,14 +219,14 @@ const ImageSlider = () => {
 
   if (!loading && clubsCount === 0) {
     return (
-      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-2xl sm:rounded-3xl bg-gray-900 flex items-center justify-center text-gray-500">
+      <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-sm bg-ink-2 border border-ink-line flex items-center justify-center text-dim">
         No clubs found to display.
       </div>
     );
   }
 
   return (
-    <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-2xl sm:rounded-3xl bg-gray-900 group">
+    <div className="relative w-full h-[60vh] max-h-[450px] sm:h-[70vh] sm:max-h-[550px] lg:h-[600px] lg:max-h-none overflow-hidden rounded-sm bg-ink-2 border border-ink-line group">
       {/* Navigation Arrows */}
       {clubsCount > 1 && (
         <Fragment>
@@ -289,21 +275,21 @@ const ImageSlider = () => {
             </AnimatePresence>
 
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-80 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent opacity-90 pointer-events-none" />
 
             {/* Text Content */}
-            <ClubContent club={currentClubData} gradient={currentGradient} />
+            <ClubContent club={currentClubData} />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Autoplay Progress Bar Container */}
       {clubsCount > 1 && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50 overflow-hidden z-10">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-ink-3/70 overflow-hidden z-10">
           <AnimatePresence>
             {isAutoPlaying && (
               <motion.div
-                className={`h-full bg-gradient-to-r ${currentGradient}`}
+                className="h-full bg-beacon"
                 animate={progressBarControls}
                 initial={{ opacity: 0 }}
                 exit={{ opacity: 1 }}
@@ -330,8 +316,8 @@ const ImageSlider = () => {
               <div
                 className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all duration-300 ${
                   index === currentClubIndex
-                    ? `bg-white scale-125 ring-2 ring-white/50`
-                    : "bg-white/40 hover:bg-white/70"
+                    ? `bg-beacon scale-125 ring-2 ring-beacon/40`
+                    : "bg-paper/40 hover:bg-paper/70"
                 }`}
               />
             </button>

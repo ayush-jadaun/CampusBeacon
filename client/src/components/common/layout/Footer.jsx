@@ -1,5 +1,4 @@
-import React from "react";
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import { HiLocationMarker, HiMail, HiPhone, HiArrowUp } from "react-icons/hi";
 import {
   SiReact,
@@ -8,69 +7,61 @@ import {
   SiTailwindcss,
   SiFramer,
   SiVercel,
-  SiPrisma,
-  SiSupabase, // Added Supabase
+  SiSupabase,
 } from "react-icons/si";
 import {
   FaLinkedin,
   FaEnvelope,
   FaGithub,
-  FaTwitter,
   FaInstagram,
 } from "react-icons/fa";
 import { BiLogoPostgresql } from "react-icons/bi";
 
-// Updated technologies array with URLs and Supabase, removed Socket.IO
 const technologies = [
   {
     Icon: SiJavascript,
     name: "JavaScript",
-    color: "hover:text-yellow-400",
     url: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
   },
   {
     Icon: SiReact,
     name: "React",
-    color: "hover:text-cyan-400",
     url: "https://react.dev/",
   },
   {
     Icon: SiNodedotjs,
     name: "Node.js",
-    color: "hover:text-green-500",
     url: "https://nodejs.org/",
   },
   {
     Icon: BiLogoPostgresql,
     name: "PostgreSQL",
-    color: "hover:text-blue-400",
     url: "https://www.postgresql.org/",
   },
   {
     Icon: SiTailwindcss,
     name: "Tailwind CSS",
-    color: "hover:text-teal-400",
     url: "https://tailwindcss.com/",
   },
   {
     Icon: SiFramer,
     name: "Framer Motion",
-    color: "hover:text-purple-400",
     url: "https://www.framer.com/motion/",
   },
   {
     Icon: SiVercel,
     name: "Vercel",
-    color: "hover:text-gray-400",
     url: "https://vercel.com/",
   },
   {
     Icon: SiSupabase,
     name: "Supabase",
-    color: "hover:text-green-400",
     url: "https://supabase.com/",
   },
 ];
+
+const columnHeading =
+  "font-mono text-xs uppercase tracking-widest text-dim mb-6";
 
 const Footer = () => {
   const scrollToTop = () => {
@@ -79,108 +70,114 @@ const Footer = () => {
 
   const simpleFadeIn = {
     initial: { opacity: 0 },
-    animate: { opacity: 1 },
+    whileInView: { opacity: 1 },
+    viewport: { once: true },
     transition: { duration: 0.3 },
   };
 
   const simpleSlideIn = {
     initial: { opacity: 0, y: 10 },
-    animate: { opacity: 1, y: 0 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
     transition: { duration: 0.3 },
   };
 
   return (
-    <footer className="relative bg-gradient-to-b from-gray-900 via-gray-900 to-black text-white pt-16 pb-8 overflow-hidden">
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -left-1/4 -top-1/4 w-1/2 h-1/2 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute -right-1/4 -bottom-1/4 w-1/2 h-1/2 bg-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-12 mb-12">
-          {/* About Section */}
-          <div>
-            <motion.h3
-              {...simpleSlideIn}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6"
+    <footer className="relative bg-ink-2 border-t border-ink-line text-paper pt-16 pb-8">
+      <div className="container mx-auto px-6">
+        {/* Sign-off wordmark */}
+        <div className="mb-14">
+          <motion.h2
+            {...simpleSlideIn}
+            className="font-display italic font-semibold text-4xl sm:text-5xl md:text-6xl text-paper"
+          >
+            Campus<span className="text-beacon">Beacon</span>
+          </motion.h2>
+          <motion.p
+            {...simpleSlideIn}
+            className="mt-5 max-w-md text-dim text-base leading-relaxed"
+          >
+            Your comprehensive campus companion, connecting students with
+            resources, opportunities, and each other.
+          </motion.p>
+          <motion.div {...simpleFadeIn} className="mt-6 flex space-x-5">
+            <a
+              href="https://www.instagram.com/campus_beacon/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-dim hover:text-beacon transition-colors"
+              aria-label="CampusBeacon Instagram"
             >
-              About CampusBeacon
-            </motion.h3>
-            <p className="text-gray-400 text-base mb-6">
-              Your comprehensive campus companion, connecting students with
-              resources, opportunities, and each other.
-            </p>
-            <motion.div {...simpleFadeIn} className="flex space-x-5">
-              <a
-                href="https://www.instagram.com/campus_beacon/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-pink-400 transition-colors"
-                aria-label="CampusBeacon Instagram"
-              >
-                <FaInstagram size={24} />
-              </a>
-              <a
-                href="https://github.com/ayush-jadaun/CampusBeacon"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="CampusBeacon Github"
-              >
-                <FaGithub size={24} />
-              </a>
-            </motion.div>
-          </div>
+              <FaInstagram size={22} />
+            </a>
+            <a
+              href="https://github.com/ayush-jadaun/CampusBeacon"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-dim hover:text-beacon transition-colors"
+              aria-label="CampusBeacon Github"
+            >
+              <FaGithub size={22} />
+            </a>
+          </motion.div>
+        </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-12 mb-12">
           {/* Contact Section */}
           <div>
-            <motion.h3
-              {...simpleSlideIn}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6"
-            >
-              Contact Us
+            <motion.h3 {...simpleSlideIn} className={columnHeading}>
+              Contact
             </motion.h3>
             <div className="space-y-4 text-base">
               <motion.a
                 {...simpleSlideIn}
                 href="mailto:campusbeacon0@gmail.com"
-                className="flex items-center space-x-4 text-gray-400 hover:text-blue-400 transition-colors group"
+                className="flex items-center space-x-4 group"
               >
-                <HiMail className="text-xl flex-shrink-0 group-hover:text-blue-400 transition-colors" />
-                <span>campusbeacon0@gmail.com</span>
+                <HiMail
+                  className="text-lg flex-shrink-0 text-dim group-hover:text-beacon transition-colors"
+                  aria-hidden="true"
+                />
+                <span className="link-sweep text-paper">
+                  campusbeacon0@gmail.com
+                </span>
               </motion.a>
               <motion.a
                 {...simpleSlideIn}
                 href="tel:+919548999129"
-                className="flex items-center space-x-4 text-gray-400 hover:text-blue-400 transition-colors group"
+                className="flex items-center space-x-4 group"
               >
-                <HiPhone className="text-xl flex-shrink-0 group-hover:text-blue-400 transition-colors" />
-                <span>+91 9548999129</span>
+                <HiPhone
+                  className="text-lg flex-shrink-0 text-dim group-hover:text-beacon transition-colors"
+                  aria-hidden="true"
+                />
+                <span className="link-sweep text-paper">+91 9548999129</span>
               </motion.a>
               <motion.a
                 {...simpleSlideIn}
                 href="https://maps.app.goo.gl/tMuCf5DjfXLF3YuDA"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-start space-x-4 text-gray-400 hover:text-blue-400 transition-colors group"
+                className="flex items-start space-x-4 group"
               >
-                <HiLocationMarker className="text-xl flex-shrink-0 mt-0.5 group-hover:text-blue-400 transition-colors" />
-                <span>MNNIT Allahabad, Prayagraj, India</span>
+                <HiLocationMarker
+                  className="text-lg flex-shrink-0 mt-1 text-dim group-hover:text-beacon transition-colors"
+                  aria-hidden="true"
+                />
+                <span className="link-sweep text-paper">
+                  MNNIT Allahabad, Prayagraj, India
+                </span>
               </motion.a>
             </div>
           </div>
 
           {/* Tech Stack Section */}
           <div>
-            <motion.h3
-              {...simpleSlideIn}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6"
-            >
+            <motion.h3 {...simpleSlideIn} className={columnHeading}>
               Built With
             </motion.h3>
-            <div className="grid grid-cols-4 gap-5">
-              {technologies.map(({ Icon, name, color, url }) => (
+            <div className="grid grid-cols-4 gap-5 max-w-[14rem]">
+              {technologies.map(({ Icon, name, url }) => (
                 <motion.a
                   key={name}
                   href={url}
@@ -189,9 +186,9 @@ const Footer = () => {
                   title={name}
                   aria-label={`Link to ${name} website`}
                   {...simpleFadeIn}
-                  className={`text-gray-400 ${color} transition-colors cursor-pointer flex justify-center items-center transform hover:scale-110`}
+                  className="text-dim hover:text-beacon transition-colors flex justify-center items-center"
                 >
-                  <Icon size={28} />
+                  <Icon size={24} />
                 </motion.a>
               ))}
             </div>
@@ -199,16 +196,15 @@ const Footer = () => {
 
           {/* Team Section */}
           <div>
-            <motion.h3
-              {...simpleSlideIn}
-              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-6"
-            >
+            <motion.h3 {...simpleSlideIn} className={columnHeading}>
               Our Team
             </motion.h3>
             <div className="space-y-6 text-base">
               <motion.div {...simpleSlideIn}>
-                <h4 className="font-semibold text-white mb-1">Ayush Jadaun</h4>
-                <p className="text-sm text-gray-500 mb-2">
+                <h4 className="font-display text-lg font-medium text-paper mb-1">
+                  Ayush Jadaun
+                </h4>
+                <p className="font-mono text-[11px] uppercase tracking-widest text-dim mb-3">
                   Full Stack Developer
                 </p>
                 <div className="flex space-x-4">
@@ -216,32 +212,34 @@ const Footer = () => {
                     href="https://github.com/ayush-jadaun"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Ayush Jadaun Github"
                   >
-                    <FaGithub size={20} />
+                    <FaGithub size={18} />
                   </a>
                   <a
                     href="https://www.linkedin.com/in/ayush-jadaun-677199311/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Ayush Jadaun LinkedIn"
                   >
-                    <FaLinkedin size={20} />
+                    <FaLinkedin size={18} />
                   </a>
                   <a
                     href="mailto:ayushjadaun6@gmail.com"
-                    className="text-gray-400 hover:text-red-400 transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Email Ayush Jadaun"
                   >
-                    <FaEnvelope size={20} />
+                    <FaEnvelope size={18} />
                   </a>
                 </div>
               </motion.div>
               <motion.div {...simpleSlideIn}>
-                <h4 className="font-semibold text-white mb-1">Ayush Agarwal</h4>
-                <p className="text-sm text-gray-500 mb-2">
+                <h4 className="font-display text-lg font-medium text-paper mb-1">
+                  Ayush Agarwal
+                </h4>
+                <p className="font-mono text-[11px] uppercase tracking-widest text-dim mb-3">
                   Full Stack Developer
                 </p>
                 <div className="flex space-x-4">
@@ -249,26 +247,26 @@ const Footer = () => {
                     href="https://github.com/ayushagr101"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Ayush Agarwal Github"
                   >
-                    <FaGithub size={20} />
+                    <FaGithub size={18} />
                   </a>
                   <a
                     href="https://www.linkedin.com/in/ayush-agarwal-108127311/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-blue-400 transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Ayush Agarwal LinkedIn"
                   >
-                    <FaLinkedin size={20} />
+                    <FaLinkedin size={18} />
                   </a>
                   <a
                     href="mailto:ayush.agr160@gmail.com"
-                    className="text-gray-400 hover:text-red-400 transition-colors"
+                    className="text-dim hover:text-beacon transition-colors"
                     aria-label="Email Ayush Agarwal"
                   >
-                    <FaEnvelope size={20} />
+                    <FaEnvelope size={18} />
                   </a>
                 </div>
               </motion.div>
@@ -277,36 +275,48 @@ const Footer = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="border-t border-gray-700 pt-6 mt-10">
+        <div className="border-t border-ink-line pt-6 mt-10">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
             <motion.p
               {...simpleFadeIn}
-              className="text-gray-500 text-sm text-center sm:text-left"
+              className="font-mono text-xs tracking-wide text-dim text-center sm:text-left"
             >
-              © {new Date().getFullYear()} CampusBeacon. All rights reserved.
+              Â© {new Date().getFullYear()} CampusBeacon{" "}
+              <span className="text-beacon" aria-hidden="true">
+                âœ¦
+              </span>{" "}
+              All rights reserved.
             </motion.p>
             <motion.div
               {...simpleFadeIn}
-              className="flex flex-wrap justify-center gap-x-6 gap-y-3 sm:gap-x-8"
+              className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 sm:gap-x-8"
             >
               <a
                 href="/policy"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className="link-sweep font-mono text-xs uppercase tracking-widest text-paper"
               >
                 Privacy Policy
               </a>
               <a
                 href="/terms"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className="link-sweep font-mono text-xs uppercase tracking-widest text-paper"
               >
                 Terms of Service
               </a>
               <a
                 href="/about"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
+                className="link-sweep font-mono text-xs uppercase tracking-widest text-paper"
               >
                 About Us
               </a>
+              <button
+                onClick={scrollToTop}
+                className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-widest text-dim hover:text-beacon transition-colors"
+                aria-label="Back to top"
+              >
+                <span>Top</span>
+                <HiArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
+              </button>
             </motion.div>
           </div>
         </div>

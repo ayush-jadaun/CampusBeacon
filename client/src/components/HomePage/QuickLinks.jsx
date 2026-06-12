@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import React from "react";
 import {
   Calendar,
   FileText,
@@ -8,165 +7,151 @@ import {
   Newspaper,
   Map,
   Lightbulb,
-
+  ArrowUpRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { last } from "lodash";
 import { HiAcademicCap } from "react-icons/hi";
 
-const QuickLinks = () => {
-  const links = [
-    {
-      icon: Calendar,
-      label: "Academic Calendar",
-      description: "View academic schedules and events",
-      href: "https://drive.google.com/file/d/1yYKlN_WktRy2SQYdSaAr-8R42w3wGnTs/view?usp=sharing",
-      gradient: "from-purple-600 via-pink-500 to-rose-500",
-    },
-    {
-      icon: User,
-      label: "Academic Portal",
-      description: "Access your academic records",
-      href: "https://www.academics.mnnit.ac.in/new",
-      gradient: "from-cyan-500 via-blue-500 to-indigo-500",
-    },
-    {
-      icon: FileText,
-      label: "LAN Information",
-      description: "Network connectivity details",
-      href: "https://drive.google.com/file/d/1IUyYjTPWsRlQCzVMvO1dkHKLIamg37js/view?usp=sharing",
-      gradient: "from-green-500 via-emerald-500 to-teal-500",
-    },
-    {
-      icon: Phone,
-      label: "Contacts",
-      description: "Important contact information",
-      href: "/contact",
-      gradient: "from-amber-500 via-orange-500 to-red-500",
-    },
-    // Fun Pages Section
-    {
-      icon: Map,
-      label: "Campus Explorer",
-      description: "Discover hidden gems around campus",
-      href: "/explore",
-      gradient: "from-indigo-500 via-purple-500 to-pink-500",
-    },
-    {
-      icon: Lightbulb,
-      label: "Facts Generator",
-      description: "Interesting facts about MNNIT",
-      href: "/facts",
-      gradient: "from-yellow-400 via-orange-500 to-red-500",
-    },
-    {
-      icon: Newspaper,
-      label: "MNNIT Time Capsule",
-      description: "Journey through MNNIT's history",
-      href: "/time",
-      gradient: "from-blue-400 via-indigo-500 to-purple-500",
-    },
-    {
-      icon: HiAcademicCap, 
-      label: "Clubs",
-      description: "Explore college clubs and campus communities",
-      href: "/clubs",
-      gradient: "from-blue-500 via-purple-600 to-pink-500",
-    },
-  ];
+/**
+ * The noticeboard: paper notes pinned on the dark board.
+ * Cream cards, slight rotations, a pin dot, mono category stamps.
+ */
+const LINKS = [
+  {
+    icon: Calendar,
+    label: "Academic Calendar",
+    description: "Semester schedule, holidays and exam windows.",
+    href: "https://drive.google.com/file/d/1yYKlN_WktRy2SQYdSaAr-8R42w3wGnTs/view?usp=sharing",
+    stamp: "PDF",
+    external: true,
+    tilt: "-rotate-1",
+  },
+  {
+    icon: User,
+    label: "Academic Portal",
+    description: "Grades, registrations and official records.",
+    href: "https://www.academics.mnnit.ac.in/new",
+    stamp: "MNNIT",
+    external: true,
+    tilt: "rotate-[0.75deg]",
+  },
+  {
+    icon: FileText,
+    label: "LAN Information",
+    description: "Get the hostel internet working at 2 AM.",
+    href: "https://drive.google.com/file/d/1IUyYjTPWsRlQCzVMvO1dkHKLIamg37js/view?usp=sharing",
+    stamp: "GUIDE",
+    external: true,
+    tilt: "rotate-1",
+  },
+  {
+    icon: Phone,
+    label: "Contacts",
+    description: "Wardens, offices and emergency numbers.",
+    href: "/contact",
+    stamp: "DIRECTORY",
+    tilt: "-rotate-[0.75deg]",
+  },
+  {
+    icon: Map,
+    label: "Campus Explorer",
+    description: "Hidden corners worth skipping a lecture for.",
+    href: "/explore",
+    stamp: "FUN",
+    tilt: "rotate-[1.25deg]",
+  },
+  {
+    icon: Lightbulb,
+    label: "Facts Generator",
+    description: "Things you didn't know about this campus.",
+    href: "/facts",
+    stamp: "FUN",
+    tilt: "-rotate-1",
+  },
+  {
+    icon: Newspaper,
+    label: "Time Capsule",
+    description: "MNNIT through the decades, year by year.",
+    href: "/time",
+    stamp: "ARCHIVE",
+    tilt: "rotate-[0.5deg]",
+  },
+  {
+    icon: HiAcademicCap,
+    label: "Clubs",
+    description: "Every society and community on campus.",
+    href: "/clubs",
+    stamp: "CULTURE",
+    tilt: "-rotate-[1.25deg]",
+  },
+];
 
-  const cardVariants = {
-    hidden: {
-      opacity: 0,
-      y: 20,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut",
-      },
-    },
-  };
+const NoteInner = ({ link }) => (
+  <>
+    {/* Pin */}
+    <span
+      className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-beacon border-2 border-beacon-deep shadow-[0_2px_6px_rgba(0,0,0,0.45)]"
+      aria-hidden="true"
+    />
 
-  return (
-    <div className="py-12 bg-gray-900/1">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-        >
-          {links.map((link, index) => (
-            <motion.div
-              key={link.label}
-              variants={cardVariants}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{
-                scale: 1.05,
-                transition: { duration: 0.2 },
-              }}
-              className="relative group"
-            >
-              <Link to={link.href}>
-                <div
-                  className={`
-                  relative flex flex-col items-center 
-                  p-6 rounded-xl
-                  bg-gray-900/90 backdrop-blur-sm
-                  border border-gray-700/50
-                  group-hover:border-transparent
-                  transition duration-300
-                  h-full
-                `}
-                >
-                  <div
-                    className={`
-                    relative p-3 rounded-lg
-                    bg-gradient-to-r ${link.gradient}
-                    transform group-hover:scale-110 
-                    transition duration-300
-                    before:absolute before:inset-0 
-                    before:blur-sm before:opacity-50
-                  `}
-                  >
-                    <link.icon className="h-8 w-8 text-white relative z-10" />
-                  </div>
-
-                  <h3
-                    className={`
-                    mt-4 text-lg font-semibold
-                    text-gray-200 group-hover:bg-gradient-to-r
-                    group-hover:${link.gradient}
-                    group-hover:bg-clip-text
-                    group-hover:text-transparent
-                    transition duration-300
-                  `}
-                  >
-                    {link.label}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-gray-400 text-center opacity-80 group-hover:opacity-100">
-                    {link.description}
-                  </p>
-
-                  <motion.span
-                    className="mt-4 text-gray-400 group-hover:text-white"
-                    initial={{ x: 0 }}
-                    whileHover={{ x: 5 }}
-                  >
-                    →
-                  </motion.span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
+    <div className="flex items-start justify-between gap-3">
+      <link.icon className="w-6 h-6 text-ink/80" aria-hidden="true" />
+      <span className="font-mono text-[10px] tracking-[0.2em] text-ink/50 border border-ink/25 rounded-sm px-1.5 py-0.5">
+        {link.stamp}
+      </span>
     </div>
-  );
+
+    <h3 className="mt-4 font-display text-xl font-semibold text-ink leading-tight">
+      {link.label}
+    </h3>
+    <p className="mt-2 text-sm text-ink/65 leading-snug flex-grow">
+      {link.description}
+    </p>
+
+    <span className="mt-4 inline-flex items-center gap-1 font-mono text-xs tracking-wide text-ink/60 group-hover:text-ink transition-colors">
+      {link.external ? "Open" : "Visit"}
+      <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+    </span>
+  </>
+);
+
+const noteClasses = (tilt) =>
+  `group relative flex flex-col h-full bg-paper ${tilt} rounded-sm p-5 pt-6 ` +
+  "shadow-[0_10px_30px_rgba(0,0,0,0.45)] transition-transform duration-300 " +
+  "hover:rotate-0 hover:scale-[1.03] hover:z-10";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
+
+const QuickLinks = () => (
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.1 }}
+    transition={{ staggerChildren: 0.06 }}
+    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+  >
+    {LINKS.map((link) => (
+      <motion.div key={link.label} variants={cardVariants} className="h-full">
+        {link.external ? (
+          <a
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={noteClasses(link.tilt)}
+          >
+            <NoteInner link={link} />
+          </a>
+        ) : (
+          <Link to={link.href} className={noteClasses(link.tilt)}>
+            <NoteInner link={link} />
+          </Link>
+        )}
+      </motion.div>
+    ))}
+  </motion.div>
+);
 
 export default QuickLinks;

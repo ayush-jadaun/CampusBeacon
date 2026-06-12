@@ -1,37 +1,16 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
-// Memoize animation variants
-const iconAnimation = {
-  rest: { rotate: 0 },
-  hover: {
-    rotate: [0, -10, 10, -10, 0],
-    transition: { duration: 0.5, ease: "easeInOut" },
-  },
-};
-
-const arrowAnimation = {
-  rest: { x: 0 },
-  hover: { x: 4 },
-};
-
-const cardAnimation = {
-  initial: { opacity: 0, y: 30 },
-  inView: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-};
-
+/**
+ * One row of the services index — an editorial directory entry.
+ * Resting state: ink row with hairline divider.
+ * Hover: the row floods beacon-amber and the type inverts to ink.
+ */
 const FeatureCard = React.memo(
-  ({
-    icon: Icon,
-    title,
-    description,
-    href = "/",
-    gradient = "from-pink-500 via-purple-500 to-indigo-500",
-    height = "h-full", // Add height prop with default value
-  }) => {
+  ({ icon: Icon, title, description, href = "/", index = 1 }) => {
     const navigate = useNavigate();
 
     const handleClick = useCallback(
@@ -42,95 +21,42 @@ const FeatureCard = React.memo(
       [navigate, href]
     );
 
-    // Memoize gradient styles
-    const gradientStyles = useMemo(
-      () => ({
-        background: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))`,
-        "--gradient-from":
-          gradient.match(/from-([a-z]+-\d+)/)?.[0] || "transparent",
-        "--gradient-via":
-          gradient.match(/via-([a-z]+-\d+)/)?.[0] || "transparent",
-        "--gradient-to":
-          gradient.match(/to-([a-z]+-\d+)/)?.[0] || "transparent",
-      }),
-      [gradient]
-    );
-
-    // Memoize class strings
-    const cardClasses = useMemo(
-      () => ({
-        // Add fixed height to wrapper for consistency
-        wrapper: `group relative cursor-pointer overflow-hidden rounded-xl ${height}`,
-        gradientBgEffect: `absolute inset-0 rounded-xl bg-gradient-to-r ${gradient} opacity-10 group-hover:opacity-30 blur-md group-hover:blur-lg transition duration-500 ease-out`,
-        // Ensure container takes full height
-        container:
-          "relative p-4 sm:p-5 bg-gray-900/80 backdrop-blur-md rounded-xl border border-white/10 h-full flex flex-col",
-        content:
-          "flex flex-col items-center text-center space-y-4 sm:space-y-5 flex-grow",
-        iconWrapper: `relative p-3 sm:p-4 rounded-2xl bg-gradient-to-r ${gradient} transform group-hover:scale-105 transition-transform duration-300 ease-out shadow-lg`,
-        icon: "h-10 w-10 sm:h-12 sm:w-12 text-white relative z-10",
-        title: `text-lg sm:text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r ${gradient} transition duration-300 group-hover:brightness-110`,
-        // Use line clamp for description to maintain consistency
-        description:
-          "text-sm sm:text-base text-gray-400 font-mono leading-relaxed line-clamp-3 flex-grow",
-        learnMoreWrapper: "mt-auto pt-4",
-        learnMore:
-          "flex items-center justify-center gap-1.5 text-gray-400 group-hover:text-white transition-colors duration-300",
-        learnMoreText: "text-xs sm:text-sm font-medium",
-        learnMoreIcon: "w-3 h-3 sm:w-4 sm:h-4",
-      }),
-      [gradient, height]
-    );
-
     return (
-      <motion.div
-        initial="initial"
-        whileInView="inView"
-        viewport={{ once: true, amount: 0.2 }}
-        variants={cardAnimation}
-        className={cardClasses.wrapper}
+      <motion.a
+        href={href}
         onClick={handleClick}
-        style={{ willChange: "transform, opacity" }}
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.5, delay: (index % 4) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+        className="group relative grid grid-cols-[auto_1fr_auto] sm:grid-cols-[5rem_1fr_2fr_auto] items-center gap-x-4 sm:gap-x-8 border-b border-ink-line px-3 sm:px-6 py-6 sm:py-7 cursor-pointer transition-colors duration-300 hover:bg-beacon focus-visible:bg-beacon outline-none"
       >
-        {/* Background blur/gradient effect */}
-        <div className={cardClasses.gradientBgEffect} />
+        {/* Index number */}
+        <span className="font-mono text-xs sm:text-sm text-dim group-hover:text-ink/60 transition-colors duration-300 tracking-widest">
+          {String(index).padStart(2, "0")}
+        </span>
 
-        {/* Main Content Container */}
-        <div className={cardClasses.container}>
-          <div className={cardClasses.content}>
-            {/* Icon */}
-            <motion.div
-              initial="rest"
-              whileHover="hover"
-              variants={iconAnimation}
-              className={cardClasses.iconWrapper}
-              style={{ willChange: "transform" }}
-            >
-              <Icon className={cardClasses.icon} />
-            </motion.div>
+        {/* Title */}
+        <span className="flex items-center gap-3 min-w-0">
+          <Icon
+            className="hidden sm:block w-5 h-5 shrink-0 text-beacon group-hover:text-ink transition-colors duration-300"
+            aria-hidden="true"
+          />
+          <span className="font-display text-2xl sm:text-3xl md:text-4xl font-medium text-paper group-hover:text-ink transition-colors duration-300 truncate">
+            {title}
+          </span>
+        </span>
 
-            {/* Title */}
-            <h3 className={cardClasses.title}>{title}</h3>
+        {/* Description (desktop) */}
+        <span className="hidden sm:block text-sm md:text-base text-dim group-hover:text-ink/75 transition-colors duration-300 leading-snug">
+          {description}
+        </span>
 
-            {/* Description - with line clamp */}
-            <p className={cardClasses.description}>{description}</p>
-          </div>
-
-          {/* Learn More - Pushed to bottom */}
-          <div className={cardClasses.learnMoreWrapper}>
-            <motion.div
-              initial="rest"
-              whileHover="hover"
-              variants={arrowAnimation}
-              className={cardClasses.learnMore}
-              style={{ willChange: "transform" }}
-            >
-              <span className={cardClasses.learnMoreText}>Learn More</span>
-              <ArrowRight className={cardClasses.learnMoreIcon} />
-            </motion.div>
-          </div>
-        </div>
-      </motion.div>
+        {/* Arrow */}
+        <span className="justify-self-end">
+          <ArrowUpRight className="w-6 h-6 sm:w-7 sm:h-7 text-dim group-hover:text-ink transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+        </span>
+      </motion.a>
     );
   }
 );
@@ -142,8 +68,7 @@ FeatureCard.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
   href: PropTypes.string,
-  gradient: PropTypes.string,
-  height: PropTypes.string, // Add height prop type
+  index: PropTypes.number,
 };
 
 export default FeatureCard;
